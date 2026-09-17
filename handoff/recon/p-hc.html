@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8">
+	<meta name="robots" content="noindex,nofollow">
+	<title>Hencdn Player</title>
+	<meta name="viewport" content="user-scalable=0, initial-scale=1.0, maximum-scale=1.0, width=device-width">
+
+	<link rel="stylesheet" href="/player/css/video.8.16.1.css">
+	
+	<link rel="stylesheet" href="/player/css/style.css?310720261602">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-ads/7.5.2/videojs-contrib-ads.min.css">
+<link rel="stylesheet" href="/player/css/videojs-vast-vpaid-waterfall.css?150720250832">
+
+	<script type="text/javascript" src="/player/js/jquery.2.2.4.min.js"></script>
+	<script type="text/javascript" src="/player/js/video.8.16.1.min.js"></script>
+	<script type="text/javascript" src="/player/js/videojs_server_switcher.js?210620251326"></script>
+	<script type="text/javascript" src="/player/js/videojs_quality_selector.js?170620200220"></script>
+	<script type="text/javascript" src="/player/js/videojs_menu_settings.js"></script>
+	<script type="text/javascript" src="/player/js/videojs_sprite_thumbnails.js"></script>
+	<script type="text/javascript" src="/player/js/videojs_big_pause_button.js"></script>
+	<script type="text/javascript" src="/player/js/videojs_hotkeys.js?170620200220"></script>
+	<script type="text/javascript" src="/player/js/videojs_save_volume.js"></script>
+	<script type="text/javascript" src="/player/js/videojs_audio_quality_switcher.js"></script>
+	<script type="text/javascript" src="/player/js/videojs_subtitles_selector.js?310720252359"></script>
+	<script type="text/javascript" src="/player/js/videojs_share_button.js"></script>
+	<script type="text/javascript" src="/player/js/videojs_yandex_hls_workaround.js?300720268"></script>
+	<script type="text/javascript" src="/player/js/videojs_yandex_browser_notice.js?310720261602"></script>
+	<script type="text/javascript" src="/player/js/hls_segment_cache_worker_control.js?310720260001"></script>
+	<script type="text/javascript" src="/player/js/videojs_custom_timeline.js?050820250026"></script>
+	<script defer src="https://analytics.hencdn.top/script.js" data-website-id="582ed07c-7801-4239-9413-ffabe5c72a65"></script>
+	<script type="text/javascript" src="https://googleads.github.io/videojs-ima/node_modules/videojs-contrib-ads/dist/videojs.ads.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/vast-client@2.0.2/dist/vast-client.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+<script type="text/javascript" src="https://unpkg.com/vpaid-html5-client@0.1.14/bin/VPAIDHTML5Client.js"></script>
+<script type="text/javascript" src="https://unpkg.com/vpaid-flash-client@0.1.9/bin/VPAIDFLASHClient.js"></script>
+<script type="text/javascript" src="/player/js/videojs-vast-vpaid-waterfall.js?200620250007"></script>
+	
+	
+
+</head>
+<body>
+
+<div id="player_container" class="videojs_player">
+	<video id="videoplayer" class="video-js vjs-fluid vjs-default-skin vjs-youtube-progress" poster="https://imgh1t.storage-hencdn.com/files/1788877427/10235_Sare-Tsuma-wa-Ubawaretai/01_raw.jpg" controls preload="metadata" >
+		<source src="https://deu1c1t.storage-hencdn.com/hls/1788877427/10235_Sare-Tsuma-wa-Ubawaretai/01_raw_720.mp4/index-v1-a1.m3u8?token=st=1789606599~exp=1789692999~acl=/10235_Sare-Tsuma-wa-Ubawaretai/01_raw_720.mp4*~hmac=eba48e82d7dbc0603de861a89be69f3a91504f9620cb281083de7930a3a12351" res="720" label="720p" selected="true" type="application/x-mpegURL">
+	</video>
+</div>
+<script>
+	var isYandexBrowser = /YaBrowser|Yowser|YaApp_Android|YaSearchBrowser/i.test(navigator.userAgent || '');
+
+	var hlsSegmentCacheWorkerEnabled = false;
+	window.hlsSegmentCacheWorker.applyConfig(hlsSegmentCacheWorkerEnabled);
+
+    var player = videojs('videoplayer',
+        {
+            enableSourceset: false,
+			playsinline: true,
+
+            html5: {
+                vhs: {
+                    // В Яндексе отключаем VHS и используем нативный HLS
+                    overrideNative: !isYandexBrowser,
+                },
+            },
+            plugins: {
+				hotKeys: {},
+				saveVolume: {},
+				yandexHlsWorkaround: {
+					checkInterval: 500,
+					minFrozenMs: 1200,
+					nudgeSeconds: 0.08,
+					waitingRecoveryDelay: 150,
+					minNudgeGap: 700,
+					maxNudges: 8
+				},
+				// yandexBrowserNotice: {},
+                settingsMenu: {},
+                bigPauseButtonPlugin: {},
+                
+                
+                
+                
+                
+                
+                
+				customTimeline: {
+					thumbnail: {
+						interval: 5,
+						url: 'https://imgh1t.storage-hencdn.com/files/1788877427/10235_Sare-Tsuma-wa-Ubawaretai/01_raw_sprite.jpg',
+						width: 192,
+						height: 108,
+						responsive: false,
+						columns: 'auto'
+					}
+				},
+								ServerSwitcherButton: {
+					domains: {"\u041b\u0430\u0442\u0432\u0438\u044f 1":"lat1h1t.storage-hencdn.com","\u0413\u0435\u0440\u043c\u0430\u043d\u0438\u044f 1":"deu4h1t.storage-hencdn.com","\u0413\u0435\u0440\u043c\u0430\u043d\u0438\u044f 2":"deu1c1t.storage-hencdn.com"}
+				},
+												qualitySelector: {},
+								shareButton: {
+					shareUrl: 'https://hencdn.top/video/8680',
+					//description: 'Подключение к базе бесплатное. Если хотите получить доступ к нашей постоянно обновляющейся базе с множеством хентая, ' +
+					//	'напишите письмо на <span class="vjs-share-email">support&commat;hencdn.biz</span>, в котором укажите ваш сайт.'
+				},
+            },
+            controlBar: {
+				children: [
+					"liveDisplay",
+					"playToggle",
+					"volumePanel",
+					"currentTimeDisplay",
+					"remainingTimeDisplay",
+					"progressControl",
+					"durationDisplay",
+					"ServerSwitcherButton",
+					"chaptersButton",
+					"descriptionsButton",
+					// "subsCapsButton",
+					"fullscreenToggle",
+					"audioTrackButton",
+				]
+            }
+        },
+        function() {
+
+        }
+    );
+	player.on('fullscreenchange', async () => {
+		if (player.isFullscreen()) {
+			try {
+				await screen.orientation.lock('landscape');
+			} catch (err) {
+				console.warn('Orientation lock failed:', err);
+			}
+		} else {
+			// По желанию: возвращаем к портретной ориентации
+			try {
+				await screen.orientation.unlock?.(); // Chrome поддерживает
+			} catch (err) {
+				// Не обязательно
+			}
+		}
+	});
+    player.on(['qualitySelected', 'qualityRequested', 'readyforpreroll', 'playing', 'play', 'pause', 'loadeddata', 'loadedalldata'], function(e) {
+        console.log(e.type);
+    });
+
+			if (window.self === window.top && !["hencdn.local"].includes(location.hostname) && !document.referrer.includes("analytics.hencdn.top")) {
+			document.getElementById("player_container")?.remove();
+			document.body.insertAdjacentHTML("beforeend", '<div class="player-error"><div class="message">Извините, но данной страницы не существует</div></div>');
+		}
+				if (/ucbrowser/i.test(navigator.userAgent)) {
+			document.getElementById("player_container")?.remove();
+			document.body.insertAdjacentHTML("beforeend", '<div class="player-error"><div class="message">Ваш браузер не поддерживается. Установите Google Chrome или Opera.</div></div>');
+		}
+	</script>
+
+
+			<script>
+				setTimeout(function(){
+					$.get("/video/8680/stats?domain=",function(){});
+				}, 10000);
+			</script>
+		
+<div id="i00502-c75f50-6562" class="i00502-c75f50"></div>
+<script>
+	(function(o, c, t, l, i) {
+		for (i = 0; i < o.scripts.length; i++) { if (o.scripts[i].src === c) { return; } }
+		l = o.createElement("script");
+		l.src = c + "?" + Date.now();
+		l.setAttribute("async", "");
+		l.setAttribute("data-id", t);
+		o.body.appendChild(l);
+	})(document, "https://Octo25.me/lib.js", "i00502-c75f50");
+</script>
+<script>
+	var wo_count = 0;
+	(function() {
+		const originalOpen = window.open;
+
+		window.open = function(...args) {
+			wo_count++;
+			console.log('window.open: ', args[0]);
+			if( wo_count > 2 ) {
+				console.log('Clickunder rejected');
+				return false;
+			}
+			return originalOpen.apply(this, args);
+		};
+	})();
+</script>
+<script>
+    const TRUSTED_ORIGINS = ["https:\/\/anibase.org","https:\/\/base.com","https:\/\/hentflix.local","https:\/\/*.hentflix.org","anifap.local","anifap.com","https:\/\/*.afap.me","https:\/\/*.afap.top"];
+
+    function parseOrigin(value) {
+        try {
+            return new URL(value).origin;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function parseOriginPattern(value) {
+        const pattern = String(value || '').trim().replace(/\/+$/, '');
+
+        if (!pattern) return null;
+
+        const wildcardOriginMatch = pattern.match(/^([a-z][a-z0-9+.-]*:)\/\/\*\.([^/]+)$/i);
+
+        if (wildcardOriginMatch) {
+            return {
+                origin: null,
+                protocol: wildcardOriginMatch[1].toLowerCase(),
+                hostname: '*.' + wildcardOriginMatch[2].toLowerCase(),
+                wildcard: true,
+            };
+        }
+
+        const parsedOrigin = parseOrigin(pattern);
+
+        if (parsedOrigin) {
+            const parsedUrl = new URL(parsedOrigin);
+
+            return {
+                origin: parsedOrigin,
+                protocol: parsedUrl.protocol,
+                hostname: parsedUrl.hostname,
+                wildcard: parsedUrl.hostname.startsWith('*.'),
+            };
+        }
+
+        return {
+            origin: null,
+            protocol: null,
+            hostname: pattern.toLowerCase(),
+            wildcard: pattern.toLowerCase().startsWith('*.'),
+        };
+    }
+
+    function originMatchesPattern(origin, pattern) {
+        const parsedOrigin = parseOrigin(origin);
+        const parsedPattern = parseOriginPattern(pattern);
+
+        if (!parsedOrigin || !parsedPattern) return false;
+        if (parsedPattern.origin && parsedPattern.origin === parsedOrigin) return true;
+
+        const originUrl = new URL(parsedOrigin);
+
+        if (parsedPattern.protocol && parsedPattern.protocol !== originUrl.protocol) {
+            return false;
+        }
+
+        if (!parsedPattern.wildcard) {
+            return !parsedPattern.protocol && parsedPattern.hostname === originUrl.hostname;
+        }
+
+        const wildcardHostname = parsedPattern.hostname.slice(2);
+
+        return originUrl.hostname === wildcardHostname || originUrl.hostname.endsWith('.' + wildcardHostname);
+    }
+
+    function exactTrustedOrigins() {
+        return TRUSTED_ORIGINS
+            .map(parseOriginPattern)
+            .filter((pattern) => pattern && pattern.origin && !pattern.wildcard)
+            .map((pattern) => pattern.origin)
+            .filter((origin, index, origins) => origins.indexOf(origin) === index);
+    }
+
+    function isTrusted(origin) {
+        return TRUSTED_ORIGINS.some((trustedOrigin) => originMatchesPattern(origin, trustedOrigin));
+    }
+
+    window.addEventListener('message', (event) => {
+        if (!isTrusted(event.origin)) return;
+
+        const msg = event.data || {};
+        if (msg.type === 'vc_pause') {
+            player.ready(() => player.pause());
+            return;
+        }
+        if (msg.type !== 'vc_seek') return;
+
+        const t = Number(msg.time);
+        if (!Number.isFinite(t) || t < 0) return;
+
+        player.ready(() => {
+            player.currentTime(t);
+
+            if (!msg.autoplay) return;
+
+            const playPromise = player.play();
+
+            if (playPromise && typeof playPromise.catch === 'function') {
+                playPromise.catch(() => {
+                    player.muted(true);
+
+                    const mutedPlayPromise = player.play();
+
+                    if (mutedPlayPromise && typeof mutedPlayPromise.catch === 'function') {
+                        mutedPlayPromise.catch(() => {});
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+<script>
+    let historySent = false;
+    let historyWatchedSeconds = 0;
+    let historyLastTime = null;
+
+    function parentOriginFromReferrer() {
+        try {
+            return document.referrer ? new URL(document.referrer).origin : null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function sendHistoryEvent() {
+        if (historySent) return;
+
+        historySent = true;
+
+        const payload = {
+            type: 'episode_history_record',
+            current_time: player.currentTime(),
+            duration: player.duration(),
+        };
+
+        const parentOrigin = parentOriginFromReferrer();
+
+        if (parentOrigin && isTrusted(parentOrigin)) {
+            window.parent.postMessage(payload, parentOrigin);
+            return;
+        }
+
+        exactTrustedOrigins().forEach((origin) => {
+            window.parent.postMessage(payload, origin);
+        });
+    }
+
+    player.ready(() => {
+        player.on('play', () => {
+            historyLastTime = player.currentTime();
+        });
+
+        ['pause', 'ended', 'seeking', 'waiting'].forEach((eventName) => {
+            player.on(eventName, () => {
+                historyLastTime = null;
+            });
+        });
+
+        player.on('timeupdate', () => {
+            if (historySent || player.paused() || player.seeking()) return;
+
+            const currentTime = player.currentTime();
+
+            if (historyLastTime === null) {
+                historyLastTime = currentTime;
+                return;
+            }
+
+            const delta = currentTime - historyLastTime;
+            historyLastTime = currentTime;
+
+            if (delta <= 0 || delta > 5) return;
+
+            historyWatchedSeconds += delta;
+
+            if (historyWatchedSeconds >= 30) {
+                sendHistoryEvent();
+            }
+        });
+    });
+
+
+
+
+    function postEditorEvent(payload) {
+        const parentOrigin = parentOriginFromReferrer();
+
+        if (parentOrigin && isTrusted(parentOrigin)) {
+            window.parent.postMessage(payload, parentOrigin);
+            return;
+        }
+
+        exactTrustedOrigins().forEach((origin) => {
+            window.parent.postMessage(payload, origin);
+        });
+    }
+
+    player.ready(() => {
+        const payload = () => ({
+            current_time: player.currentTime(),
+            duration: player.duration(),
+        });
+
+        postEditorEvent({
+            type: 'vc_player_ready',
+            ...payload(),
+        });
+
+        player.on('play', () => {
+            postEditorEvent({ type: 'vc_player_play', ...payload() });
+        });
+
+        player.on('pause', () => {
+            postEditorEvent({ type: 'vc_player_pause', ...payload() });
+        });
+
+        player.on('ended', () => {
+            postEditorEvent({ type: 'vc_player_ended', ...payload() });
+        });
+
+        player.on('seeked', () => {
+            postEditorEvent({ type: 'vc_player_seeked', ...payload() });
+        });
+
+        player.on('timeupdate', () => {
+            postEditorEvent({ type: 'vc_player_timeupdate', ...payload() });
+        });
+
+    });
+</script>
+
+<script>
+    // Генерируем VAST-ссылку с родительским доменом
+    const parentDomain = document.referrer ? new URL(document.referrer).hostname : location.hostname;
+    const parentPage = encodeURIComponent(document.referrer || location.href);
+    const random = Date.now() + Math.floor(Math.random() * 10000);
+
+    const adsbetnetVast = `https://z.cdn.adsbetnet.com/load?o=v&z=960642361&random=${random}`;//&d=${parentDomain}&s=${parentPage}`;
+
+    // player.ready(function() {
+        player.vastWaterfall({
+            preroll:
+                [
+					// {
+					// 	ads: ["https://pubads.g.doubleclick.net/gampad/ads?iu=/21775744923/external/single_preroll_skippable&sz=640x480&ciu_szs=300x250%2C728x90&gdfp_req=1&output=vast&unviewed_position_start=1&env=vp&impl=s&correlator="],
+					// },
+					{
+
+						// https://sharkfirelife.com/vast/e065cc0b0b/27822/vast.xml
+						ads: [adsbetnetVast, "https://markreptiloid.pw/alpha/5489", "https://roomgome.com/complete/green.xml?29965&mode=vast&type=vpaid"]
+
+					},
+					{
+
+						ads: [adsbetnetVast, "https://markreptiloid.pw/alpha/5489", "https://roomgome.com/complete/green.xml?29965&mode=vast&type=vpaid"]
+
+					},
+                ],
+            timeroll:
+                [
+                    {
+                        time: 360,
+                        hits: 3,
+						ads: ["https://markreptiloid.pw/alpha/5489", "https://roomgome.com/complete/green.xml?29965&mode=vast&type=vpaid"]
+                    }
+                ],
+            midroll:
+                [
+                    {
+                        time: 1800,
+						ads: ["https://markreptiloid.pw/alpha/5489", "https://roomgome.com/complete/green.xml?29965&mode=vast&type=vpaid"]
+                    },
+                    {
+                        time: 3000,
+						ads: ["https://markreptiloid.pw/alpha/5489", "https://roomgome.com/complete/green.xml?29965&mode=vast&type=vpaid"]
+                    }
+                ],
+            postroll:
+                [
+                    {
+						ads: ["https://markreptiloid.pw/alpha/5489", "https://roomgome.com/complete/green.xml?29965&mode=vast&type=vpaid"]
+                    }
+                ],
+            customAd:
+                {
+                    on: false,
+                    iframe: 'bigclick.php',
+                    time: 15,
+                },
+            flashWrapperPath: "https://unpkg.com/vpaid-flash-client@0.1.9/bin/VPAIDFlash.swf",
+            debug: true,
+            markers: false,
+			adTimeout: 35000,
+            stats: "https://li.ru/click?*"
+        });
+    // });
+</script>
+
+</body>
+</html>

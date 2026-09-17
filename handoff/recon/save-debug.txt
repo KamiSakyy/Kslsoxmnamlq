@@ -1,0 +1,14 @@
+== status
+ M handoff/recon/candidates.txt
+ M handoff/recon/fetch.log
+ M handoff/recon/head-probe.txt
+ M handoff/recon/hentakli-player.html
+ M handoff/recon/hentasis.html
+ M handoff/recon/m3u8-probe.txt
+ M handoff/recon/m3u8s.txt
+ M handoff/recon/porncado-cat.html
+ M handoff/recon/porncado.html
+ M handoff/recon/save-debug.txt
+ M handoff/recon/summary.txt
+?? handoff/recon/hencdn.html
+== add

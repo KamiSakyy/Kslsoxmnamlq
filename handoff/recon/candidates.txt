@@ -1,0 +1,795 @@
+== aid-browse.html (167299 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== aid-emb.html (3881 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== aid-ep.html (60232 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== allhentaii-home.html (69674 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== allhentaii.html (49159 bytes)
+-- m3u8:
+-- mp4:
+https://cdn.allhentai.fun/video/bigtits/80/1.mp4?name=s1_Друзья
+https://cdn.allhentai.fun/video/bigtits/80/2.mp4?name=s2_Друзья
+https://cdn.allhentai.fun/video/bigtits/80/3.mp4?name=s3_Друзья
+https://cdn2.allhentai.fun/video/bigtits/80/1.mp4?name=s1(sub)
+https://cdn2.allhentai.fun/video/bigtits/80/2.mp4?name=s2(sub)
+https://cdn2.allhentai.fun/video/bigtits/80/3.mp4?name=s3(sub)
+https://cdn2.allhentai.fun/video/bigtits/80/4.mp4?name=s4(sub)
+-- media tags:
+-- hls/player js:
+file:"/pl/bigtits/80/playlist.txt?a=3", poster:"https://allhentaii.fun/uploads/posts/2024-06/1596360544_tsugou-no-yoi-sexfriend.jpg"})
+== c-ah.html (45182 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c-hk.html (116713 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c-hs.html (84692 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c-pc.html (109452 bytes)
+-- m3u8:
+-- mp4:
+https://st1.nosofiles.com/0/2/f/e/7/output_69174627-3b0f-4a91-9074-fb62e6d7ef20/trailer.mp4
+https://st1.nosofiles.com/0/c/b/4/f/output_691c53f5-87f1-4b47-bdd0-5a49576f4bc0/trailer.mp4
+https://st1.nosofiles.com/0/d/e/1/6/output_691dccb4-6ea2-4a6b-8b80-4be7f0261ed0/trailer.mp4
+https://st1.nosofiles.com/1/5/a/7/c/output_69174651-3a91-4193-9219-26d4bdcc7a51/trailer.mp4
+https://st1.nosofiles.com/1/d/b/f/6/output_69174629-b32c-4c85-be3f-e0f84cb6fbd1/trailer.mp4
+https://st1.nosofiles.com/2/1/2/b/5/output_6818885c-c2d9-45f1-ac27-f6237565b212/trailer.mp4
+https://st1.nosofiles.com/2/1/c/9/2/output_691c5458-8545-4801-84a4-829c7d429c12/trailer.mp4
+https://st1.nosofiles.com/2/1/d/b/8/output_6917468f-7615-4798-8932-d52fb718bd12/trailer.mp4
+https://st1.nosofiles.com/2/6/e/9/0/output_6917465a-09f8-4008-81a2-9f17ace09e62/trailer.mp4
+https://st1.nosofiles.com/2/8/9/5/f/output_691c5484-b175-4397-8984-19323eff5982/trailer.mp4
+-- media tags:
+-- hls/player js:
+== c10-ak-f.html (1878 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<video id="display" class="display">
+-- hls/player js:
+== c10-ak-f2.html (1878 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<video id="display" class="display">
+-- hls/player js:
+== c11-ak-v.html (1096 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c11-ak-v2.html (1096 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c11-ak-vp.html (31982 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe id="iframe-embed" class="embed-responsive-item lazyloaded" src="' + url + '" frameborder="0" scrolling="no" allowfullscreen>
+-- hls/player js:
+== c14-ak-e.html (4917 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="https://streaming.aki.today/playback/v/YOU1oGXk/" scrolling="no" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+<iframe src="https://streaming.aki.today/playback/v/YOU1oGXk/" scrolling="no" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+<iframe src="https://streaming.aki.today/playback/x/YOU1oGXk/" scrolling="no" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c16-ak-p.html (66 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c17-ak-p.html (1335 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe class="embed-responsive-item" src="https://aki-h.stream/v/OmteVKzU" frameborder="0" width="100%" height="600" scrolling="no" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c18-ak-s.html (14590 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c19-ht-ep.html (290825 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c19-ht-ser.html (76035 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c20-nh.html (3655 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c21-ser.html (75992 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c22-home.html (290825 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c22-nh-2rqFyTJUcIxdn2v.html (3659 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c22-nh-BMPaPILU7iolj8f.html (3709 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c22-nh-EHKFjVOxNKJN6ve.html (3564 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c22-nh-MqaHEYBRGiOrNqg.html (3655 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c22-nh-TrJtixK9fkwWjQn.html (3881 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c22-nh-U3g9ASak4eSW9jG.html (3655 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c22-nh-gNdMuTKLKMlunRe.html (3655 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c22-nh-ikbN4WNjcSUEBkp.html (3564 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c22-nh-kHYDaBtxl39kpb3.html (3659 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c22-nh-lFf1zzLgcw3Vcjp.html (3655 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c22-nh-noref.html (3655 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c22-nh-nzhRQZcQOdajGon.html (3564 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c22-nh-tkf416ctxI6aoc1.html (3881 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c22-nh-uwkxACe5qJzJtVP.html (3635 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c22-nh-z4rceMmpawLraG3.html (3564 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== c22-ser.html (75992 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c6-ep.html (58566 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe width="601" scrolling="no" height="511" frameborder="0" src="https://tube.hentaistream.com/frames/s32_Shoujo_Ramune_Episode_01.html" allowtransparency="true" marginheight="0" marginwidth="0" allowfullscreen>
+<iframe width="601" scrolling="no" height="511" frameborder="0" src="https://tube.hentaistream.com/frames/s30_Shoujo_Ramune_Episode_01.html" allowtransparency="true" marginheight="0" marginwidth="0" allowfullscreen>
+<iframe src="https://tube.hentaistream.com/new/cools" scrolling="no" style="margin:0px; border:0px;" width="301" height="550" allowtransparency="true" frameborder="0" framespacing="0">
+<iframe src="https://discordapp.com/widget?id=513053111133405186&theme=dark" width="290" height="70" allowtransparency="true" frameborder="0">
+-- hls/player js:
+== c6-fr.html (3181 bytes)
+-- m3u8:
+-- mp4:
+https://cdn1.streamhentai.org/Shoujo%20Ramune%20-%2001.mp4
+-- media tags:
+<video playsinline id="hs_video_1" data-setup="{}" class="video-js vjs-default-skin" controls unmuted preload="auto" poster="https://tube.hentaistream.com/wp-includes/images/preview3.png" width="600" height="510">
+<source src="https://cdn1.streamhentai.org/Shoujo%20Ramune%20-%2001.mp4" type='video/mp4' />
+-- hls/player js:
+== c6-list.html (324578 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="https://tube.hentaistream.com/new/cools" scrolling="no" style="margin:0px; border:0px;" width="301" height="550" allowtransparency="true" frameborder="0" framespacing="0">
+<iframe src="https://discordapp.com/widget?id=513053111133405186&theme=dark" width="290" height="70" allowtransparency="true" frameborder="0">
+-- hls/player js:
+== c6-search.html (48693 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="https://tube.hentaistream.com/new/cools" scrolling="no" style="margin:0px; border:0px;" width="301" height="550" allowtransparency="true" frameborder="0" framespacing="0">
+<iframe src="https://discordapp.com/widget?id=513053111133405186&theme=dark" width="290" height="70" allowtransparency="true" frameborder="0">
+-- hls/player js:
+== c6-ser.html (49773 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="https://tube.hentaistream.com/new/cools" scrolling="no" style="margin:0px; border:0px;" width="301" height="550" allowtransparency="true" frameborder="0" framespacing="0">
+<iframe src="https://discordapp.com/widget?id=513053111133405186&theme=dark" width="290" height="70" allowtransparency="true" frameborder="0">
+-- hls/player js:
+== c7-ak-l.html (71325 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c7-ak-s.html (73327 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c7-ak-v.html (31819 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe id="iframe-embed" class="embed-responsive-item lazyloaded" src="' + url + '" frameborder="0" scrolling="no" allowfullscreen>
+-- hls/player js:
+== c7-he2.html (64379 bytes)
+-- m3u8:
+-- mp4:
+https://hentaiera.com/6151206435.mp4
+-- media tags:
+<video id="slider_video" autoplay loop muted playsinline>
+<source id="slider_source" src="https://hentaiera.com/6151206435.mp4" type="video/mp4">
+-- hls/player js:
+== c7-hf.html (5468 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c7-hf2.html (44444 bytes)
+-- m3u8:
+-- mp4:
+https://hentaifox.com/242529197.mp4
+-- media tags:
+<video id="slider_video" autoplay loop muted playsinline>
+<source id="slider_source" src="https://hentaifox.com/242529197.mp4" type="video/mp4">
+-- hls/player js:
+== c7-ht.html (290812 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== c8-ak-v.html (32077 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe id="iframe-embed" class="embed-responsive-item lazyloaded" src="' + url + '" frameborder="0" scrolling="no" allowfullscreen>
+-- hls/player js:
+== c8-he2.html (66694 bytes)
+-- m3u8:
+-- mp4:
+https://hentaiera.com/6151206435.mp4
+-- media tags:
+<video id="slider_video" autoplay loop muted playsinline>
+<source id="slider_source" src="https://hentaiera.com/6151206435.mp4" type="video/mp4">
+-- hls/player js:
+== e-an-emb.html (3881 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== e-he-ep.html (58566 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe width="601" scrolling="no" height="511" frameborder="0" src="https://tube.hentaistream.com/frames/s32_Shoujo_Ramune_Episode_01.html" allowtransparency="true" marginheight="0" marginwidth="0" allowfullscreen>
+<iframe width="601" scrolling="no" height="511" frameborder="0" src="https://tube.hentaistream.com/frames/s30_Shoujo_Ramune_Episode_01.html" allowtransparency="true" marginheight="0" marginwidth="0" allowfullscreen>
+<iframe src="https://tube.hentaistream.com/new/cools" scrolling="no" style="margin:0px; border:0px;" width="301" height="550" allowtransparency="true" frameborder="0" framespacing="0">
+<iframe src="https://discordapp.com/widget?id=513053111133405186&theme=dark" width="290" height="70" allowtransparency="true" frameborder="0">
+-- hls/player js:
+== e-he-fr.html (3181 bytes)
+-- m3u8:
+-- mp4:
+https://cdn1.streamhentai.org/Shoujo%20Ramune%20-%2001.mp4
+-- media tags:
+<video playsinline id="hs_video_1" data-setup="{}" class="video-js vjs-default-skin" controls unmuted preload="auto" poster="https://tube.hentaistream.com/wp-includes/images/preview3.png" width="600" height="510">
+<source src="https://cdn1.streamhentai.org/Shoujo%20Ramune%20-%2001.mp4" type='video/mp4' />
+-- hls/player js:
+== e-he-s.html (48693 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="https://tube.hentaistream.com/new/cools" scrolling="no" style="margin:0px; border:0px;" width="301" height="550" allowtransparency="true" frameborder="0" framespacing="0">
+<iframe src="https://discordapp.com/widget?id=513053111133405186&theme=dark" width="290" height="70" allowtransparency="true" frameborder="0">
+-- hls/player js:
+== e-he-ser.html (49773 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="https://tube.hentaistream.com/new/cools" scrolling="no" style="margin:0px; border:0px;" width="301" height="550" allowtransparency="true" frameborder="0" framespacing="0">
+<iframe src="https://discordapp.com/widget?id=513053111133405186&theme=dark" width="290" height="70" allowtransparency="true" frameborder="0">
+-- hls/player js:
+== e-htv-emb.html (3881 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== e-htv.html (290825 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== era-home.html (65065 bytes)
+-- m3u8:
+-- mp4:
+https://hentaiera.com/6151206435.mp4
+-- media tags:
+<video id="slider_video" autoplay loop muted playsinline>
+<source id="slider_source" src="https://hentaiera.com/6151206435.mp4" type="video/mp4">
+-- hls/player js:
+== hanime-home.html (5591 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== hencdn.html (18008 bytes)
+-- m3u8:
+https://deu4h1t.storage-hencdn.com/hls/1714856400/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4/index-v1-a1.m3u8?token=st=1789606589~exp=1789692989~acl=/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4*~hmac=7110e389b777bfa59a76caf44252dd5c2e65f28d9abf6e4872ed24410d1ad882
+-- mp4:
+https://deu4h1t.storage-hencdn.com/hls/1714856400/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4/index-v1-a1.m3u8?token=st=1789606589~exp=1789692989~acl=/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4*~hmac=7110e389b777bfa59a76caf44252dd5c2e65f28d9abf6e4872ed24410d1ad882
+-- media tags:
+<video id="videoplayer" class="video-js vjs-fluid vjs-default-skin vjs-youtube-progress" poster="https://imgh1t.storage-hencdn.com/files/1714856400/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.jpg" controls preload="metadata" >
+-- hls/player js:
+== hentakli-home.html (116713 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== hentakli-player.html (19992 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe width="728" height="410" src="//hencdn.top/video/157" class="vdd-element" frameborder="0" scrolling="no" allowfullscreen>
+-- hls/player js:
+== hentakli.html (101201 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src=\"\/video.php?id=1763&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\">
+<iframe src=\"\/video.php?id=1764&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\">
+<iframe src=\"\/video.php?id=1765&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\">
+<iframe src=\"\/video.php?id=1766&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\">
+<iframe src=\"\/video.php?id=1763&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\">
+-- hls/player js:
+== hentasis-home.html (85284 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== hentasis.html (84153 bytes)
+-- m3u8:
+-- mp4:
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-01_rus_(www.Hentasis.top).mp4
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-01_sub_(www.Hentasis.top).mp4
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-02_rus_(www.Hentasis.top).mp4
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-02_sub_(www.Hentasis.top).mp4
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-03_rus_(www.Hentasis.top).mp4
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-03_sub_(www.Hentasis.top).mp4
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-04_rus_(www.Hentasis.top).mp4
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-04_sub_(www.Hentasis.top).mp4
+-- media tags:
+-- hls/player js:
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-01_rus_(www.Hentasis.top).mp4",title:"Файл 1"},{file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-02_rus_(
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-03_rus_(www.Hentasis.top).mp4",title:"Файл 3"},{file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-04_rus_(
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-01_sub_(www.Hentasis.top).mp4",title:"Файл 5"},{file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-02_sub_(
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-03_sub_(www.Hentasis.top).mp4",title:"Файл 7"},{file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-04_sub_(
+file:"",title:"Файл 9"},{file:"",title:"Файл 10"},{file:"",title:"Файл 11"},{file:"",title:"Файл 12"},{file:"",title:"Файл 13"},{file:"",title:"Файл 14"},{file:"",title:"Файл 15"},{file:"",title:"Файл 16"},
+file:"",title:"Файл 17"},{file:"",title:"Файл 18"},{file:"",title:"Файл 19"},{file:"",title:"Файл 20"},{file:"",title:"Файл 21"},{file:"",title:"Файл 22"},{file:"",title:"Файл 23"},{file:"",title:"Файл 24"}
+file:"",title:"Файл 25"},{file:"",title:"Файл 26"}]})
+== hs-dbl.html (25179 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== hs-desk.html (3686 bytes)
+-- m3u8:
+-- mp4:
+https://cdn3.streamhentai.org/Hitozukiai%20ga%20Nigate%20na%20Miboujin%20no%20Yukionna-san%20to%20Noroi%20no%20Yubiwa%20Ep1-subbed-unc.mp4
+-- media tags:
+<video playsinline id="hs_video_1" data-setup="{}" class="video-js vjs-default-skin" onclick="this.paused?this.play():this.pause();" controls unmuted preload="auto" poster="https://tube.hentaistream.com/wp-includes/images/preview3.png" width="300" height="380">
+<source src="https://cdn3.streamhentai.org/Hitozukiai%20ga%20Nigate%20na%20Miboujin%20no%20Yukionna-san%20to%20Noroi%20no%20Yubiwa%20Ep1-subbed-unc.mp4" type='video/mp4' />
+-- hls/player js:
+== hs-ep.html (32783 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe width="300" scrolling="no" height="250" frameborder="0" src="https://tube.hentaistream.com/wp-content/plugins/wptouch/themes/default/ads_videopage.php" allowtransparency="true">
+<iframe width="300" scrolling="no" height="400" frameborder="0" src="https://tube.hentaistream.com/frames/s32_mob_Ane_Koi_Episode_01.html" allowtransparency="true" marginheight="0" marginwidth="0" >
+<iframe width="300" scrolling="no" height="400" frameborder="0" src="https://tube.hentaistream.com/frames/s28_mob_Ane_Koi_Episode_01.html" allowtransparency="true" marginheight="0" marginwidth="0" >
+<iframe width="300" scrolling="no" height="250" frameborder="0" src="https://tube.hentaistream.com/wp-content/plugins/wptouch/themes/default/ads_pages2.php" allowtransparency="true">
+-- hls/player js:
+== hs-ep2.html (31926 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe width="300" scrolling="no" height="250" frameborder="0" src="https://tube.hentaistream.com/wp-content/plugins/wptouch/themes/default/ads_videopage.php" allowtransparency="true">
+<iframe width="300" scrolling="no" height="400" frameborder="0" src="https://tube.hentaistream.com/frames/s32_mob_Hitozukiai_ga_Nigate_na_Miboujin_no_Yukionna-san_to_Noroi_no_Yubiwa_Episode_01.html" allowtransparency="true" marginheight="0" marginwidth="0" >
+<iframe width="300" scrolling="no" height="250" frameborder="0" src="https://tube.hentaistream.com/wp-content/plugins/wptouch/themes/default/ads_pages2.php" allowtransparency="true">
+-- hls/player js:
+== hs-ep3.html (32825 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe width="300" scrolling="no" height="250" frameborder="0" src="https://tube.hentaistream.com/wp-content/plugins/wptouch/themes/default/ads_videopage.php" allowtransparency="true">
+<iframe width="300" scrolling="no" height="400" frameborder="0" src="https://tube.hentaistream.com/frames/s32_mob_Mouse_Cursor_de_Genjitsu_o_Sousa_Dekiru_You_ni_Natta_no_de,_Onnanoko_o_Ippai_Click_Shima~su_Episode_01.html" allowtransparency="true" marginheight="0" marginwidth="0" >
+<iframe width="300" scrolling="no" height="250" frameborder="0" src="https://tube.hentaistream.com/wp-content/plugins/wptouch/themes/default/ads_pages2.php" allowtransparency="true">
+-- hls/player js:
+== hs-fr2.html (25179 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== hs-fr3.html (25227 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== hs-s28_mob_Ane_Koi_Episode_01.html (3125 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== hs-s32_mob_Ane_Koi_Episode_01.html (3542 bytes)
+-- m3u8:
+-- mp4:
+https://cdn1.streamhentai.org/ane-koi-1-subbed-unc.mp4
+-- media tags:
+<video playsinline id="hs_video_1" data-setup="{}" class="video-js vjs-default-skin" onclick="this.paused?this.play():this.pause();" controls unmuted preload="auto" poster="https://tube.hentaistream.com/wp-includes/images/preview3.png" width="300" height="380">
+<source src="https://cdn1.streamhentai.org/ane-koi-1-subbed-unc.mp4" type='video/mp4' />
+-- hls/player js:
+== nh-embed.html (3881 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src="" width="" height="" allowFullScreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+-- hls/player js:
+== p-hc.html (17926 bytes)
+-- m3u8:
+https://deu1c1t.storage-hencdn.com/hls/1788877427/10235_Sare-Tsuma-wa-Ubawaretai/01_raw_720.mp4/index-v1-a1.m3u8?token=st=1789606599~exp=1789692999~acl=/10235_Sare-Tsuma-wa-Ubawaretai/01_raw_720.mp4*~hmac=eba48e82d7dbc0603de861a89be69f3a91504f9620cb281083de7930a3a12351
+-- mp4:
+https://deu1c1t.storage-hencdn.com/hls/1788877427/10235_Sare-Tsuma-wa-Ubawaretai/01_raw_720.mp4/index-v1-a1.m3u8?token=st=1789606599~exp=1789692999~acl=/10235_Sare-Tsuma-wa-Ubawaretai/01_raw_720.mp4*~hmac=eba48e82d7dbc0603de861a89be69f3a91504f9620cb281083de7930a3a12351
+-- media tags:
+<video id="videoplayer" class="video-js vjs-fluid vjs-default-skin vjs-youtube-progress" poster="https://imgh1t.storage-hencdn.com/files/1788877427/10235_Sare-Tsuma-wa-Ubawaretai/01_raw.jpg" controls preload="metadata" >
+-- hls/player js:
+== porncado-cat.html (109452 bytes)
+-- m3u8:
+-- mp4:
+https://st1.nosofiles.com/0/2/f/e/7/output_69174627-3b0f-4a91-9074-fb62e6d7ef20/trailer.mp4
+https://st1.nosofiles.com/0/c/b/4/f/output_691c53f5-87f1-4b47-bdd0-5a49576f4bc0/trailer.mp4
+https://st1.nosofiles.com/0/d/e/1/6/output_691dccb4-6ea2-4a6b-8b80-4be7f0261ed0/trailer.mp4
+https://st1.nosofiles.com/1/5/a/7/c/output_69174651-3a91-4193-9219-26d4bdcc7a51/trailer.mp4
+https://st1.nosofiles.com/1/d/b/f/6/output_69174629-b32c-4c85-be3f-e0f84cb6fbd1/trailer.mp4
+https://st1.nosofiles.com/2/1/2/b/5/output_6818885c-c2d9-45f1-ac27-f6237565b212/trailer.mp4
+https://st1.nosofiles.com/2/1/c/9/2/output_691c5458-8545-4801-84a4-829c7d429c12/trailer.mp4
+https://st1.nosofiles.com/2/1/d/b/8/output_6917468f-7615-4798-8932-d52fb718bd12/trailer.mp4
+https://st1.nosofiles.com/2/6/e/9/0/output_6917465a-09f8-4008-81a2-9f17ace09e62/trailer.mp4
+https://st1.nosofiles.com/2/8/9/5/f/output_691c5484-b175-4397-8984-19323eff5982/trailer.mp4
+-- media tags:
+-- hls/player js:
+== porncado.html (96775 bytes)
+-- m3u8:
+-- mp4:
+https://st1.nosofiles.com/0/0/5/a/d/output_67f063d1-1335-4af2-928f-deb422fda500/trailer.mp4
+https://st1.nosofiles.com/0/8/5/1/7/output_687ff860-53ae-4a4d-9575-23be47a71580/trailer.mp4
+https://st1.nosofiles.com/1/b/a/8/7/output_687fa35c-c9e6-4b57-ad59-935e77978ab1/trailer.mp4
+https://st1.nosofiles.com/1/c/7/2/7/output_681f59f5-3a86-4e74-bc33-cfa857e727c1/trailer.mp4
+https://st1.nosofiles.com/6/e/d/1/6/output_69174678-a24e-42bd-9aaa-785d0cd61de6/trailer.mp4
+https://st1.nosofiles.com/9/3/d/e/5/output_6917466a-7baf-4ccb-b111-cee747a5ed39/trailer.mp4
+https://st1.nosofiles.com/a/7/c/8/3/output_681c09a5-9057-4242-96ff-81d902b38c7a/trailer.mp4
+https://st1.nosofiles.com/a/d/b/a/f/output_687f5f0c-cbab-4259-bb38-f4b4f81fabda/trailer.mp4
+https://st1.nosofiles.com/c/1/8/5/3/output_681e7561-3b68-4fab-9e33-8b46a863581c/trailer.mp4
+https://st1.nosofiles.com/c/5/6/5/2/output_67bba650-7678-4250-ae99-04c62ef2565c/trailer.mp4
+-- media tags:
+<source>
+<source>
+<video>
+-- hls/player js:
+file:"https://st1.nosofiles.com/1/b/a/8/7/output_687fa35c-c9e6-4b57-ad59-935e77978ab1/previews/main.vtt?cv=2",spriteRelativePath:true,type:'VTT'},},}
+videoUrl']
+== site-haven.html (5469 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== site-hs.html (87766 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe width="300" scrolling="no" height="250" frameborder="0" src="https://tube.hentaistream.com/wp-content/plugins/wptouch/themes/default/ads_pages.php" allowtransparency="true">
+<iframe width="300" scrolling="no" height="250" frameborder="0" src="https://tube.hentaistream.com/wp-content/plugins/wptouch/themes/default/ads_pages2.php" allowtransparency="true">
+-- hls/player js:
+== site-kish.html (114 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== site-mucho.html (5588 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== site-zhen.html (169541 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<source media="(max-width: 767px)"  data-srcset="https://zhentube.com/wp-content/uploads/2026/08/300x100.gif">
+-- hls/player js:
+== t-ah.html (49368 bytes)
+-- m3u8:
+-- mp4:
+https://cdn.allhentai.fun/video/2d2/21/1.mp4?name=s1_Вдова
+https://cdn.allhentai.fun/video/2d2/21/2.mp4?name=s2_Вдова
+https://cdn.allhentai.fun/video/2d2/21/3.mp4?name=s3_Вдова
+https://cdn2.allhentai.fun/video/2d2/21/1.mp4?name=s1(sub)
+-- media tags:
+-- hls/player js:
+file:"/pl/2d2/21/playlist.txt?a=3", poster:"https://allhentaii.fun/uploads/posts/2026-09/poster_1789158001519844.jpg"})
+== t-hk.html (101829 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src=\"\/video.php?id=4967&cat=162,160,5,111,28,30,32,37,101,44,45,52,55,102,106,134,180,182,189,192,194,196,197,198,218\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\">
+<iframe src=\"\/video.php?id=4958&cat=162,160,5,111,28,30,32,37,101,44,45,52,55,102,106,134,180,182,189,192,194,196,197,198,218\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\">
+<iframe src=\"\/video.php?id=4967&cat=162,160,5,111,28,30,32,37,101,44,45,52,55,102,106,134,180,182,189,192,194,196,197,198,218\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\">
+-- hls/player js:
+== t-hs.html (109750 bytes)
+-- m3u8:
+-- mp4:
+https://svt05.hentasis1.top/hentasis2025/051/Onaji-Zemi-no-Someya_01_04_rus1_(www.Hentasis.top).mp4
+https://svt05.hentasis1.top/hentasis2025/051/Onaji-Zemi-no-Someya_01_04_rus2_(www.Hentasis.top).mp4
+https://svt05.hentasis1.top/hentasis2025/051/Onaji-Zemi-no-Someya_01_04_sub_(www.Hentasis.top).mp4
+https://svt05.hentasis1.top/hentasis2025/051/Onaji-Zemi-no-Someya_05_08_rus1_(www.Hentasis.top).mp4
+https://svt05.hentasis1.top/hentasis2025/051/Onaji-Zemi-no-Someya_05_08_rus2_(www.Hentasis.top).mp4
+https://svt05.hentasis1.top/hentasis2025/051/Onaji-Zemi-no-Someya_05_08_sub_(www.Hentasis.top).mp4
+-- media tags:
+-- hls/player js:
+file:"https://svt05.hentasis1.top/hentasis2025/051/Onaji-Zemi-no-Someya_01_04_rus1_(www.Hentasis.top).mp4",title:"Файл 1"},{file:"https://svt05.hentasis1.top/hentasis2025/051/Onaji-Zemi-no-Someya_05_08_rus1
+file:"https://svt05.hentasis1.top/hentasis2025/051/Onaji-Zemi-no-Someya_01_04_sub_(www.Hentasis.top).mp4",title:"Файл 3"},{file:"https://svt05.hentasis1.top/hentasis2025/051/Onaji-Zemi-no-Someya_05_08_sub_(
+file:"https://svt05.hentasis1.top/hentasis2025/051/Onaji-Zemi-no-Someya_01_04_rus2_(www.Hentasis.top).mp4",title:"Файл 5"},{file:"https://svt05.hentasis1.top/hentasis2025/051/Onaji-Zemi-no-Someya_05_08_rus2
+file:"https://svt05.hentasis1.top/hentasis2025/songs/Onaji-Zemi-no-Someya_01.mp3",title:"Файл 7"},{file:"https://svt05.hentasis1.top/hentasis2025/songs/Onaji-Zemi-no-Someya_02.mp3",title:"Файл 8"},{file:"",
+file:"",title:"Файл 10"},{file:"",title:"Файл 11"},{file:"",title:"Файл 12"},{file:"",title:"Файл 13"},{file:"",title:"Файл 14"},{file:"",title:"Файл 15"},{file:"",title:"Файл 16"},{file:"",title:"Файл 17"}
+file:"",title:"Файл 18"},{file:"",title:"Файл 19"},{file:"",title:"Файл 20"},{file:"",title:"Файл 21"},{file:"",title:"Файл 22"},{file:"",title:"Файл 23"},{file:"",title:"Файл 24"},{file:"",title:"Файл 25"}
+file:"",title:"Файл 26"}]})
+== t-pc.html (95346 bytes)
+-- m3u8:
+-- mp4:
+https://st1.nosofiles.com/0/0/5/a/d/output_67f063d1-1335-4af2-928f-deb422fda500/trailer.mp4
+https://st1.nosofiles.com/0/8/5/1/7/output_687ff860-53ae-4a4d-9575-23be47a71580/trailer.mp4
+https://st1.nosofiles.com/1/c/7/2/7/output_681f59f5-3a86-4e74-bc33-cfa857e727c1/trailer.mp4
+https://st1.nosofiles.com/6/e/d/1/6/output_69174678-a24e-42bd-9aaa-785d0cd61de6/trailer.mp4
+https://st1.nosofiles.com/9/3/d/e/5/output_6917466a-7baf-4ccb-b111-cee747a5ed39/trailer.mp4
+https://st1.nosofiles.com/a/7/c/8/3/output_681c09a5-9057-4242-96ff-81d902b38c7a/trailer.mp4
+https://st1.nosofiles.com/a/d/b/a/f/output_687f5f0c-cbab-4259-bb38-f4b4f81fabda/trailer.mp4
+https://st1.nosofiles.com/c/1/8/5/3/output_681e7561-3b68-4fab-9e33-8b46a863581c/trailer.mp4
+https://st1.nosofiles.com/c/4/1/f/2/output_69174643-4c31-42fc-9b91-ec5c95b2f14c/trailer.mp4
+https://st1.nosofiles.com/c/5/6/5/2/output_67bba650-7678-4250-ae99-04c62ef2565c/trailer.mp4
+-- media tags:
+<source>
+<source>
+<video>
+-- hls/player js:
+file:"https://st1.nosofiles.com/c/4/1/f/2/output_69174643-4c31-42fc-9b91-ec5c95b2f14c/previews/main.vtt?cv=2",spriteRelativePath:true,type:'VTT'},},}
+videoUrl']
+== tv-ep.html (256512 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== tv-home.html (290799 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== v-hk.html (19998 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe width="728" height="410" src="//hencdn.top/video/8680/a2" class="vdd-element" frameborder="0" scrolling="no" allowfullscreen>
+-- hls/player js:
+-- hentakli player json:
+RalodePlayer.init({"710":{"items":{"1763":{"id":"1763","parent":"710","aname":"1 \u0441\u0435\u0440\u0438\u044f","sname":"\u0414\u0440\u0443\u0437\u044c\u044f \u0434\u043b\u044f \u0441\u0435\u043a\u0441\u0430 \u044d\u0442\u043e \u043d\u043e\u0440\u043c\u0430\u043b\u044c\u043d\u043e? - 1 \u0441\u0435\u0440\u0438\u044f [Rus SUB]","scode":"<iframe src=\"\/video.php?id=1763&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\"><\/iframe>","lssort":"1","err":"0","codetype":"110","max_size":"0","sdata":""},"1764":{"id":"1764","parent":"710","aname":"2 \u0441\u0435\u0440\u0438\u044f","sname":"\u0414\u0440\u0443\u0437\u044c\u044f \u0434\u043b\u044f \u0441\u0435\u043a\u0441\u0430 \u044d\u0442\u043e \u043d\u043e\u0440\u043c\u0430\u043b\u044c\u043d\u043e? - 2 \u0441\u0435\u0440\u0438\u044f [Rus SUB]","scode":"<iframe src=\"\/video.php?id=1764&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\"><\/iframe>","lssort":"2","err":"0","codetype":"110","max_size":"0","sdata":""},"1765":{"id":"1765","parent":"710","aname":"3 \u0441\u0435\u0440\u0438\u044f","sname":"\u0414\u0440\u0443\u0437\u044c\u044f \u0434\u043b\u044f \u0441\u0435\u043a\u0441\u0430 \u044d\u0442\u043e \u043d\u043e\u0440\u043c\u0430\u043b\u044c\u043d\u043e? - 3 \u0441\u0435\u0440\u0438\u044f [Rus SUB]","scode":"<iframe src=\"\/video.php?id=1765&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\"><\/iframe>","lssort":"3","err":"0","codetype":"110","max_size":"0","sdata":""},"1766":{"id":"1766","parent":"710","aname":"4 \u0441\u0435\u0440\u0438\u044f","sname":"\u0414\u0440\u0443\u0437\u044c\u044f \u0434\u043b\u044f \u0441\u0435\u043a\u0441\u0430 \u044d\u0442\u043e \u043d\u043e\u0440\u043c\u0430\u043b\u044c\u043d\u043e? - 4 \u0441\u0435\u0440\u0438\u044f [Rus SUB]","scode":"<iframe src=\"\/video.php?id=1766&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\"><\/iframe>","lssort":"4","err":"0","codetype":"110","max_size":"0","sdata":""}},"id":"710","name":"Player 1","sort":"1","style":"","ssort":"2","data":"","group":""}},{"scount":4,"zcount":1,"first_name":"\u0414\u0440\u0443\u0437\u044c\u044f \u0434\u043b\u044f \u0441\u0435\u043a\u0441\u0430 \u044d\u0442\u043e \u043d\u043e\u0440\u043c\u0430\u043b\u044c\u043d\u043e? - 1 \u0441\u0435\u0440\u0438\u044f [Rus SUB]","first_code":"<iframe src=\"\/video.php?id=1763&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\"><\/iframe>","first_zid":"710","first_sid":"1763","style":"","first_z_name":"Player 1","first_code_begin":null},[]);
+
+-- allhentaii player config:
+playlist.txt?a=3", poster:"https://allhentaii.fun/uploads/posts/2024-06/1596360544_tsugou-no-yoi-sexfriend.jpg"})
+
+-- allhentaii playlist.txt:
+[{"title":"серия1","file":"https://cdn.allhentai.fun/video/bigtits/80/1.mp4?name=1"},{"title":"серия2","file":"https://cdn.allhentai.fun/video/bigtits/80/2.mp4?name=2"},{"title":"серия3","file":"https://cdn.allhentai.fun/video/bigtits/80/3.mp4?name=3"},{"title":"серия4","file":"https://cdn.allhentai.fun/video/bigtits/80/4.mp4?name=4"}]
+-- hentasis files:
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-01_rus_(www.Hentasis.top).mp4",title:"Файл 1"
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-02_rus_(www.Hentasis.top).mp4",title:"Файл 2"
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-03_rus_(www.Hentasis.top).mp4",title:"Файл 3"
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-04_rus_(www.Hentasis.top).mp4",title:"Файл 4"
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-01_sub_(www.Hentasis.top).mp4",title:"Файл 5"
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-02_sub_(www.Hentasis.top).mp4",title:"Файл 6"
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-03_sub_(www.Hentasis.top).mp4",title:"Файл 7"
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-04_sub_(www.Hentasis.top).mp4",title:"Файл 8"
+-- hentakli video.php iframe:
+<iframe width="728" height="410" src="//hencdn.top/video/157" class="vdd-element" frameborder="0" scrolling="no" allowfullscreen>
+-- hencdn head:
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="utf-8">
+	<meta name="robots" content="noindex,nofollow">
+	<title>Hencdn Player</title>
+	<meta name="viewport" content="user-scalable=0, initial-scale=1.0, maximum-scale=1.0, width=device-width">
+
+	<link rel="stylesheet" href="/player/css/video.8.16.1.css">
+	
+	<link rel="stylesheet" href="/player/css/style.css?310720261602">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-ads/7.5.2/videojs-contrib-ads.min.css">
+<link rel="stylesheet" href="/player/css/videojs-vast-vpaid-waterfall.css?150720250832">
+
+	<script type="text/javascript" src="/player/js/jquery.2.2.4.min.js"></script>
+	<script type="text/javascript" src="/player/js/video.8.16.1.min.js"></script>
+	<script type="text/javascript" src="/player/js/videojs_server_switcher.js?210620251326"></script>
+	<script type="text/javascript" src="/player/js/videojs_quality_selector.js?170620200220"></script>
+	<script type="text/javascript" src="/player/js/videojs_menu_settings.js"></script>
+	<script type="text/javascript" src="/player/js/videojs_sprite_thumbnails.js"></script>
+	<script type="text/javascript" src="/player/js/videojs_big_pause_button.js"></script>
+	<script type="text/javascript" src="/player/js/videojs_hotkeys.js?170620200220"></script>
+	<script type="text/javascript" src="/player/js/videojs_save_volume.js"></script>
+	<script type="text/javascript" src="/player/js/videojs_audio_quality_switcher.js"></script>
+	<script type="text/javascript" src="/player/js/videojs_subtitles_selector.js?310720252359"></script>
+	<script type="text/javascript" src="/player/js/videojs_share_button.js"></script>
+	<script type="text/javascript" src="/player/js/videojs_yandex_hls_workaround.js?300720268"></script>
+	<script type="text/javascript" src="/player/js/videojs_yandex_browser_notice.js?310720261602"></script>
+	<script type="text/javascript" src="/player/js/hls_segment_cache_worker_control.js?310720260001"></script>
+	<script type="text/javascript" src="/player/js/videojs_custom_timeline.js?050820250026"></script>
+	<script defer src="https://analytics.hencdn.top/script.js" data-website-id="582ed07c-7801-4239-9413-ffabe5c72a65"></script>
+	<script type="text/javascript" src="https://googleads.github.io/videojs-ima/node_modules/videojs-contrib-ads/dist/videojs.ads.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/vast-client@2.0.2/dist/vast-client.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+<script type="text/javascript" src="https://unpkg.com/vpaid-html5-client@0.1.14/bin/VPAIDHTML5Client.js"></script>
+<script type="text/javascript" src="https://unpkg.com/vpaid-flash-client@0.1.9/bin/VPAIDFLASHClient.js"></script>
+<script type="text/javascript" src="/player/js/videojs-vast-vpaid-waterfall.js?200620250007"></script>
+	
+	
+
+</head>
+<body>
+
+<div id="player_container" class="videojs_player">
+	<video id="videoplayer" class="video-js vjs-fluid vjs-default-skin vjs-youtube-progress" poster="https://imgh1t.storage-hencdn.com/files/1714856400/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.jpg" controls preload="metadata" >
+		<source src="https://deu4h1t.storage-hencdn.com/hls/1714856400/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4/index-v1-a1.m3u8?token=st=1789606589~exp=1789692989~acl=/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4*~hmac=7110e389b777bfa59a76caf44252dd5c2e65f28d9abf6e4872ed24410d1ad882" res="720" label="720p" selected="true" type="application/x-mpegURL">
+	</video>
+</div>
+<script>
+	var isYandexBrowser = /YaBrowser|Yowser|YaApp_Android|YaSearchBrowser/i.test(navigator.userAgent || '');
+
+	var hlsSegmentCacheWorkerEnabled = false;
+	window.hlsSegmentCacheWorker.applyConfig(hlsSegmentCacheWorkerEnabled);
+
+    var player = videojs('videoplayer',
+        {
+            enableSourceset: false,
+			playsinline: true,
+
+            html5: {
+              -- shikimori r_plus:
+[{"id":432,"name":"Iria: Zeiram The Animation","russian":"Ирия: Зейрам","image":{"original":"/system/animes/original/432.jpg?1711955189","preview":"/system/animes/preview/432.jpg?1711955189","x96":"/system/animes/x96/432.jpg?1711955189","x48":"/system/animes/x48/432.jpg?1711955189"},"url":"/animes/432-iria-zeiram-the-animation","kind":"ova","score":"7.1","status":"released","episodes":6,"episodes_aired":0,"aired_on":"1994-06-23","released_on":"1994-11-21"},{"id":3701,"name":"Kaiba","russian":"Кайба","image":{"original":"/system/animes/original/3701.jpg?1711957561","preview":"/system/animes/preview/3701.jpg?1711957561","x96":"/system/animes/x96/3701.jpg?1711957561","x48":"/system/animes/x48/3701.jpg?1711957561"},"url":"/animes/3701-kaiba","kind":"tv","score":"8.14","status":"released","episodes":12,"episodes_aired":0,"aired_on":"2008-04-11","released_on":"2008-07-25"},{"id":2528,"name":"Megami Paradise","russian":"Рай богинь","image":{"original":"/system/animes/original/2528.jpg?1711963250","preview":"/system/animes/preview/2528.jpg?1711963250","x96":"/system/animes/x96/2528.jpg?1711963250","x48":"/system/animes/x48/2528.jpg?1711963250"},"url":"/animes/2528-megami-paradise","kind":"ova","score":"5.43","status":"released","episodes":2,"episodes_aired":0,"aired_on":"1995-06-07","released_on":"1995-08-04"},{"id":1232,"name":"Saber Marionette R","russian":"Воины-марионетки Эр","image":{"original":"/system/animes/original/1232.jpg?1711971461","preview":"/system/animes/preview/1232.jpg?1711971461","x96":"/system/animes/x96/1232.jpg?1711971461","x48":"/system/animes/x48/1232.jpg?1711971461"},"url":"/animes/1232-saber-marionette-r","kind":"ova","score":"6.57","status":"released","episodes":3,"episodes_aired":0,"aired_on":"1995-05-24","released_on":"1995-09-25"},{"id":14513,"name":"Magi: The Labyrinth of Magic","russian":"Маги: Лабиринт магии","image":{"original":"/system/animes/original/14513.jpg?1711962130","preview":"/system/animes/preview/14513.jpg?1711962130","x96":"/system/animes/x96/14513.jpg?1711962130","x48":"/system/animes/x48/14513.jpg?1711962130"},"url":"/animes/z14513-magi-the-labyrinth-of-magic","kind":"tv","score":"8.0","status":"released","episodes":25,"episodes_aired":25,"aired_on":"2012-10-07","released_on":"2013-03-31"}]
+-- shikimori rx:
+[{"id":58123,"name":"Dearest Blue","russian":"Дорогой голубой","image":{"original":"/system/animes/original/58123.jpg?1717852516","preview":"/system/animes/preview/58123.jpg?1717852516","x96":"/system/animes/x96/58123.jpg?1717852516","x48":"/system/animes/x48/58123.jpg?1717852516"},"url":"/animes/58123-dearest-blue","kind":"ova","score":"5.72","status":"ongoing","episodes":0,"episodes_aired":4,"aired_on":"2024-04-26","released_on":null},{"id":10779,"name":"Eroge! H mo Game mo Kaihatsu Zanmai","russian":"Эроге: Разработка порнушки с тремя сестричками","image":{"original":"/system/animes/original/10779.jpg?1711948990","preview":"/system/animes/preview/10779.jpg?1711948990","x96":"/system/animes/x96/10779.jpg?1711948990","x48":"/system/animes/x48/10779.jpg?1711948990"},"url":"/animes/10779-eroge-h-mo-game-mo-kaihatsu-zanmai","kind":"ova","score":"7.55","status":"released","episodes":6,"episodes_aired":6,"aired_on":"2011-08-26","released_on":"2016-03-25"},{"id":2208,"name":"Flutter of Birds II: Tenshi-tachi no Tsubasa","russian":"Касание девственницы 2","image":{"original":"/system/animes/original/2208.jpg?1711949533","preview":"/system/animes/preview/2208.jpg?1711949533","x96":"/system/animes/x96/2208.jpg?1711949533","x48":"/system/animes/x48/2208.jpg?1711949533"},"url":"/animes/2208-flutter-of-birds-ii-tenshi-tachi-no-tsubasa","kind":"ova","score":"5.53","status":"released","episodes":2,"episodes_aired":0,"aired_on":"2003-05-23","released_on":"2003-08-22"},{"id":57789,"name":"Ateuma Chara no Kuse shite, Super Darling Ouji ni Chouai sareteimasu.","russian":"","image":{"original":"/system/animes/original/57789.jpg?1717373218","preview":"/system/animes/preview/57789.jpg?1717373218","x96":"/system/animes/x96/57789.jpg?1717373218","x48":"/system/animes/x48/57789.jpg?1717373218"},"url":"/animes/57789-ateuma-chara-no-kuse-shite-super-darling-ouji-ni-chouai-sareteimasu","kind":"ona","score":"6.13","status":"released","episodes":8,"episodes_aired":8,"aired_on":"2024-04-08","released_on":"2024-06-10"},{"id":3951,"name":"Shimai Ijiri","russian":"Сёстры-рабыни","image":{"original":"/system/animes/original/3951.jpg?1711973219","preview":"/system/animes/preview/3951.jpg?1711973219","x96":"/system/animes/x96/3951.jpg?1711973219","x48":"/system/animes/x48/3951.jpg?1711973219"},"url":"/animes/3951-shimai-ijiri","kind":"ova","score":"5.64","status":"released","episodes":2,"episodes_aired":0,"
+-- head probe:
+== https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-01_rus_(www.Hentasis.top).mp4
+HTTP/1.1 200 OK
+Server: nginx
+Date: Thu, 17 Sep 2026 00:57:10 GMT
+Content-Type: video/mp4
+Content-Length: 117220676
+Last-Modified: Mon, 15 Sep 2025 06:24:00 GMT
+Connection: keep-alive
+ETag: "68c7b100-6fca544"
+Accept-Ranges: bytes
+
+
+== https://cdn.allhentai.fun/video/bigtits/80/1.mp4?name=s1
+HTTP/2 200 
+server: nginx
+date: Thu, 17 Sep 2026 00:56:31 GMT
+content-type: video/mp4
+content-length: 129452738
+last-modified: Tue, 11 Jun 2024 18:52:24 GMT
+etag: "66689ce8-7b74ac2"
+expires: Thu, 31 Dec 2037 23:55:55 GMT
+cache-control: max-age=315360000
+content-disposition: attachment; filename="s1".mp4
+content-type: application/octet-stream
+accept-ranges: bytes
+
+== https://cdn2.allhentai.fun/video/bigtits/80/1.mp4?name=s1sub
+HTTP/2 200 
+server: nginx
+date: Thu, 17 Sep 2026 00:56:32 GMT
+content-type: video/mp4
+content-length: 129452738
+last-modified: Tue, 11 Jun 2024 18:52:24 GMT
+etag: "66689ce8-7b74ac2"
+expires: Thu, 31 Dec 2037 23:55:55 GMT
+cache-control: max-age=315360000
+content-disposition: attachment; filename="s1sub".mp4
+content-type: application/octet-stream
+accept-ranges: bytes
+
+== https://xcdn1.nosofiles.com/1/b/a/8/7/output_687fa35c-c9e6-4b57-ad59-935e77978ab1_high.mp4
+HTTP/2 403 
+date: Thu, 17 Sep 2026 00:56:32 GMT
+content-type: text/html; charset=UTF-8
+cache-control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+expires: Thu, 01 Jan 1970 00:00:01 GMT
+referrer-policy: same-origin
+x-frame-options: SAMEORIGIN
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=PggvHNHr2r11tq6Fcr98g2YmZiEPMoCHq4BXbYoKX4iFC66INrZ%2FEGz4K8%2BXrzUi3rCojkc3lrDYoxAcCWLhjRLNs7r0xVGvCOwSSNMQoDrRMg1DDxG6P6gImAvxyJN25TODcnU%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+server: cloudflare
+cf-ray: a3c426d1a9d87236-ORD
+
+

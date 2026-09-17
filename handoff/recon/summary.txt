@@ -1,0 +1,246 @@
+### fetch.log
+https://porncado.com/135157-hentai-rus/ -> HTTP 200 bytes 96775
+https://v6.hentakli.org/633-tsugou-no-yoi-sexfriend.html -> HTTP 200 bytes 101201
+https://hentasis1.top/293-tsugou-no-yoi-sexfriend.html -> HTTP 200 bytes 83425
+https://allhentaii.fun/bigtits/743-druzja-dlja-seksa-jeto-normalno-tsugou-no-yoi-sexfriend.html -> HTTP 200 bytes 49159
+https://v6.hentakli.org/ -> HTTP 200 bytes 116713
+https://allhentaii.fun/ -> HTTP 200 bytes 69674
+https://hentasis1.top/ -> HTTP 200 bytes 84072
+https://porncado.com/8-hentai/ -> HTTP 200 bytes 109452
+https://v6.hentakli.org/video.php?id=1763&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68 -> HTTP 200 bytes 19993
+https://allhentaii.fun/pl/bigtits/80/playlist.txt?a=3 -> HTTP 200 bytes 357
+hencdn HEAD: content-type: text/html; charset=UTF-8
+https://hencdn.top/video/157 -> HTTP 200 bytes 18008
+shikimori r_plus -> HTTP 200 bytes 2327
+shikimori rx -> HTTP 200 bytes 2551
+== https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-01_rus_(www.Hentasis.top).mp4
+HTTP/1.1 200 OK
+Server: nginx
+Date: Wed, 16 Sep 2026 17:40:45 GMT
+Content-Type: video/mp4
+Content-Length: 117220676
+Last-Modified: Mon, 15 Sep 2025 06:24:00 GMT
+Connection: keep-alive
+ETag: "68c7b100-6fca544"
+Accept-Ranges: bytes
+
+
+== https://cdn.allhentai.fun/video/bigtits/80/1.mp4?name=s1
+HTTP/2 200 
+server: nginx
+date: Wed, 16 Sep 2026 17:40:08 GMT
+content-type: video/mp4
+content-length: 129452738
+last-modified: Tue, 11 Jun 2024 18:52:24 GMT
+etag: "66689ce8-7b74ac2"
+expires: Thu, 31 Dec 2037 23:55:55 GMT
+cache-control: max-age=315360000
+content-disposition: attachment; filename="s1".mp4
+content-type: application/octet-stream
+accept-ranges: bytes
+
+== https://cdn2.allhentai.fun/video/bigtits/80/1.mp4?name=s1sub
+HTTP/2 200 
+server: nginx
+date: Wed, 16 Sep 2026 17:40:08 GMT
+content-type: video/mp4
+content-length: 129452738
+last-modified: Tue, 11 Jun 2024 18:52:24 GMT
+etag: "66689ce8-7b74ac2"
+expires: Thu, 31 Dec 2037 23:55:55 GMT
+cache-control: max-age=315360000
+content-disposition: attachment; filename="s1sub".mp4
+content-type: application/octet-stream
+accept-ranges: bytes
+
+== https://xcdn1.nosofiles.com/1/b/a/8/7/output_687fa35c-c9e6-4b57-ad59-935e77978ab1_high.mp4
+HTTP/2 403 
+date: Wed, 16 Sep 2026 17:40:09 GMT
+content-type: text/html; charset=UTF-8
+cache-control: private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+expires: Thu, 01 Jan 1970 00:00:01 GMT
+referrer-policy: same-origin
+x-frame-options: SAMEORIGIN
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=GSp88i%2Ba026qwKmJSdLVDNxPthE3ar%2BtE%2F%2FWYpVOgYBp35N32WFvffKrknAVW%2FYAImSEgENxwrfSsGh7nu2A34z5IUOyC47Q8z6PrUgSam6W%2BOvlh5nPrI03EjOgtAtUr6NEI%2BQ%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+server: cloudflare
+cf-ray: a3c1a7951b60d6ac-IAD
+
+
+total 824
+drwxr-xr-x 2 runner runner   4096 Sep 16 17:40 .
+drwxr-xr-x 3 runner runner   4096 Sep 16 17:39 ..
+-rw-r--r-- 1 runner runner  69674 Sep 16 17:40 allhentaii-home.html
+-rw-r--r-- 1 runner runner    357 Sep 16 17:40 allhentaii-pl.txt
+-rw-r--r-- 1 runner runner  49159 Sep 16 17:40 allhentaii.html
+-rw-r--r-- 1 runner runner  19361 Sep 16 17:39 candidates.txt
+-rw-r--r-- 1 runner runner   2977 Sep 16 17:40 fetch.log
+-rw-r--r-- 1 runner runner   1997 Sep 16 17:40 head-probe.txt
+-rw-r--r-- 1 runner runner  18008 Sep 16 17:40 hencdn.html
+-rw-r--r-- 1 runner runner 116713 Sep 16 17:40 hentakli-home.html
+-rw-r--r-- 1 runner runner  19993 Sep 16 17:40 hentakli-player.html
+-rw-r--r-- 1 runner runner 101201 Sep 16 17:40 hentakli.html
+-rw-r--r-- 1 runner runner  84072 Sep 16 17:40 hentasis-home.html
+-rw-r--r-- 1 runner runner  83425 Sep 16 17:40 hentasis.html
+-rw-r--r-- 1 runner runner      0 Sep 16 17:39 m3u8-probe.txt
+-rw-r--r-- 1 runner runner      0 Sep 16 17:39 m3u8s.txt
+-rw-r--r-- 1 runner runner 109452 Sep 16 17:40 porncado-cat.html
+-rw-r--r-- 1 runner runner  96775 Sep 16 17:39 porncado.html
+-rw-r--r-- 1 runner runner    443 Sep 16 17:39 save-debug.txt
+-rw-r--r-- 1 runner runner    143 Sep 16 17:39 shikimori-erotic.json
+-rw-r--r-- 1 runner runner   2327 Sep 16 17:40 shikimori-rplus.json
+-rw-r--r-- 1 runner runner   2551 Sep 16 17:40 shikimori-rx.json
+-rw-r--r-- 1 runner runner  13710 Sep 16 17:39 summary.txt
+shikimori.io erotic -> HTTP 422 bytes 143
+total 828
+drwxr-xr-x 2 runner runner   4096 Sep 16 17:40 .
+drwxr-xr-x 3 runner runner   4096 Sep 16 17:39 ..
+-rw-r--r-- 1 runner runner  69674 Sep 16 17:40 allhentaii-home.html
+-rw-r--r-- 1 runner runner    357 Sep 16 17:40 allhentaii-pl.txt
+-rw-r--r-- 1 runner runner  49159 Sep 16 17:40 allhentaii.html
+-rw-r--r-- 1 runner runner  19361 Sep 16 17:39 candidates.txt
+-rw-r--r-- 1 runner runner   4454 Sep 16 17:40 fetch.log
+-rw-r--r-- 1 runner runner   1997 Sep 16 17:40 head-probe.txt
+-rw-r--r-- 1 runner runner  18008 Sep 16 17:40 hencdn.html
+-rw-r--r-- 1 runner runner 116713 Sep 16 17:40 hentakli-home.html
+-rw-r--r-- 1 runner runner  19993 Sep 16 17:40 hentakli-player.html
+-rw-r--r-- 1 runner runner 101201 Sep 16 17:40 hentakli.html
+-rw-r--r-- 1 runner runner  84072 Sep 16 17:40 hentasis-home.html
+-rw-r--r-- 1 runner runner  83425 Sep 16 17:40 hentasis.html
+-rw-r--r-- 1 runner runner      0 Sep 16 17:39 m3u8-probe.txt
+-rw-r--r-- 1 runner runner      0 Sep 16 17:39 m3u8s.txt
+-rw-r--r-- 1 runner runner 109452 Sep 16 17:40 porncado-cat.html
+-rw-r--r-- 1 runner runner  96775 Sep 16 17:39 porncado.html
+-rw-r--r-- 1 runner runner    443 Sep 16 17:39 save-debug.txt
+-rw-r--r-- 1 runner runner    143 Sep 16 17:40 shikimori-erotic.json
+-rw-r--r-- 1 runner runner   2327 Sep 16 17:40 shikimori-rplus.json
+-rw-r--r-- 1 runner runner   2551 Sep 16 17:40 shikimori-rx.json
+-rw-r--r-- 1 runner runner  13710 Sep 16 17:39 summary.txt
+### candidates
+== allhentaii-home.html (69674 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== allhentaii.html (49159 bytes)
+-- m3u8:
+-- mp4:
+https://cdn.allhentai.fun/video/bigtits/80/1.mp4?name=s1_Друзья
+https://cdn.allhentai.fun/video/bigtits/80/2.mp4?name=s2_Друзья
+https://cdn.allhentai.fun/video/bigtits/80/3.mp4?name=s3_Друзья
+https://cdn2.allhentai.fun/video/bigtits/80/1.mp4?name=s1(sub)
+https://cdn2.allhentai.fun/video/bigtits/80/2.mp4?name=s2(sub)
+https://cdn2.allhentai.fun/video/bigtits/80/3.mp4?name=s3(sub)
+https://cdn2.allhentai.fun/video/bigtits/80/4.mp4?name=s4(sub)
+-- media tags:
+-- hls/player js:
+file:"/pl/bigtits/80/playlist.txt?a=3", poster:"https://allhentaii.fun/uploads/posts/2024-06/1596360544_tsugou-no-yoi-sexfriend.jpg"})
+== hencdn.html (18008 bytes)
+-- m3u8:
+https://deu4h1t.storage-hencdn.com/hls/1714856400/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4/index-v1-a1.m3u8?token=st=1789580406~exp=1789666806~acl=/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4*~hmac=f3f881fa69646c29dc532faaa501dc5547021e6d905cf7ec39c4e3bad03294e8
+-- mp4:
+https://deu4h1t.storage-hencdn.com/hls/1714856400/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4/index-v1-a1.m3u8?token=st=1789580406~exp=1789666806~acl=/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4*~hmac=f3f881fa69646c29dc532faaa501dc5547021e6d905cf7ec39c4e3bad03294e8
+-- media tags:
+<video id="videoplayer" class="video-js vjs-fluid vjs-default-skin vjs-youtube-progress" poster="https://imgh1t.storage-hencdn.com/files/1714856400/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.jpg" controls preload="metadata" >
+-- hls/player js:
+== hentakli-home.html (116713 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== hentakli-player.html (19993 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe width="728" height="410" src="//hencdn.top/video/157" class="vdd-element" frameborder="0" scrolling="no" allowfullscreen>
+-- hls/player js:
+== hentakli.html (101201 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+<iframe src=\"\/video.php?id=1763&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\">
+<iframe src=\"\/video.php?id=1764&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\">
+<iframe src=\"\/video.php?id=1765&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\">
+<iframe src=\"\/video.php?id=1766&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\">
+<iframe src=\"\/video.php?id=1763&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68\" width=\"728\" height=\"410\" frameborder=\"0\" allowfullscreen=\"true\" webkitallowfullscreen=\"true\" mozallowfullscreen=\"true\">
+-- hls/player js:
+== hentasis-home.html (84072 bytes)
+-- m3u8:
+-- mp4:
+-- media tags:
+-- hls/player js:
+== hentasis.html (83425 bytes)
+-- m3u8:
+-- mp4:
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-01_rus_(www.Hentasis.top).mp4
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-01_sub_(www.Hentasis.top).mp4
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-02_rus_(www.Hentasis.top).mp4
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-02_sub_(www.Hentasis.top).mp4
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-03_rus_(www.Hentasis.top).mp4
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-03_sub_(www.Hentasis.top).mp4
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-04_rus_(www.Hentasis.top).mp4
+https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-04_sub_(www.Hentasis.top).mp4
+-- media tags:
+-- hls/player js:
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-01_rus_(www.Hentasis.top).mp4",title:"Файл 1"},{file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-02_rus_(
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-03_rus_(www.Hentasis.top).mp4",title:"Файл 3"},{file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-04_rus_(
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-01_sub_(www.Hentasis.top).mp4",title:"Файл 5"},{file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-02_sub_(
+file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-03_sub_(www.Hentasis.top).mp4",title:"Файл 7"},{file:"https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-04_sub_(
+file:"",title:"Файл 9"},{file:"",title:"Файл 10"},{file:"",title:"Файл 11"},{file:"",title:"Файл 12"},{file:"",title:"Файл 13"},{file:"",title:"Файл 14"},{file:"",title:"Файл 15"},{file:"",title:"Файл 16"},
+file:"",title:"Файл 17"},{file:"",title:"Файл 18"},{file:"",title:"Файл 19"},{file:"",title:"Файл 20"},{file:"",title:"Файл 21"},{file:"",title:"Файл 22"},{file:"",title:"Файл 23"},{file:"",title:"Файл 24"}
+file:"",title:"Файл 25"},{file:"",title:"Файл 26"}]})
+== porncado-cat.html (109452 bytes)
+-- m3u8:
+-- mp4:
+https://st1.nosofiles.com/0/2/f/e/7/output_69174627-3b0f-4a91-9074-fb62e6d7ef20/trailer.mp4
+https://st1.nosofiles.com/0/c/b/4/f/output_691c53f5-87f1-4b47-bdd0-5a49576f4bc0/trailer.mp4
+https://st1.nosofiles.com/0/d/e/1/6/output_691dccb4-6ea2-4a6b-8b80-4be7f0261ed0/trailer.mp4
+https://st1.nosofiles.com/1/5/a/7/c/output_69174651-3a91-4193-9219-26d4bdcc7a51/trailer.mp4
+https://st1.nosofiles.com/1/d/b/f/6/output_69174629-b32c-4c85-be3f-e0f84cb6fbd1/trailer.mp4
+https://st1.nosofiles.com/2/1/2/b/5/output_6818885c-c2d9-45f1-ac27-f6237565b212/trailer.mp4
+https://st1.nosofiles.com/2/1/c/9/2/output_691c5458-8545-4801-84a4-829c7d429c12/trailer.mp4
+https://st1.nosofiles.com/2/1/d/b/8/output_6917468f-7615-4798-8932-d52fb718bd12/trailer.mp4
+https://st1.nosofiles.com/2/6/e/9/0/output_6917465a-09f8-4008-81a2-9f17ace09e62/trailer.mp4
+https://st1.nosofiles.com/2/8/9/5/f/output_691c5484-b175-4397-8984-19323eff5982/trailer.mp4
+-- media tags:
+-- hls/player js:
+== porncado.html (96775 bytes)
+-- m3u8:
+-- mp4:
+https://st1.nosofiles.com/0/0/5/a/d/output_67f063d1-1335-4af2-928f-deb422fda500/trailer.mp4
+https://st1.nosofiles.com/0/8/5/1/7/output_687ff860-53ae-4a4d-9575-23be47a71580/trailer.mp4
+https://st1.nosofiles.com/1/b/a/8/7/output_687fa35c-c9e6-4b57-ad59-935e77978ab1/trailer.mp4
+https://st1.nosofiles.com/1/c/7/2/7/output_681f59f5-3a86-4e74-bc33-cfa857e727c1/trailer.mp4
+https://st1.nosofiles.com/6/e/d/1/6/output_69174678-a24e-42bd-9aaa-785d0cd61de6/trailer.mp4
+https://st1.nosofiles.com/9/3/d/e/5/output_6917466a-7baf-4ccb-b111-cee747a5ed39/trailer.mp4
+https://st1.nosofiles.com/a/7/c/8/3/output_681c09a5-9057-4242-96ff-81d902b38c7a/trailer.mp4
+https://st1.nosofiles.com/a/d/b/a/f/output_687f5f0c-cbab-4259-bb38-f4b4f81fabda/trailer.mp4
+https://st1.nosofiles.com/c/1/8/5/3/output_681e7561-3b68-4fab-9e33-8b46a863581c/trailer.mp4
+https://st1.nosofiles.com/c/5/6/5/2/output_67bba650-7678-4250-ae99-04c62ef2565c/trailer.mp4
+-- media tags:
+<source>
+<source>
+<video>
+-- hls/player js:
+file:"https://st1.nosofiles.com/1/b/a/8/7/output_687fa35c-c9e6-4b57-ad59-935e77978ab1/previews/main.vtt?cv=2",spriteRelativePath:true,t### m3u8 probe
+== https://deu4h1t.storage-hencdn.com/hls/1714856400/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4/index-v1-a1.m3u8?token=st=1789580406~exp=1789666806~acl=/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4*~hmac=f3f881fa69646c29dc532faaa501dc5547021e6d905cf7ec39c4e3bad03294e8
+#EXTM3U
+#EXT-X-TARGETDURATION:17
+#EXT-X-ALLOW-CACHE:YES
+#EXT-X-PLAYLIST-TYPE:VOD
+#EXT-X-VERSION:3
+#EXT-X-MEDIA-SEQUENCE:1
+#EXTINF:17.017,
+seg-1-v1-a1.ts?token=st=1789580406~exp=1789666806~acl=/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4*~hmac=f3f881fa69646c29dc532faaa501dc5547021e6d905cf7ec39c4e3bad03294e8
+#EXTINF:4.505,
+seg-2-v1-a1.ts?token=st=1789580406~exp=1789666806~acl=/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4*~hmac=f3f881fa69646c29dc532faaa501dc5547021e6d905cf7ec39c4e3bad03294e8
+#EXTINF:13.514,
+seg-3-v1-a1.ts?token=st=1789580406~exp=1789666806~acl=/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4*~hmac=f3f881fa69646c29dc532faaa501dc5547021e6d905cf7ec39c4e3bad03294e8
+#EXTINF:9.576,
+seg-4-v1-a1.ts?token=st=1789580406~exp=1789666806~acl=/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4*~hmac=f3f881fa69646c29dc532faaa501dc5547021e6d905cf7ec39c4e3bad03294e8
+#EXTINF:5.706,
+seg-5-v1-a1.ts?token=st=1789580406~exp=1789666806~acl=/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4*~hmac=f3f881fa69646c29dc532faaa501dc5547021e6d905cf7ec39c4e3bad03294e8
+#EXTINF:11.845,
+seg-6-v1-a1.ts?token=st=1789580406~exp=1789666806~acl=/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4*~hmac=f3f881fa69646c29dc532faaa501dc5547021e6d905cf7ec39c4e3bad03294e8
+#EXTINF:10.310,
+seg-7-v1-a1.ts?token=st=1789580406~exp=1789666806~acl=/2178_Tsugou-no-Yoi-Sexfriend/tsugou-no-yoi-sexfriend-ep1-sub.mp4*~hm

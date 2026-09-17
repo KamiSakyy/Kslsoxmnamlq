@@ -1,0 +1,217 @@
+name: Build Android APK
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - arena/01a0aeb0-kslsoxmnamlq
+    paths:
+      - 'yoru-android/app/**'
+      - 'yoru-android/owner-signing/certificate-sha256.txt'
+      - 'yoru-android/settings.gradle'
+      - 'yoru-android/build.gradle'
+      - 'yoru-android/gradle.properties'
+      - 'yoru-android/gradle/**'
+      - 'yoru-android/gradlew'
+      - 'yoru-android/gradlew.bat'
+      - 'tools/yoru-release-key.py'
+      - '.github/workflows/build-apk.yml'
+
+concurrency:
+  group: yoru-apk-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  android-apk:
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+    defaults:
+      run:
+        working-directory: yoru-android
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+          cache-dependency-path: |
+            yoru-android/*.gradle
+            yoru-android/**/*.gradle
+            yoru-android/gradle/wrapper/gradle-wrapper.properties
+      - name: Setup Android SDK (preinstalled on runner)
+        run: |
+          SDK="$ANDROID_SDK_ROOT"
+          [ -d "$SDK/cmdline-tools" ] || SDK=/usr/local/lib/android/sdk
+          [ -d "$SDK/cmdline-tools" ] || SDK=/opt/android-sdk
+          echo "ANDROID_HOME=$SDK" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$SDK" >> $GITHUB_ENV
+          echo "$SDK/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "$SDK/platform-tools" >> $GITHUB_PATH
+          export PATH="$SDK/cmdline-tools/latest/bin:$SDK/platform-tools:$PATH"
+          echo "sdkmanager: $(command -v sdkmanager)"
+          yes | sdkmanager --licenses >/dev/null 2>&1 || true
+      - name: Restore Android SDK cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.ANDROID_HOME }}/platforms/android-36
+            ${{ env.ANDROID_HOME }}/build-tools/36.0.0
+            ${{ env.ANDROID_HOME }}/platform-tools
+          key: yoru-android-sdk-36-36.0.0-${{ runner.os }}
+      - name: Install missing Android SDK components
+        run: |
+          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+          if [ ! -d "$ANDROID_HOME/platforms/android-36" ] || [ ! -d "$ANDROID_HOME/build-tools/36.0.0" ]; then
+            set +e
+            out=$(yes | sdkmanager "platforms;android-36" "build-tools;36.0.0" "platform-tools" 2>&1)
+            code=$?
+            echo "$out" | tail -8
+            if [ "$code" -ne 0 ]; then
+              msg=$(echo "$out" | tail -10 | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g')
+              echo "::error title=sdkmanager failed::$msg"
+              exit "$code"
+            fi
+          else
+            echo "Android SDK 36 already restored"
+          fi
+      - name: Prepare release signing
+        working-directory: .
+        env:
+          YORU_STORE_B64: ${{ secrets.YORU_STORE_B64 }}
+          YORU_STORE_PASSWORD: ${{ secrets.YORU_STORE_PASSWORD }}
+          YORU_KEY_ALIAS: ${{ secrets.YORU_KEY_ALIAS }}
+          YORU_KEY_PASSWORD: ${{ secrets.YORU_KEY_PASSWORD }}
+        run: |
+          mkdir -p yoru-android/owner-signing
+          if [ -n "$YORU_STORE_B64" ]; then
+            echo "$YORU_STORE_B64" | base64 -d > yoru-android/owner-signing/yoru-release.p12
+            printf 'storePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' "$YORU_STORE_PASSWORD" "$YORU_KEY_ALIAS" "$YORU_KEY_PASSWORD" > yoru-android/owner-signing/signing.properties
+            echo "Using secrets-provided release key"
+          else
+            pip install cryptography --quiet
+            python3 tools/yoru-release-key.py
+          fi
+      - name: Build Java release APK
+        run: |
+          set +e
+          chmod +x gradlew
+          run_build(){ ./gradlew --no-daemon :app:testTsuyuDebugUnitTest :app:assembleTsuyuDebug :app:assembleTsuyuRelease :app:assembleHentaRelease 2>&1 | tee ../build-release.log; code=${PIPESTATUS[0]}; }
+          code=0
+          run_build
+          if [ "$code" -ne 0 ]; then
+            echo "Gradle failure (code $code) — automatic retry" >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning title=Retrying Gradle build::transient R8 failure"
+            run_build
+          fi
+          if [ "$code" -ne 0 ]; then
+            {
+              echo "### Java release build failed"
+              echo '```'
+              tail -120 ../build-release.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            message=$(tail -40 ../build-release.log | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g')
+            echo "::error title=Gradle Java release build failed::$message"
+            tail -220 ../build-release.log > "$GITHUB_WORKSPACE/handoff/ci-build-failure.log"
+            exit "$code"
+          fi
+      - name: Commit build failure log
+        if: failure()
+        working-directory: .
+        run: |
+          if [ -f handoff/ci-build-failure.log ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -f handoff/ci-build-failure.log
+            git commit -m "Log build failure [skip ci]" || exit 0
+            git push origin HEAD:arena/01a0aeb0-kslsoxmnamlq
+          fi
+      - name: Verify APK signatures
+        run: |
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify app/build/outputs/apk/tsuyu/release/app-tsuyu-release.apk
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify app/build/outputs/apk/tsuyu/debug/app-tsuyu-debug.apk
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify app/build/outputs/apk/henta/release/app-henta-release.apk
+      - name: Report APK sizes
+        working-directory: .
+        run: |
+          release=apk-output/Tsuyu-1.13-release.apk
+          henta=apk-output/TsuyuHentai-1.3-release.apk
+          debug=apk-output/Tsuyu-1.13-debug.apk
+          mkdir -p apk-output
+          cp yoru-android/app/build/outputs/apk/tsuyu/release/app-tsuyu-release.apk "$release"
+          cp yoru-android/app/build/outputs/apk/tsuyu/debug/app-tsuyu-debug.apk "$debug"
+          cp yoru-android/app/build/outputs/apk/henta/release/app-henta-release.apk "$henta"
+          rm -f apk-output/Tsuyu-1.13-release.apk.sha256 apk-output/Tsuyu-1.13-debug.apk.sha256 apk-output/TsuyuHentai-1.3-release.apk.sha256
+          sha256sum "$release" > apk-output/Tsuyu-1.13-release.apk.sha256
+          sha256sum "$debug" > apk-output/Tsuyu-1.13-debug.apk.sha256
+          sha256sum "$henta" > apk-output/TsuyuHentai-1.3-release.apk.sha256
+          size=$(stat -c %s "$release")
+          hsize=$(stat -c %s "$henta")
+          echo "## APK sizes" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Tsuyu release: $(awk "BEGIN{printf \"%.2f\", $size/1048576}") MB (лимит 2.7 MB)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Tsuyu H release: $(awk "BEGIN{printf \"%.2f\", $hsize/1048576}") MB (лимит 2.7 MB)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Tsuyu debug: $(awk "BEGIN{printf \"%.2f\", $(stat -c %s "$debug")/1048576}") MB" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$size" -gt 2831155 ]; then
+            echo "::error title=Release APK выше лимита 2.7 MB::$size байт"
+            {
+              echo "### Release APK выше лимита"
+              echo "Текущий вес $((size/1024)) КБ, допустимо до 2764 КБ"
+              echo "Крупнейшие вложения APK:"
+              unzip -l "$release" | sort -k1 -n -r | head -15
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          if [ "$hsize" -gt 2831155 ]; then
+            echo "::error title=Tsuyu H APK выше лимита 2.7 MB::$hsize байт"
+            exit 1
+          fi
+      - name: Save APK into branch
+        working-directory: .
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f apk-output/Tsuyu-1.13-*.apk apk-output/Tsuyu-1.13-*.apk.sha256 apk-output/TsuyuHentai-1.3-*.apk apk-output/TsuyuHentai-1.3-*.apk.sha256
+          git commit -m "Add built Tsuyu 1.8 release APK [skip ci]" || exit 0
+          git push origin HEAD:arena/01a0aeb0-kslsoxmnamlq || { sleep 8; git pull --rebase origin arena/01a0aeb0-kslsoxmnamlq; git push origin HEAD:arena/01a0aeb0-kslsoxmnamlq; }
+      - name: Diagnose save step
+        if: failure()
+        working-directory: .
+        run: |
+          {
+            echo "### Save APK diagnostics"
+            echo '```'
+            git status 2>&1
+            git log --oneline -3 2>&1
+            git ls-files apk-output 2>&1
+            ls -la apk-output 2>&1
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          { git status 2>&1; git log --oneline -3 2>&1; ls -la apk-output 2>&1; } > handoff/ci-save-failure.log
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f handoff/ci-save-failure.log
+          git commit -m "Log save failure [skip ci]" || exit 0
+          git push origin HEAD:arena/01a0aeb0-kslsoxmnamlq || exit 0
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: tsuyu-1.13-release-apk
+          path: |
+            apk-output/Tsuyu-1.13-*.apk
+            apk-output/Tsuyu-1.13-*.apk.sha256
+            apk-output/TsuyuHentai-1.3-*.apk
+            apk-output/TsuyuHentai-1.3-*.apk.sha256
+
+      - name: Upload unit test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tsuyu-1.8-tests
+          path: yoru-android/app/build/test-results/testDebugUnitTest/
+          if-no-files-found: ignore

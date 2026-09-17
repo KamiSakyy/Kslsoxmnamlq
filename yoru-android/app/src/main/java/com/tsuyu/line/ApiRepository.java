@@ -238,7 +238,7 @@ public final class ApiRepository {
             },
             new ThreadPoolExecutor.CallerRunsPolicy()
     );
-    private void runEnrich(Anime a){ArrayList<Future<?>> jobs=new ArrayList<>();try{jobs.add(ENRICH.submit((Runnable)()->enrichSchedule(a)));jobs.add(ENRICH.submit((Runnable)()->enrichVisuals(a)));jobs.add(ENRICH.submit((Runnable)()->enrichRelated(a)));for(Future<?> j:jobs)try{j.get(2500,TimeUnit.MILLISECONDS);}catch(Exception ignored){}}catch(InterruptedException e){Thread.currentThread().interrupt();}catch(Exception ignored){}finally{for(Future<?> j:jobs)j.cancel(true);}}
+    private void runEnrich(Anime a){ArrayList<Future<?>> jobs=new ArrayList<>();try{jobs.add(ENRICH.submit((Runnable)()->enrichSchedule(a)));jobs.add(ENRICH.submit((Runnable)()->enrichVisuals(a)));jobs.add(ENRICH.submit((Runnable)()->enrichRelated(a)));for(Future<?> j:jobs){try{j.get(2500,TimeUnit.MILLISECONDS);}catch(InterruptedException ie){Thread.currentThread().interrupt();break;}catch(Exception ignored){}}}catch(Exception ignored){}finally{for(Future<?> j:jobs)j.cancel(true);}}
     public Anime.Playback playback(Anime input,String selectedMode)throws Exception{
         normalizeIds(input);
         String selected=selectedMode==null||selectedMode.trim().isEmpty()?"auto":selectedMode.trim();

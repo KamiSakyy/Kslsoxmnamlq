@@ -1,21 +1,25 @@
 -allowaccessmodification
 -renamesourcefileattribute ''
--keepattributes !SourceFile,!LineNumberTable,!LocalVariableTable,!LocalVariableTypeTable
+-keepattributes !SourceFile,!LineNumberTable,!LocalVariableTable,!LocalVariableTypeTable,!MethodParameters,!Signature,!Deprecated
 -repackageclasses ''
+-flattenpackagehierarchy ''
 -overloadaggressively
--useuniqueclassmembernames
--dontoptimize
 -assumenosideeffects class android.util.Log {
- public static *** d(...);
- public static *** v(...);
- public static *** i(...);
- public static *** w(...);
- public static *** e(...);
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+    public static int w(...);
+    public static int e(...);
+    public static int wtf(...);
+    public static java.lang.String getStackTraceString(java.lang.Throwable);
 }
--keep class go.** { *; }
+-assumenosideeffects class java.lang.Throwable {
+    public void printStackTrace();
+}
 -keep class com.tsuyu.line.r.** { *; }
 -keepclassmembers class * {
- @android.webkit.JavascriptInterface <methods>;
+    @android.webkit.JavascriptInterface <methods>;
 }
 -keepclassmembers class * extends java.lang.Throwable { *; }
 -dontwarn okhttp3.**

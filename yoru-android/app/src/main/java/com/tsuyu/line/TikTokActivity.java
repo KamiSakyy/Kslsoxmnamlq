@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.*;
+import android.view.ScaleGestureDetector;
 import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.media3.common.MediaItem;
@@ -35,6 +36,8 @@ public final class TikTokActivity extends Activity {
     private boolean isMuted = false;
     private boolean isZoomMode = false; // By default NOT expanded (Fit mode)
     private boolean destroyed = false;
+    private boolean uiOverlayVisible = true;
+    private View topBar;
     private final Handler progressHandler = new Handler(Looper.getMainLooper());
     private ClipHolder currentHolder;
 
@@ -173,23 +176,37 @@ public final class TikTokActivity extends Activity {
         root.addView(recycler, new FrameLayout.LayoutParams(-1, -1));
     }
 
+    public void setOverlayVisible(boolean visible) {
+        if (uiOverlayVisible == visible) return;
+        uiOverlayVisible = visible;
+        float alpha = visible ? 1f : 0f;
+        int vis = visible ? View.VISIBLE : View.GONE;
+
+        if (topBar != null) {
+            topBar.animate().alpha(alpha).setDuration(220).withEndAction(() -> {
+                if (topBar != null) topBar.setVisibility(vis);
+            }).start();
+        }
+        if (currentHolder != null) {
+            currentHolder.setOverlayVisible(visible);
+        }
+    }
+
     private void initTopBar() {
-        LinearLayout topBar = Ui.row(this);
+        topBar = Ui.row(this);
         topBar.setPadding(Ui.dp(this, 14), Ui.dp(this, 36), Ui.dp(this, 14), Ui.dp(this, 10));
 
         View back = Ui.iconButton(this, "back", "Назад", this::finish);
-        topBar.addView(back, Ui.lp(this, 40, 40));
+        ((LinearLayout) topBar).addView(back, Ui.lp(this, 40, 40));
 
         LinearLayout titleCol = Ui.column(this);
         titleCol.setPadding(Ui.dp(this, 12), 0, Ui.dp(this, 10), 0);
+        titleCol.setGravity(Gravity.CENTER_VERTICAL);
         TextView title = Ui.text(this, "Лента аниме", 16, Color.WHITE, true);
         titleCol.addView(title);
+        ((LinearLayout) topBar).addView(titleCol, new LinearLayout.LayoutParams(0, -2, 1));
 
-        TextView badge = Ui.text(this, "TikTok • 15–30 сек", 10, Ui.PURPLE, false);
-        titleCol.addView(badge);
-        topBar.addView(titleCol, new LinearLayout.LayoutParams(0, -2, 1));
-
-        Ui.gap(topBar, Ui.iconButton(this, "refresh", "Случайный", () -> {
+        Ui.gap((LinearLayout) topBar, Ui.iconButton(this, "refresh", "Случайный", () -> {
             if (currentPosition + 1 < clips.size()) {
                 recycler.smoothScrollToPosition(currentPosition + 1);
             } else {
@@ -276,6 +293,7 @@ public final class TikTokActivity extends Activity {
         holder.poster.setVisibility(View.VISIBLE);
         holder.buffering.setVisibility(View.VISIBLE);
         holder.updateState();
+        holder.applyOverlayState(uiOverlayVisible);
 
         player.stop();
         player.clearMediaItems();
@@ -336,6 +354,8 @@ public final class TikTokActivity extends Activity {
     final class ClipHolder extends RecyclerView.ViewHolder {
         final FrameLayout container;
         final ImageView poster;
+        final View topGrad;
+        final View botGrad;
         final ProgressBar progressBar;
         final ProgressBar buffering;
         final ImageView playPauseCenter;
@@ -347,6 +367,8 @@ public final class TikTokActivity extends Activity {
         final Ui.Icon autoSwipeIcon;
         final Ui.Icon resizeIcon;
         final Ui.Icon muteIcon;
+        final LinearLayout actions;
+        final LinearLayout info;
         ClipServer.Clip clip;
 
         ClipHolder(@NonNull View itemView) {
@@ -359,12 +381,12 @@ public final class TikTokActivity extends Activity {
             container.addView(poster, new FrameLayout.LayoutParams(-1, -1));
 
             // Top gradient
-            View topGrad = new View(TikTokActivity.this);
+            topGrad = new View(TikTokActivity.this);
             topGrad.setBackground(Ui.gradient(0xa0000000, 0x00000000, 0, TikTokActivity.this));
             container.addView(topGrad, new FrameLayout.LayoutParams(-1, Ui.dp(TikTokActivity.this, 110), Gravity.TOP));
 
             // Bottom gradient
-            View botGrad = new View(TikTokActivity.this);
+            botGrad = new View(TikTokActivity.this);
             botGrad.setBackground(Ui.gradient(0x00000000, 0xdf000000, 0, TikTokActivity.this));
             container.addView(botGrad, new FrameLayout.LayoutParams(-1, Ui.dp(TikTokActivity.this, 300), Gravity.BOTTOM));
 
@@ -378,6 +400,8 @@ public final class TikTokActivity extends Activity {
             playPauseCenter.setImageResource(android.R.drawable.ic_media_play);
             playPauseCenter.setColorFilter(Color.WHITE);
             playPauseCenter.setVisibility(View.GONE);
+            playPauseCenter.setClickable(false);
+            playPauseCenter.setFocusable(false);
             container.addView(playPauseCenter, new FrameLayout.LayoutParams(Ui.dp(TikTokActivity.this, 64), Ui.dp(TikTokActivity.this, 64), Gravity.CENTER));
 
             // Bottom Progress Bar
@@ -388,7 +412,7 @@ public final class TikTokActivity extends Activity {
             container.addView(progressBar, pp);
 
             // Right Action Column
-            LinearLayout actions = Ui.column(TikTokActivity.this);
+            actions = Ui.column(TikTokActivity.this);
             actions.setGravity(Gravity.CENTER_HORIZONTAL);
             actions.setPadding(0, 0, Ui.dp(TikTokActivity.this, 14), Ui.dp(TikTokActivity.this, 30));
 
@@ -466,25 +490,11 @@ public final class TikTokActivity extends Activity {
             Ui.press(muteIcon);
             actions.addView(muteIcon, Ui.lp(TikTokActivity.this, 28, 28));
 
-            Ui.space(actions, 20);
-
-            // 6. Full Episode icon button
-            Ui.Icon fullEpIcon = new Ui.Icon(TikTokActivity.this, "play");
-            fullEpIcon.color = Ui.PURPLE;
-            fullEpIcon.setContentDescription("Серия");
-            fullEpIcon.setOnClickListener(v -> {
-                if (clip != null) {
-                    Ui.openPlayer(TikTokActivity.this, clip.anime, "yoru", clip.episode != null ? clip.episode.number : 1, clip.startMs);
-                }
-            });
-            Ui.press(fullEpIcon);
-            actions.addView(fullEpIcon, Ui.lp(TikTokActivity.this, 28, 28));
-
             FrameLayout.LayoutParams ap = new FrameLayout.LayoutParams(-2, -2, Gravity.END | Gravity.BOTTOM);
             container.addView(actions, ap);
 
             // Bottom Info Column
-            LinearLayout info = Ui.column(TikTokActivity.this);
+            info = Ui.column(TikTokActivity.this);
             info.setPadding(Ui.dp(TikTokActivity.this, 16), 0, Ui.dp(TikTokActivity.this, 84), Ui.dp(TikTokActivity.this, 24));
 
             title = Ui.text(TikTokActivity.this, "", 18, Color.WHITE, true);
@@ -520,10 +530,39 @@ public final class TikTokActivity extends Activity {
             FrameLayout.LayoutParams ip = new FrameLayout.LayoutParams(-1, -2, Gravity.START | Gravity.BOTTOM);
             container.addView(info, ip);
 
-            // Single tap gesture to pause / resume
-            GestureDetector gestureDetector = new GestureDetector(TikTokActivity.this, new GestureDetector.SimpleOnGestureListener() {
+            // Pinch gesture to hide/show UI overlay
+            ScaleGestureDetector scaleDetector = new ScaleGestureDetector(TikTokActivity.this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                private float scaleAccumulator = 1f;
+
                 @Override
-                public boolean onSingleTapConfirmed(MotionEvent e) {
+                public boolean onScaleBegin(ScaleGestureDetector detector) {
+                    scaleAccumulator = 1f;
+                    return true;
+                }
+
+                @Override
+                public boolean onScale(ScaleGestureDetector detector) {
+                    scaleAccumulator *= detector.getScaleFactor();
+                    if (scaleAccumulator > 1.12f) { // Spreading two fingers apart -> hide UI
+                        setOverlayVisible(false);
+                        scaleAccumulator = 1f;
+                    } else if (scaleAccumulator < 0.88f) { // Pinching two fingers together -> show UI
+                        setOverlayVisible(true);
+                        scaleAccumulator = 1f;
+                    }
+                    return true;
+                }
+            });
+
+            // Single tap gesture to pause / resume
+            GestureDetector tapDetector = new GestureDetector(TikTokActivity.this, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onDown(MotionEvent e) {
+                    return true;
+                }
+
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
                     if (player != null) {
                         if (player.isPlaying()) player.pause();
                         else player.play();
@@ -532,7 +571,57 @@ public final class TikTokActivity extends Activity {
                 }
             });
 
-            container.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
+            container.setOnTouchListener((v, event) -> {
+                if (event.getPointerCount() >= 2) {
+                    v.getParent().requestDisallowInterceptTouchEvent(true);
+                    scaleDetector.onTouchEvent(event);
+                    return true;
+                } else {
+                    v.getParent().requestDisallowInterceptTouchEvent(false);
+                }
+                boolean handled = tapDetector.onTouchEvent(event);
+                return handled || event.getAction() == MotionEvent.ACTION_DOWN;
+            });
+        }
+
+        void setOverlayVisible(boolean visible) {
+            float alpha = visible ? 1f : 0f;
+            int vis = visible ? View.VISIBLE : View.GONE;
+            if (actions != null) {
+                actions.animate().alpha(alpha).setDuration(220).withEndAction(() -> {
+                    if (actions != null) actions.setVisibility(vis);
+                }).start();
+            }
+            if (info != null) {
+                info.animate().alpha(alpha).setDuration(220).withEndAction(() -> {
+                    if (info != null) info.setVisibility(vis);
+                }).start();
+            }
+            if (progressBar != null) {
+                progressBar.animate().alpha(alpha).setDuration(220).withEndAction(() -> {
+                    if (progressBar != null) progressBar.setVisibility(vis);
+                }).start();
+            }
+            if (topGrad != null) {
+                topGrad.animate().alpha(alpha).setDuration(220).withEndAction(() -> {
+                    if (topGrad != null) topGrad.setVisibility(vis);
+                }).start();
+            }
+            if (botGrad != null) {
+                botGrad.animate().alpha(alpha).setDuration(220).withEndAction(() -> {
+                    if (botGrad != null) botGrad.setVisibility(vis);
+                }).start();
+            }
+        }
+
+        void applyOverlayState(boolean visible) {
+            float alpha = visible ? 1f : 0f;
+            int vis = visible ? View.VISIBLE : View.GONE;
+            if (actions != null) { actions.setAlpha(alpha); actions.setVisibility(vis); }
+            if (info != null) { info.setAlpha(alpha); info.setVisibility(vis); }
+            if (progressBar != null) { progressBar.setAlpha(alpha); progressBar.setVisibility(vis); }
+            if (topGrad != null) { topGrad.setAlpha(alpha); topGrad.setVisibility(vis); }
+            if (botGrad != null) { botGrad.setAlpha(alpha); botGrad.setVisibility(vis); }
         }
 
         void bind(ClipServer.Clip c) {
@@ -549,6 +638,7 @@ public final class TikTokActivity extends Activity {
                 YoruApp.app().images.load(avatar, c.anime);
                 YoruApp.app().images.load(poster, c.anime);
             }
+            applyOverlayState(uiOverlayVisible);
         }
 
         void updateState() {

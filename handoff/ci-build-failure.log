@@ -21,11 +21,9 @@ Daemon will be stopped at the end of the build
 > Task :app:processTsuyuDebugResources UP-TO-DATE
 
 > Task :app:compileTsuyuDebugJavaWithJavac
-/home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/HentaiEngine.java:761: error: cannot find symbol
-                a.poster=hentaCoverFallback(a.title,a.original,r.slug);
-                                                                ^
-  symbol:   variable slug
-  location: variable r of type Row
+/home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:241: error: exception InterruptedException is never thrown in body of corresponding try statement
+    private void runEnrich(Anime a){ArrayList<Future<?>> jobs=new ArrayList<>();try{jobs.add(ENRICH.submit((Runnable)()->enrichSchedule(a)));jobs.add(ENRICH.submit((Runnable)()->enrichVisuals(a)));jobs.add(ENRICH.submit((Runnable)()->enrichRelated(a)));for(Future<?> j:jobs)try{j.get(2500,TimeUnit.MILLISECONDS);}catch(Exception ignored){}}catch(InterruptedException e){Thread.currentThread().interrupt();}catch(Exception ignored){}finally{for(Future<?> j:jobs)j.cancel(true);}}
+                                                                                                                                                                                                                                                                                                                                                    ^
 Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 1 error
@@ -39,11 +37,9 @@ FAILURE: Build failed with an exception.
 * What went wrong:
 Execution failed for task ':app:compileTsuyuDebugJavaWithJavac'.
 > Compilation failed; see the compiler output below.
-  /home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/HentaiEngine.java:761: error: cannot find symbol
-                  a.poster=hentaCoverFallback(a.title,a.original,r.slug);
-                                                                  ^
-    symbol:   variable slug
-    location: variable r of type Row
+  /home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:241: error: exception InterruptedException is never thrown in body of corresponding try statement
+      private void runEnrich(Anime a){ArrayList<Future<?>> jobs=new ArrayList<>();try{jobs.add(ENRICH.submit((Runnable)()->enrichSchedule(a)));jobs.add(ENRICH.submit((Runnable)()->enrichVisuals(a)));jobs.add(ENRICH.submit((Runnable)()->enrichRelated(a)));for(Future<?> j:jobs)try{j.get(2500,TimeUnit.MILLISECONDS);}catch(Exception ignored){}}catch(InterruptedException e){Thread.currentThread().interrupt();}catch(Exception ignored){}finally{for(Future<?> j:jobs)j.cancel(true);}}
+                                                                                                                                                                                                                                                                                                                                                      ^
   Note: Some input files use or override a deprecated API.
   Note: Recompile with -Xlint:deprecation for details.
   1 error

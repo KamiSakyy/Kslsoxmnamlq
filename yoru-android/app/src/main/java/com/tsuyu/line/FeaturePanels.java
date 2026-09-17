@@ -10,6 +10,8 @@ import java.util.*;
 final class FeaturePanels {
     private FeaturePanels(){}
 
+    static void tiktok(Activity a){try{a.startActivity(new Intent(a,TikTokActivity.class));}catch(Exception e){Ui.toast(a,"Не удалось открыть ленту");}}
+
 
 
     static void queue(Activity a){List<Anime> rows=YoruApp.app().store.watchQueue();ScrollView sc=new ScrollView(a);LinearLayout col=Ui.column(a);col.setPadding(Ui.dp(a,2),0,Ui.dp(a,2),0);sc.addView(col);sc.setLayoutParams(new LinearLayout.LayoutParams(-1,Ui.dp(a,430)));if(rows.isEmpty()){col.addView(Ui.text(a,"План пуст Добавьте тайтл из карточки кнопкой “В план”",12,Ui.MUTED,false));}else{for(Anime anime:rows)animeLine(a,col,anime,YoruBrain.nextHint(anime),true);}Ui.custom(a,"План просмотра",sc,"Готово",null,rows.isEmpty()?null:"Очистить",()->{YoruApp.app().store.clearWatchQueue();Ui.toast(a,"План очищен");},null);}

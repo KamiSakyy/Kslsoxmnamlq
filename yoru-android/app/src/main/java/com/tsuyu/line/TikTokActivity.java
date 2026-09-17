@@ -1,11 +1,17 @@
 package com.tsuyu.line;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.*;
 import android.view.ScaleGestureDetector;
 import android.widget.*;
@@ -21,6 +27,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.Executors;
 
 public final class TikTokActivity extends Activity {
     private FrameLayout root;
@@ -192,7 +202,369 @@ public final class TikTokActivity extends Activity {
         }
     }
 
+    private void showVoiceDialog() {
+        Dialog d = new Dialog(this);
+        d.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        LinearLayout box = Ui.column(this);
+        box.setPadding(Ui.dp(this, 18), Ui.dp(this, 12), Ui.dp(this, 18), Ui.dp(this, 22));
+
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(0xff121215);
+        float r = Ui.dp(this, 20);
+        bg.setCornerRadii(new float[]{r, r, r, r, 0, 0, 0, 0});
+        bg.setStroke(Ui.dp(this, 1), 0x22ffffff);
+        box.setBackground(bg);
+
+        View handle = new View(this);
+        handle.setBackground(Ui.shape(0x44ffffff, 3, this));
+        LinearLayout.LayoutParams hp = new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 4));
+        hp.gravity = Gravity.CENTER_HORIZONTAL;
+        hp.bottomMargin = Ui.dp(this, 14);
+        box.addView(handle, hp);
+
+        LinearLayout head = Ui.row(this);
+        head.setGravity(Gravity.CENTER_VERTICAL);
+        head.addView(Ui.text(this, "Выбор озвучки", 18, Color.WHITE, true), new LinearLayout.LayoutParams(0, -2, 1));
+
+        Ui.Icon close = new Ui.Icon(this, "close");
+        close.color = Color.WHITE;
+        close.setPadding(Ui.dp(this, 6), Ui.dp(this, 6), Ui.dp(this, 6), Ui.dp(this, 6));
+        close.setOnClickListener(v -> d.dismiss());
+        Ui.press(close);
+        head.addView(close, Ui.lp(this, 32, 32));
+        box.addView(head);
+
+        Ui.space(box, 4);
+        box.addView(Ui.text(this, "Показывать в ленте только аниме с этой озвучкой", 12, Ui.MUTED, false));
+        Ui.space(box, 14);
+
+        String[] voices = new String[]{
+                "Все озвучки",
+                "AniLibria",
+                "Dream Cast",
+                "StudioBand",
+                "SHIZA Project",
+                "AnimeVost",
+                "AniDUB",
+                "AniFilm",
+                "AniStar",
+                "JAM",
+                "Субтитры",
+                "Дубляж"
+        };
+        String current = ClipServer.get().getVoiceFilter();
+
+        ScrollView scroll = new ScrollView(this);
+        scroll.setVerticalScrollBarEnabled(false);
+        LinearLayout list = Ui.column(this);
+
+        for (int i = 0; i < voices.length; i++) {
+            final String vName = voices[i];
+            final String voiceVal = i == 0 ? "" : vName;
+            boolean isSelected = i == 0 ? current.isEmpty() : ApiRepository.voiceMatches(current, vName);
+
+            LinearLayout row = Ui.row(this);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            row.setPadding(Ui.dp(this, 14), Ui.dp(this, 12), Ui.dp(this, 14), Ui.dp(this, 12));
+            row.setBackground(isSelected ? Ui.shape(0x20ffffff, 12, this) : Ui.shape(0x00000000, 12, this));
+
+            TextView label = Ui.text(this, vName, 14, isSelected ? Color.WHITE : 0xffcccccc, isSelected);
+            row.addView(label, new LinearLayout.LayoutParams(0, -2, 1));
+
+            if (isSelected) {
+                TextView mark = Ui.text(this, "✓", 16, Ui.PURPLE, true);
+                row.addView(mark, Ui.lp(this, -2, -2));
+            }
+
+            Ui.press(row);
+            row.setOnClickListener(v -> {
+                d.dismiss();
+                onVoiceSelected(voiceVal);
+            });
+
+            list.addView(row, Ui.lp(this, -1, -2));
+            Ui.space(list, 4);
+        }
+
+        scroll.addView(list);
+        box.addView(scroll, new LinearLayout.LayoutParams(-1, Math.min(Ui.dp(this, 360), Ui.dp(this, 50 * voices.length))));
+
+        d.setContentView(box);
+        Window w = d.getWindow();
+        if (w != null) {
+            w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            w.setGravity(Gravity.BOTTOM);
+            w.setWindowAnimations(android.R.style.Animation_InputMethod);
+            WindowManager.LayoutParams p = w.getAttributes();
+            p.dimAmount = 0.65f;
+            w.setAttributes(p);
+            w.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            int width = getResources().getDisplayMetrics().widthPixels;
+            w.setLayout(Math.min(width, Ui.dp(this, 560)), WindowManager.LayoutParams.WRAP_CONTENT);
+        }
+        d.show();
+    }
+
+    private void onVoiceSelected(String voice) {
+        ClipServer.get().setVoiceFilter(voice);
+        clips.clear();
+        adapter.notifyDataSetChanged();
+        currentPosition = -1;
+        if (player != null) {
+            player.stop();
+            player.clearMediaItems();
+        }
+        initTopBar();
+        Ui.toast(this, voice.isEmpty() ? "Все озвучки" : "Озвучка: " + voice);
+        loadInitialClips();
+    }
+
+    private void showAnimeSearchDialog() {
+        Dialog d = new Dialog(this);
+        d.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        LinearLayout box = Ui.column(this);
+        box.setPadding(Ui.dp(this, 18), Ui.dp(this, 12), Ui.dp(this, 18), Ui.dp(this, 22));
+
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(0xff121215);
+        float r = Ui.dp(this, 20);
+        bg.setCornerRadii(new float[]{r, r, r, r, 0, 0, 0, 0});
+        bg.setStroke(Ui.dp(this, 1), 0x22ffffff);
+        box.setBackground(bg);
+
+        View handle = new View(this);
+        handle.setBackground(Ui.shape(0x44ffffff, 3, this));
+        LinearLayout.LayoutParams hp = new LinearLayout.LayoutParams(Ui.dp(this, 40), Ui.dp(this, 4));
+        hp.gravity = Gravity.CENTER_HORIZONTAL;
+        hp.bottomMargin = Ui.dp(this, 14);
+        box.addView(handle, hp);
+
+        LinearLayout head = Ui.row(this);
+        head.setGravity(Gravity.CENTER_VERTICAL);
+        head.addView(Ui.text(this, "Поиск аниме", 18, Color.WHITE, true), new LinearLayout.LayoutParams(0, -2, 1));
+
+        Ui.Icon close = new Ui.Icon(this, "close");
+        close.color = Color.WHITE;
+        close.setPadding(Ui.dp(this, 6), Ui.dp(this, 6), Ui.dp(this, 6), Ui.dp(this, 6));
+        close.setOnClickListener(v -> d.dismiss());
+        Ui.press(close);
+        head.addView(close, Ui.lp(this, 32, 32));
+        box.addView(head);
+
+        Ui.space(box, 4);
+        box.addView(Ui.text(this, "Лента будет показывать нарезки только из выбранного тайтла", 12, Ui.MUTED, false));
+        Ui.space(box, 12);
+
+        Anime currentTarget = ClipServer.get().getTargetAnime();
+        if (currentTarget != null) {
+            LinearLayout banner = Ui.row(this);
+            banner.setGravity(Gravity.CENTER_VERTICAL);
+            banner.setPadding(Ui.dp(this, 12), Ui.dp(this, 8), Ui.dp(this, 12), Ui.dp(this, 8));
+            banner.setBackground(Ui.stroke(0x22ffffff, 12, this));
+
+            TextView currLabel = Ui.text(this, "Сейчас: " + YoruBrain.title(currentTarget), 12, Color.WHITE, true);
+            currLabel.setMaxLines(1);
+            currLabel.setEllipsize(TextUtils.TruncateAt.END);
+            banner.addView(currLabel, new LinearLayout.LayoutParams(0, -2, 1));
+
+            TextView resetBtn = Ui.chip(this, "Сбросить ленту", true, () -> {
+                d.dismiss();
+                onAnimeSelected(null);
+            });
+            banner.addView(resetBtn, Ui.lp(this, -2, -2));
+            box.addView(banner, Ui.lp(this, -1, -2));
+            Ui.space(box, 10);
+        }
+
+        LinearLayout searchBox = Ui.row(this);
+        searchBox.setGravity(Gravity.CENTER_VERTICAL);
+        searchBox.setBackground(Ui.stroke(Ui.CARD, 12, this));
+        searchBox.setPadding(Ui.dp(this, 12), 0, Ui.dp(this, 10), 0);
+
+        Ui.Icon sIcon = new Ui.Icon(this, "search");
+        sIcon.color = Ui.MUTED;
+        searchBox.addView(sIcon, Ui.lp(this, 20, 20));
+
+        EditText edit = new EditText(this);
+        edit.setTextColor(Color.WHITE);
+        edit.setHintTextColor(Ui.MUTED);
+        edit.setHint("Найти тайтл...");
+        edit.setSingleLine(true);
+        edit.setTextSize(14);
+        edit.setBackground(null);
+        edit.setPadding(Ui.dp(this, 10), Ui.dp(this, 12), Ui.dp(this, 10), Ui.dp(this, 12));
+        searchBox.addView(edit, new LinearLayout.LayoutParams(0, -2, 1));
+
+        Ui.Icon clearIcon = new Ui.Icon(this, "close");
+        clearIcon.color = Ui.MUTED;
+        clearIcon.setVisibility(View.GONE);
+        clearIcon.setPadding(Ui.dp(this, 4), Ui.dp(this, 4), Ui.dp(this, 4), Ui.dp(this, 4));
+        clearIcon.setOnClickListener(v -> edit.setText(""));
+        searchBox.addView(clearIcon, Ui.lp(this, 26, 26));
+
+        box.addView(searchBox, Ui.lp(this, -1, Ui.dp(this, 46)));
+        Ui.space(box, 12);
+
+        ScrollView scroll = new ScrollView(this);
+        scroll.setVerticalScrollBarEnabled(false);
+        LinearLayout listCol = Ui.column(this);
+        scroll.addView(listCol, new LinearLayout.LayoutParams(-1, -2));
+        box.addView(scroll, new LinearLayout.LayoutParams(-1, Ui.dp(this, 320)));
+
+        renderAnimeList(listCol, d, getAnimePreviewList(""));
+
+        Handler searchH = new Handler(Looper.getMainLooper());
+        final Runnable[] searchTask = new Runnable[1];
+
+        edit.addTextChangedListener(new TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String q = s == null ? "" : s.toString().trim();
+                clearIcon.setVisibility(q.isEmpty() ? View.GONE : View.VISIBLE);
+                if (searchTask[0] != null) searchH.removeCallbacks(searchTask[0]);
+
+                searchTask[0] = () -> {
+                    List<Anime> local = getAnimePreviewList(q);
+                    renderAnimeList(listCol, d, local);
+
+                    if (q.length() >= 2) {
+                        Executors.newSingleThreadExecutor().execute(() -> {
+                            try {
+                                Anime.Page p = YoruApp.app().api.catalog("yoru", q, 1, null);
+                                if (p != null && !p.items.isEmpty()) {
+                                    searchH.post(() -> {
+                                        LinkedHashMap<String, Anime> merged = new LinkedHashMap<>();
+                                        for (Anime item : local) merged.put(item.key(), item);
+                                        for (Anime item : p.items) {
+                                            if (item != null && Anime.valid(item) && YoruBrain.visible(item)) {
+                                                merged.put(item.key(), item);
+                                            }
+                                        }
+                                        renderAnimeList(listCol, d, new ArrayList<>(merged.values()));
+                                    });
+                                }
+                            } catch (Exception ignored) {}
+                        });
+                    }
+                };
+                searchH.postDelayed(searchTask[0], q.isEmpty() ? 50 : 250);
+            }
+            public void afterTextChanged(Editable s) {}
+        });
+
+        d.setContentView(box);
+        Window w = d.getWindow();
+        if (w != null) {
+            w.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            w.setGravity(Gravity.BOTTOM);
+            w.setWindowAnimations(android.R.style.Animation_InputMethod);
+            WindowManager.LayoutParams p = w.getAttributes();
+            p.dimAmount = 0.65f;
+            w.setAttributes(p);
+            w.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            int width = getResources().getDisplayMetrics().widthPixels;
+            w.setLayout(Math.min(width, Ui.dp(this, 560)), WindowManager.LayoutParams.WRAP_CONTENT);
+        }
+        d.show();
+    }
+
+    private void renderAnimeList(LinearLayout listCol, Dialog d, List<Anime> list) {
+        listCol.removeAllViews();
+        if (list == null || list.isEmpty()) {
+            TextView empty = Ui.text(this, "Ничего не найдено", 13, Ui.MUTED, false);
+            empty.setGravity(Gravity.CENTER);
+            empty.setPadding(0, Ui.dp(this, 30), 0, 0);
+            listCol.addView(empty);
+            return;
+        }
+        for (Anime a : list) {
+            if (a == null || !Anime.valid(a)) continue;
+            LinearLayout item = Ui.row(this);
+            item.setGravity(Gravity.CENTER_VERTICAL);
+            item.setPadding(Ui.dp(this, 8), Ui.dp(this, 7), Ui.dp(this, 10), Ui.dp(this, 7));
+            item.setBackground(Ui.shape(0x12ffffff, 10, this));
+
+            ImageView poster = new ImageView(this);
+            poster.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            poster.setBackground(Ui.shape(Ui.CARD, 6, this));
+            poster.setClipToOutline(true);
+            item.addView(poster, Ui.lp(this, 36, 50));
+            YoruApp.app().images.load(poster, a);
+
+            LinearLayout col = Ui.column(this);
+            col.setPadding(Ui.dp(this, 10), 0, Ui.dp(this, 8), 0);
+            TextView title = Ui.text(this, YoruBrain.title(a), 13, Color.WHITE, true);
+            title.setMaxLines(1);
+            title.setEllipsize(TextUtils.TruncateAt.END);
+            col.addView(title);
+
+            String meta = (a.year > 0 ? a.year + "" : "") + (a.score > 0 ? " · ★ " + String.format(Locale.US, "%.1f", a.score) : "") + (!a.statusLabel().isEmpty() ? " · " + a.statusLabel() : "");
+            meta = meta.replaceAll("^ · ", "");
+            if (!meta.isEmpty()) {
+                Ui.space(col, 2);
+                col.addView(Ui.text(this, meta, 11, Ui.MUTED, false));
+            }
+            item.addView(col, new LinearLayout.LayoutParams(0, -2, 1));
+
+            Ui.Icon play = new Ui.Icon(this, "play");
+            play.color = Ui.PURPLE;
+            item.addView(play, Ui.lp(this, 18, 18));
+
+            Ui.press(item);
+            item.setOnClickListener(v -> {
+                d.dismiss();
+                onAnimeSelected(a);
+            });
+
+            listCol.addView(item, Ui.lp(this, -1, -2));
+            Ui.space(listCol, 6);
+        }
+    }
+
+    private List<Anime> getAnimePreviewList(String query) {
+        String needle = ApiRepository.plainName(query);
+        LinkedHashMap<String, Anime> map = new LinkedHashMap<>();
+        ArrayList<Anime> pool = new ArrayList<>();
+        pool.addAll(YoruApp.app().store.recent());
+        pool.addAll(YoruApp.app().store.favorites());
+        pool.addAll(YoruApp.app().api.seed());
+
+        for (Anime a : pool) {
+            if (a == null || !Anime.valid(a) || !YoruBrain.visible(a) || map.containsKey(a.key())) continue;
+            if (needle.isEmpty()) {
+                map.put(a.key(), a);
+                if (map.size() >= 20) break;
+            } else {
+                String hay = ApiRepository.plainName(a.title + " " + a.original + " " + a.alias);
+                if (hay.contains(needle)) {
+                    map.put(a.key(), a);
+                    if (map.size() >= 25) break;
+                }
+            }
+        }
+        return new ArrayList<>(map.values());
+    }
+
+    private void onAnimeSelected(Anime anime) {
+        ClipServer.get().setTargetAnime(anime);
+        clips.clear();
+        adapter.notifyDataSetChanged();
+        currentPosition = -1;
+        if (player != null) {
+            player.stop();
+            player.clearMediaItems();
+        }
+        initTopBar();
+        Ui.toast(this, anime == null ? "Случайная лента включена" : "Лента: " + YoruBrain.title(anime));
+        loadInitialClips();
+    }
+
     private void initTopBar() {
+        if (topBar != null) {
+            root.removeView(topBar);
+        }
         topBar = Ui.row(this);
         topBar.setPadding(Ui.dp(this, 14), Ui.dp(this, 36), Ui.dp(this, 14), Ui.dp(this, 10));
 
@@ -202,17 +574,44 @@ public final class TikTokActivity extends Activity {
         LinearLayout titleCol = Ui.column(this);
         titleCol.setPadding(Ui.dp(this, 12), 0, Ui.dp(this, 10), 0);
         titleCol.setGravity(Gravity.CENTER_VERTICAL);
-        TextView title = Ui.text(this, "Лента аниме", 16, Color.WHITE, true);
+        Anime target = ClipServer.get().getTargetAnime();
+        String mainTitle = target != null ? YoruBrain.title(target) : "Лента аниме";
+        TextView title = Ui.text(this, mainTitle, 15, Color.WHITE, true);
+        title.setSingleLine(true);
+        title.setEllipsize(TextUtils.TruncateAt.END);
         titleCol.addView(title);
+
+        String sub = "";
+        String vFilter = ClipServer.get().getVoiceFilter();
+        if (target != null) {
+            sub = "Сбросить выбор";
+            titleCol.setOnClickListener(v -> onAnimeSelected(null));
+            Ui.press(titleCol);
+        } else if (!vFilter.isEmpty()) {
+            sub = "Озвучка: " + vFilter;
+        }
+        if (!sub.isEmpty()) {
+            TextView subText = Ui.text(this, sub, 11, Ui.MUTED, false);
+            subText.setSingleLine(true);
+            titleCol.addView(subText);
+        }
         ((LinearLayout) topBar).addView(titleCol, new LinearLayout.LayoutParams(0, -2, 1));
 
-        Ui.gap((LinearLayout) topBar, Ui.iconButton(this, "refresh", "Случайный", () -> {
-            if (currentPosition + 1 < clips.size()) {
-                recycler.smoothScrollToPosition(currentPosition + 1);
-            } else {
-                fetchMoreClips(true);
-            }
-        }), 38, 38, 8);
+        Ui.Icon searchBtn = new Ui.Icon(this, "search");
+        searchBtn.color = target != null ? Color.WHITE : Ui.MUTED;
+        searchBtn.setContentDescription("Поиск аниме");
+        searchBtn.setPadding(Ui.dp(this, 7), Ui.dp(this, 7), Ui.dp(this, 7), Ui.dp(this, 7));
+        searchBtn.setOnClickListener(v -> showAnimeSearchDialog());
+        Ui.press(searchBtn);
+        Ui.gap((LinearLayout) topBar, searchBtn, 36, 36, 8);
+
+        Ui.Icon voiceBtn = new Ui.Icon(this, "mic");
+        voiceBtn.color = vFilter.isEmpty() ? Ui.MUTED : Color.WHITE;
+        voiceBtn.setContentDescription("Выбор озвучки");
+        voiceBtn.setPadding(Ui.dp(this, 7), Ui.dp(this, 7), Ui.dp(this, 7), Ui.dp(this, 7));
+        voiceBtn.setOnClickListener(v -> showVoiceDialog());
+        Ui.press(voiceBtn);
+        Ui.gap((LinearLayout) topBar, voiceBtn, 36, 36, 8);
 
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(-1, -2, Gravity.TOP);
         root.addView(topBar, lp);
@@ -632,7 +1031,8 @@ public final class TikTokActivity extends Activity {
                     ? String.join(", ", c.anime.genres.subList(0, Math.min(3, c.anime.genres.size())))
                     : "Аниме";
             String score = c.anime != null && c.anime.score > 0 ? String.format(java.util.Locale.US, "★ %.1f • ", c.anime.score) : "";
-            details.setText(score + genres);
+            String voiceLabel = c.voiceName != null && !c.voiceName.isEmpty() ? " • " + c.voiceName : "";
+            details.setText(score + genres + voiceLabel);
             updateState();
             if (c.anime != null) {
                 YoruApp.app().images.load(avatar, c.anime);

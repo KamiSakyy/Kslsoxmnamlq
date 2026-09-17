@@ -19,10 +19,11 @@ public final class ClipServer {
         public final String title;
         public final String timingText;
         public final String id;
+        public final String voiceName;
         public int likes;
         public boolean liked;
 
-        public Clip(Anime anime, Anime.Episode episode, String streamUrl, long startMs, long endMs, int durationSec, String title, String timingText) {
+        public Clip(Anime anime, Anime.Episode episode, String streamUrl, long startMs, long endMs, int durationSec, String title, String timingText, String voiceName) {
             this.anime = anime;
             this.episode = episode;
             this.streamUrl = streamUrl;
@@ -31,6 +32,7 @@ public final class ClipServer {
             this.durationSec = durationSec;
             this.title = title;
             this.timingText = timingText;
+            this.voiceName = voiceName == null ? "" : voiceName;
             this.id = anime.key() + ":" + (episode != null ? episode.number : 1) + ":" + startMs;
             this.likes = 120 + (Math.abs(this.id.hashCode()) % 1500);
             this.liked = false;
@@ -47,8 +49,36 @@ public final class ClipServer {
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private final Random random = new Random();
     private volatile boolean prefetching = false;
+    private volatile String selectedVoice = "";
+    private volatile Anime targetAnime = null;
+    private volatile Anime.Playback cachedTargetPlayback = null;
 
     private ClipServer() {}
+
+    public void setVoiceFilter(String voice) {
+        this.selectedVoice = voice == null ? "" : voice.trim();
+        queue.clear();
+        triggerPrefetch();
+    }
+
+    public String getVoiceFilter() {
+        return selectedVoice;
+    }
+
+    public void setTargetAnime(Anime anime) {
+        this.targetAnime = anime;
+        this.cachedTargetPlayback = null;
+        queue.clear();
+        triggerPrefetch();
+    }
+
+    public Anime getTargetAnime() {
+        return targetAnime;
+    }
+
+    public void clearQueue() {
+        queue.clear();
+    }
 
     public void nextClip(ClipCallback cb) {
         Clip cached = queue.poll();
@@ -85,13 +115,26 @@ public final class ClipServer {
     }
 
     private Clip sliceRandomClip() {
-        for (int attempt = 0; attempt < 7; attempt++) {
+        String filter = selectedVoice;
+        Anime target = targetAnime;
+        for (int attempt = 0; attempt < 22; attempt++) {
             try {
-                Anime anime = pickRandomAnime();
-                if (anime == null) continue;
+                Anime anime;
+                Anime.Playback playback;
+                if (target != null) {
+                    anime = target;
+                    if (cachedTargetPlayback == null) {
+                        cachedTargetPlayback = YoruApp.app().api.playback(target, "auto");
+                    }
+                    playback = cachedTargetPlayback;
+                } else {
+                    anime = pickRandomAnime();
+                    if (anime == null) continue;
+                    playback = YoruApp.app().api.playback(anime, "auto");
+                }
 
-                Anime.Playback playback = YoruApp.app().api.playback(anime, "auto");
                 if (playback == null || playback.video == null || playback.video.episodeList == null || playback.video.episodeList.isEmpty()) {
+                    if (target != null && attempt > 2) return null;
                     continue;
                 }
                 ArrayList<Anime.Episode> validEps = new ArrayList<>();
@@ -103,8 +146,45 @@ public final class ClipServer {
                 Anime.Episode chosenEp = validEps.get(random.nextInt(validEps.size()));
                 YoruApp.app().api.loadEpisode(chosenEp);
 
-                String streamUrl = extractStreamUrl(chosenEp);
-                if (streamUrl == null || streamUrl.isEmpty()) continue;
+                String streamUrl = null;
+                String matchedVoice = "";
+
+                if (filter != null && !filter.isEmpty()) {
+                    // Check variants for chosen voice
+                    if (!chosenEp.variants.isEmpty()) {
+                        for (Anime.Variant v : chosenEp.variants) {
+                            String vName = v.name.isEmpty() ? v.label() : v.name;
+                            String vTitle = ApiRepository.voiceTitle(vName);
+                            if (ApiRepository.voiceMatches(filter, vName) || ApiRepository.voiceMatches(filter, vTitle)) {
+                                try {
+                                    TreeMap<Integer, String> resolved = YoruApp.app().api.resolveStreams(v.url);
+                                    if (resolved != null && !resolved.isEmpty()) {
+                                        if (resolved.containsKey(720)) streamUrl = resolved.get(720);
+                                        else if (resolved.containsKey(480)) streamUrl = resolved.get(480);
+                                        else streamUrl = resolved.firstEntry().getValue();
+                                        matchedVoice = vTitle.isEmpty() ? vName : vTitle;
+                                        break;
+                                    }
+                                } catch (Exception ignored) {}
+                            }
+                        }
+                    }
+                    // Check source direct streams if variants didn't have stream
+                    if (streamUrl == null) {
+                        String srcVoice = ApiRepository.sourceVoice(playback.video.source);
+                        if (ApiRepository.voiceMatches(filter, srcVoice) || ApiRepository.voiceMatches(filter, chosenEp.name)) {
+                            streamUrl = extractStreamUrl(chosenEp);
+                            matchedVoice = filter;
+                        }
+                    }
+                    if (streamUrl == null || streamUrl.isEmpty()) {
+                        continue;
+                    }
+                } else {
+                    streamUrl = extractStreamUrl(chosenEp);
+                    if (streamUrl == null || streamUrl.isEmpty()) continue;
+                    matchedVoice = !chosenEp.variants.isEmpty() ? ApiRepository.voiceTitle(chosenEp.variants.get(0).name) : ApiRepository.sourceVoice(playback.video.source);
+                }
 
                 int durationSec = chosenEp.duration > 180 ? chosenEp.duration : 1440;
                 int minSec = Math.min(100, Math.max(60, durationSec / 6));
@@ -118,7 +198,7 @@ public final class ClipServer {
                 String timing = Ui.time(startSec) + " - " + Ui.time(endSec) + " (" + clipLen + " сек)";
                 String displayTitle = YoruBrain.title(anime);
 
-                return new Clip(anime, chosenEp, streamUrl, startMs, endMs, clipLen, displayTitle, timing);
+                return new Clip(anime, chosenEp, streamUrl, startMs, endMs, clipLen, displayTitle, timing, matchedVoice);
             } catch (Exception ignored) {
             }
         }
@@ -157,6 +237,22 @@ public final class ClipServer {
 
     private Anime pickRandomAnime() {
         List<Anime> candidates = new ArrayList<>();
+        String filter = selectedVoice;
+        if (filter != null && !filter.isEmpty()) {
+            String fLower = filter.toLowerCase(Locale.ROOT);
+            String sourceKey = "";
+            if (fLower.contains("anilibria") || fLower.contains("анилибрия")) sourceKey = "anilibria";
+            else if (fLower.contains("animevost") || fLower.contains("анимевост")) sourceKey = "animevost";
+            else if (fLower.contains("anidub") || fLower.contains("анидаб")) sourceKey = "anidub";
+            else if (fLower.contains("animedia") || fLower.contains("анимедиа")) sourceKey = "animedia";
+            if (!sourceKey.isEmpty()) {
+                try {
+                    int p = 1 + random.nextInt(8);
+                    Anime.Page page = YoruApp.app().api.catalog(sourceKey, "", p, new ApiRepository.Filter());
+                    if (page != null && !page.items.isEmpty()) candidates.addAll(page.items);
+                } catch (Exception ignored) {}
+            }
+        }
         List<Anime> seed = YoruApp.app().api.seed();
         if (seed != null && !seed.isEmpty()) candidates.addAll(seed);
         List<Anime> favs = YoruApp.app().store.favorites();
@@ -167,9 +263,9 @@ public final class ClipServer {
         if (candidates.size() < 10 || random.nextInt(3) == 0) {
             try {
                 int page = 1 + random.nextInt(15);
-                ApiRepository.Filter filter = new ApiRepository.Filter();
-                filter.sort = "POPULARITY";
-                Anime.Page p = YoruApp.app().api.catalog("shikimori", "", page, filter);
+                ApiRepository.Filter filterObj = new ApiRepository.Filter();
+                filterObj.sort = "POPULARITY";
+                Anime.Page p = YoruApp.app().api.catalog("shikimori", "", page, filterObj);
                 if (p != null && !p.items.isEmpty()) candidates.addAll(p.items);
             } catch (Exception ignored) {}
         }

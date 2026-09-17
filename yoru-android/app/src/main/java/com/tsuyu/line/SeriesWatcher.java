@@ -156,7 +156,7 @@ final class SeriesWatcher extends SQLiteOpenHelper {
             String text=YoruBrain.title(anime)+" · серия "+Ui.number(episode);
             Notification.Builder builder=Build.VERSION.SDK_INT>=26?new Notification.Builder(context,"yoru-updates"):new Notification.Builder(context);
             builder.setSmallIcon(R.drawable.ic_download).setContentTitle("Вышла серия").setContentText(text).setContentIntent(pi).setAutoCancel(true).setShowWhen(true).setWhen(System.currentTimeMillis()).setCategory(Notification.CATEGORY_STATUS).addAction(R.drawable.ic_pip_play,"Смотреть",watchPi);
-            if(Build.VERSION.SDK_INT>=21)builder.setColor(0xffa78bfa).setOnlyAlertOnce(true);
+            if(Build.VERSION.SDK_INT>=21)builder.setColor(0xffa1a1aa).setOnlyAlertOnce(true);
             if(Build.VERSION.SDK_INT<26)builder.setPriority(Notification.PRIORITY_HIGH);
             if(poster!=null)builder.setLargeIcon(poster).setStyle(new Notification.BigPictureStyle().bigPicture(poster).setSummaryText(text));
             else builder.setStyle(new Notification.BigTextStyle().bigText(text+" — можно открывать просмотр"));

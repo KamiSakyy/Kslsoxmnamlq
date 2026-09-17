@@ -1,0 +1,88 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.13/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preTsuyuDebugBuild UP-TO-DATE
+> Task :app:generateTsuyuDebugBuildConfig UP-TO-DATE
+> Task :app:javaPreCompileTsuyuDebug UP-TO-DATE
+> Task :app:checkTsuyuDebugAarMetadata UP-TO-DATE
+> Task :app:processTsuyuDebugNavigationResources UP-TO-DATE
+> Task :app:compileTsuyuDebugNavigationResources UP-TO-DATE
+> Task :app:generateTsuyuDebugResValues UP-TO-DATE
+> Task :app:mapTsuyuDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateTsuyuDebugResources UP-TO-DATE
+> Task :app:mergeTsuyuDebugResources UP-TO-DATE
+> Task :app:packageTsuyuDebugResources UP-TO-DATE
+> Task :app:parseTsuyuDebugLocalResources UP-TO-DATE
+> Task :app:createTsuyuDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksTsuyuDebug UP-TO-DATE
+> Task :app:processTsuyuDebugMainManifest UP-TO-DATE
+> Task :app:processTsuyuDebugManifest UP-TO-DATE
+> Task :app:processTsuyuDebugManifestForPackage UP-TO-DATE
+> Task :app:processTsuyuDebugResources UP-TO-DATE
+
+> Task :app:compileTsuyuDebugJavaWithJavac
+/home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:388: error: method shikiImage(String) is already defined in class ApiRepository
+    private static String shikiImage(String raw){String s=raw==null?"":raw.trim();if(s.startsWith("//"))s="https:"+s;if(s.startsWith("/"))s="https://shikimori.io"+s;return safeUrl(s);}
+                          ^
+/home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:51: error: cannot find symbol
+    public static JSONArray airingJson(List<AiringItem> rows){return CalendarApi.airingJson(rows);}
+                                                                                ^
+  symbol:   method airingJson(List<AiringItem>)
+  location: class CalendarApi
+/home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:52: error: cannot find symbol
+    public static ArrayList<AiringItem> airingFromJson(JSONArray arr){return CalendarApi.airingFromJson(arr);}
+                                                                                        ^
+  symbol:   method airingFromJson(JSONArray)
+  location: class CalendarApi
+/home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:53: error: cannot find symbol
+    public static int todayCount(List<AiringItem> rows){return CalendarApi.todayCount(rows);}
+                                                                          ^
+  symbol:   method todayCount(List<AiringItem>)
+  location: class CalendarApi
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+4 errors
+
+> Task :app:compileTsuyuDebugJavaWithJavac FAILED
+
+[Incubating] Problems report is available at: file:///home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileTsuyuDebugJavaWithJavac'.
+> Compilation failed; see the compiler output below.
+  /home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:388: error: method shikiImage(String) is already defined in class ApiRepository
+      private static String shikiImage(String raw){String s=raw==null?"":raw.trim();if(s.startsWith("//"))s="https:"+s;if(s.startsWith("/"))s="https://shikimori.io"+s;return safeUrl(s);}
+                            ^
+  /home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:51: error: cannot find symbol
+      public static JSONArray airingJson(List<AiringItem> rows){return CalendarApi.airingJson(rows);}
+                                                                                  ^
+    symbol:   method airingJson(List<AiringItem>)
+    location: class CalendarApi
+  /home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:52: error: cannot find symbol
+      public static ArrayList<AiringItem> airingFromJson(JSONArray arr){return CalendarApi.airingFromJson(arr);}
+                                                                                          ^
+    symbol:   method airingFromJson(JSONArray)
+    location: class CalendarApi
+  /home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:53: error: cannot find symbol
+      public static int todayCount(List<AiringItem> rows){return CalendarApi.todayCount(rows);}
+                                                                            ^
+    symbol:   method todayCount(List<AiringItem>)
+    location: class CalendarApi
+  Note: Some input files use or override a deprecated API.
+  Note: Recompile with -Xlint:deprecation for details.
+  4 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 20s
+18 actionable tasks: 1 executed, 17 up-to-date

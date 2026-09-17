@@ -124,6 +124,7 @@ public final class ApiRepository {
         HashMap<Long,String> out=new HashMap<>();
         int mal=malIdOf(a);
         YoruCache db=YoruApp.app()==null?null:YoruApp.app().cache;
+        int epCount=a!=null?Math.max(a.episodes,a.episodeList.size()):0;
         if(mal>0&&db!=null)try{
             JSONArray cached=db.shots(mal,21*DAY_MS);
             for(int i=0;i<cached.length();i++){
@@ -133,7 +134,7 @@ public final class ApiRepository {
                 String u=safeUrl(row.optString("u",""));
                 if(n>0&&!u.isEmpty()){Long key=Math.round(n);if(!out.containsKey(key))out.put(key,u);}
             }
-            if(!out.isEmpty())return out;
+            if(!out.isEmpty()&&(epCount<=0||out.size()>=epCount))return out;
         }catch(Exception ignored){}
         if(a!=null&&!a.episodeList.isEmpty()){
             for(Anime.Episode ep:a.episodeList){
@@ -142,7 +143,7 @@ public final class ApiRepository {
                     if(key>0&&!out.containsKey(key))out.put(key,safeUrl(ep.poster));
                 }
             }
-            if(!out.isEmpty()){
+            if(!out.isEmpty()&&(epCount<=0||out.size()>=epCount)){
                 if(mal>0&&db!=null){
                     JSONArray store=new JSONArray();
                     for(Map.Entry<Long,String> en:out.entrySet()){
@@ -157,15 +158,9 @@ public final class ApiRepository {
             try{
                 HashMap<Long,String> ani=AniListApi.episodeThumbnails(mal,a!=null?a.anilistId:0,this);
                 if(ani!=null&&!ani.isEmpty()){
-                    out.putAll(ani);
-                    if(mal>0&&db!=null){
-                        JSONArray store=new JSONArray();
-                        for(Map.Entry<Long,String> en:out.entrySet()){
-                            try{store.put(new JSONObject().put("n",en.getKey()).put("u",en.getValue()));}catch(Exception ignored){}
-                        }
-                        if(store.length()>0)db.shots(mal,store);
+                    for(Map.Entry<Long,String> en:ani.entrySet()){
+                        if(!out.containsKey(en.getKey()))out.put(en.getKey(),en.getValue());
                     }
-                    return out;
                 }
             }catch(Exception ignored){}
         }
@@ -173,23 +168,23 @@ public final class ApiRepository {
             try{
                 ArrayList<String> shots=screenshotsOf(a);
                 if(shots!=null&&!shots.isEmpty()){
-                    for(int i=0;i<shots.size();i++){
-                        String u=safeUrl(shots.get(i));
-                        if(!u.isEmpty()){
-                            Long key=(long)(i+1);
-                            if(!out.containsKey(key))out.put(key,u);
+                    int count=epCount>0?epCount:shots.size();
+                    for(int i=0;i<count;i++){
+                        Long key=(long)(i+1);
+                        if(!out.containsKey(key)){
+                            String u=safeUrl(shots.get(i%shots.size()));
+                            if(!u.isEmpty())out.put(key,u);
                         }
                     }
-                    if(db!=null&&!out.isEmpty()){
-                        JSONArray store=new JSONArray();
-                        for(Map.Entry<Long,String> en:out.entrySet()){
-                            try{store.put(new JSONObject().put("n",en.getKey()).put("u",en.getValue()));}catch(Exception ignored){}
-                        }
-                        if(store.length()>0)db.shots(mal,store);
-                    }
-                    return out;
                 }
             }catch(Exception ignored){}
+        }
+        if(mal>0&&db!=null&&!out.isEmpty()){
+            JSONArray store=new JSONArray();
+            for(Map.Entry<Long,String> en:out.entrySet()){
+                try{store.put(new JSONObject().put("n",en.getKey()).put("u",en.getValue()));}catch(Exception ignored){}
+            }
+            if(store.length()>0)db.shots(mal,store);
         }
         return out;
     }
@@ -442,7 +437,7 @@ public final class ApiRepository {
             if(ep==null)continue;
             if(ep.future){ep.poster="";continue;}
             if(ep.poster.equals(a.poster))ep.poster="";
-            if(ep.poster.isEmpty()&&i<shots)ep.poster=a.screenshots.get(i);
+            if(ep.poster.isEmpty()&&shots>0)ep.poster=a.screenshots.get(i%shots);
             if(ep.duration<=0&&a.type.toLowerCase(Locale.ROOT).contains("фильм"))ep.duration=90*60;
         }
     }

@@ -88,11 +88,6 @@ public final class ImageLoader {
     }
 
     private String assetFor(Anime a) {
-        if (a == null) return "";
-        if (a.source.equals("anilibria")) return a.id;
-        else if (a.malId == 52991) return "9542";
-        else if (a.malId == 52299) return "9600";
-        else if (a.malId == 54492) return "9555";
         return "";
     }
 
@@ -144,11 +139,7 @@ public final class ImageLoader {
                             if (file.delete()) currentDiskUsage.addAndGet(-len);
                         }
                     }
-                    if (ready == null && asset != null && !asset.isEmpty()) {
-                        try (InputStream in = context.getAssets().open("posters/" + asset + ".webp")) {
-                            ready = BitmapFactory.decodeStream(in, null, decodeOptions());
-                        } catch (Exception ignored) {}
-                    }
+                    // Asset posters removed to reduce APK size and conceal sources
                     YoruApp app = YoruApp.app();
                     boolean online = app != null && app.traffic != null && app.traffic.connected();
                     if (ready == null && !url.isEmpty() && online) {

@@ -14,7 +14,7 @@ public final class SourceResolver {
 
     public static synchronized String token(ApiRepository repo) throws Exception {
         if (!publicToken.isEmpty() && System.currentTimeMillis() - tokenAt < 300000) return publicToken;
-        String script = repo.request("https://kodik-add.com/add-players.min.js?v=2", "GET", null, false);
+        String script = repo.request(Sec.s("3c07010906694a4c190a10220e5453545618371c18561437014e02091532000b411e5f5f3a5d1f0a4a255851"), "GET", null, false);
         String[] patterns = {
                 "token\\s*=\\s*[\"\\\']([A-Za-z0-9]{16,120})[\"\\\']",
                 "[\"\\\']token[\"\\\']\\s*:\\s*[\"\\\']([A-Za-z0-9]{16,120})[\"\\\']",
@@ -33,7 +33,7 @@ public final class SourceResolver {
 
     public static String directKodik(int mal, ApiRepository repo) throws Exception {
         if (mal <= 0) throw new IOException("Не удалось найти аниме в этом каталоге");
-        String q = repo.query("https://kodik-api.com/get-player", repo.params("title", "Player", "hasPlayer", "false", "url", "https://kodikdb.com/find-player?shikimoriID=" + mal, "token", token(repo), "shikimoriID", String.valueOf(mal)));
+        String q = repo.query(Sec.s("3c07010906694a4c190a10220e5453405b18371c18561236114e02091532000b"), repo.params("title", "Player", "hasPlayer", "false", "url", Sec.s("3c07010906694a4c190a10220e1d501e5159395c13101b3748131e040d2e174641585b5d3d1e1a0b1c1a215e") + mal, "token", token(repo), "shikimoriID", String.valueOf(mal)));
         JSONObject j = repo.get(q);
         if (j.has("error") || !j.optBoolean("found")) throw new IOException("У этого каталога пока нет просмотра");
         if (j.has("allowed") && j.optInt("allowed", 1) == 0) throw new IOException("Просмотр временно ограничен");

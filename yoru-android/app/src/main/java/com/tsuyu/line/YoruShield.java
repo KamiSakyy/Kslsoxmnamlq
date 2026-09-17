@@ -9,10 +9,10 @@ import java.util.*;
 
 final class YoruShield {
     private static final String FORMAT="yoru.source.profile.v1";
-    private static final String DEFAULT_PROFILE="{\"format\":\"yoru.source.profile.v1\",\"version\":2,\"routes\":[{\"from\":\"https://api.cdnlibs.org/api/\",\"to\":[\"https://api.cdnlibs.org/api/\"]},{\"from\":\"https://api.yani.tv/\",\"to\":[\"https://api.yani.tv/\"]},{\"from\":\"https://shikimori.one/\",\"to\":[\"https://shikimori.one/\"]}],\"remote\":[\"https://raw.githubusercontent.com/KamiSakyy/Reseeerooejcnc/arena/01a0a91e-reseeerooejcnc/yoru-android/app/src/main/assets/yoru_profile.json\"]}";
+    private static final String DEFAULT_PROFILE="{\"format\":\"yoru.source.profile.v1\",\"version\":2,\"routes\":[],\"remote\":[]}";
     private final Context context;private JSONObject profile;private long lastAsync;
-    YoruShield(Context c){context=c.getApplicationContext();profile=assetProfile();if(profile==null)profile=parse(DEFAULT_PROFILE);YoruApp app=YoruApp.app();if(app!=null)app.io.execute(this::loadStored);}
-    private JSONObject assetProfile(){try{return parse(ApiRepository.readStream(context.getAssets().open("yoru_profile.json"),160*1024));}catch(Exception ignored){return null;}}
+    YoruShield(Context c){context=c.getApplicationContext();profile=parse(DEFAULT_PROFILE);YoruApp app=YoruApp.app();if(app!=null)app.io.execute(this::loadStored);}
+    private JSONObject assetProfile(){return null;}
     private void loadStored(){try{JSONObject stored=parse(YoruApp.app().store.sourceProfile());if(stored!=null)synchronized(this){profile=stored;}}catch(Exception ignored){}}
     synchronized ArrayList<String> routes(String url){LinkedHashSet<String> out=new LinkedHashSet<>();out.add(url);JSONArray rows=profile.optJSONArray("routes");for(int i=0;rows!=null&&i<rows.length();i++){JSONObject r=rows.optJSONObject(i);if(r==null)continue;String from=r.optString("from","");if(from.isEmpty()||!url.startsWith(from))continue;JSONArray to=r.optJSONArray("to");for(int n=0;to!=null&&n<to.length();n++){String base=to.optString(n,"");if(!base.isEmpty())out.add(base+url.substring(from.length()));}}return new ArrayList<>(out);}
     void ok(String url){}

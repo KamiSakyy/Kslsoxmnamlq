@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 import java.util.regex.*;
 
 public final class AniListApi {
-    private static final String GRAPHQL_URL = "https://graphql.anilist.co";
+    private static final String GRAPHQL_URL = Sec.s("3c07010906694a4c1517153b0d085e1e53583d1f1c0a017d060c");
     private static final String ANI_FIELDS = "id idMal title{romaji english native} bannerImage coverImage{extraLarge large medium} format status episodes duration genres averageScore startDate{year month day} season description(asHtml:false)";
 
     private static final ConcurrentHashMap<String, String> POSTER_FIX = new ConcurrentHashMap<>();

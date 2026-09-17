@@ -9,8 +9,8 @@ android {
   applicationId 'com.tsuyu.line'
   minSdk 26
   targetSdk 36
-  versionCode 18
-  versionName '1.17'
+  versionCode 19
+  versionName '1.18'
   ndk { abiFilters 'arm64-v8a', 'armeabi-v7a' }
  }
  flavorDimensions "app"
@@ -46,7 +46,24 @@ android {
  }
  buildFeatures { buildConfig true }
  compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
- packaging { resources { excludes += ['META-INF/DEPENDENCIES','META-INF/LICENSE*','META-INF/NOTICE*'] }; jniLibs { useLegacyPackaging true } }
+ packaging {
+  resources {
+   excludes += [
+    'META-INF/DEPENDENCIES',
+    'META-INF/LICENSE*',
+    'META-INF/NOTICE*',
+    'META-INF/*.version',
+    'META-INF/*.md',
+    'META-INF/*.txt',
+    'META-INF/androidx/**',
+    'META-INF/kotlinx/**',
+    'kotlin/**',
+    '**.txt',
+    '**.md'
+   ]
+  }
+  jniLibs { useLegacyPackaging true }
+ }
 }
 
 dependencies {

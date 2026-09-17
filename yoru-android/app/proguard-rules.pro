@@ -1,7 +1,9 @@
 -allowaccessmodification
--renamesourcefileattribute Tsu
+-renamesourcefileattribute ''
+-keepattributes !SourceFile,!LineNumberTable,!LocalVariableTable,!LocalVariableTypeTable
 -repackageclasses ''
 -overloadaggressively
+-useuniqueclassmembernames
 -dontoptimize
 -assumenosideeffects class android.util.Log {
  public static *** d(...);

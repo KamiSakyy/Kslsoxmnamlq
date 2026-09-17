@@ -110,14 +110,14 @@ final class YoruGuard {
         int idx=1;
         int bad=0;
         int s=route(key,7);
-        for(int t=0;t<12;t++){
+        for(int t=0;t<16;t++){
             s=route(s,idx);
             switch(idx){
                 case 1:
                     idx=4;
                     break;
                 case 4:
-                    if(tracerPid()>0)bad=1;
+                    if(tracerPid()>0||android.os.Debug.isDebuggerConnected()||android.os.Debug.waitingForDebugger())bad=1;
                     idx=6;
                     break;
                 case 6:
@@ -129,11 +129,28 @@ final class YoruGuard {
                     idx=10;
                     break;
                 case 10:
+                    if(bad==0&&fridaPresent())bad=1;
+                    idx=12;
+                    break;
+                case 12:
                     t=99;
                     break;
             }
         }
         return bad;
+    }
+
+    private static boolean fridaPresent(){
+        try{
+            if(new java.io.File("/data/local/tmp/frida-server").exists())return true;
+        }catch(Exception ignored){}
+        try(BufferedReader r=reader("/proc/net/tcp")){
+            String line;
+            while((line=r.readLine())!=null){
+                if(line.contains(":69AA ") || line.contains(":69AA\t"))return true;
+            }
+        }catch(Exception ignored){}
+        return false;
     }
 
     private static int tracerPid(){

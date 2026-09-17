@@ -758,7 +758,7 @@ public final class HentaiEngine {
             a.original=r.orig;
             a.poster=r.poster;
             if(a.poster==null||a.poster.isEmpty()){
-                a.poster=hentaCoverFallback(a.title,a.original,r.slug);
+                a.poster=hentaCoverFallback(a.title,a.original,r.ref.isEmpty()?r.url:r.ref);
             }
             a.hentaUrl=r.ref.isEmpty()?r.url:r.ref;
             a.year=r.year;

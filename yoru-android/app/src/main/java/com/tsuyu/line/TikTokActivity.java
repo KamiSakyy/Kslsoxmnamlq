@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.*;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.media3.common.MediaItem;
@@ -24,6 +23,7 @@ import java.util.ArrayList;
 
 public final class TikTokActivity extends Activity {
     private FrameLayout root;
+    private PlayerView playerView;
     private RecyclerView recycler;
     private ClipAdapter adapter;
     private LinearLayoutManager layoutManager;
@@ -31,26 +31,24 @@ public final class TikTokActivity extends Activity {
     private ExoPlayer player;
     private final ArrayList<ClipServer.Clip> clips = new ArrayList<>();
     private int currentPosition = -1;
-    private boolean autoScroll = true;
+    private boolean autoScroll = false; // By default disabled
     private boolean isMuted = false;
-    private boolean isZoomMode = true;
+    private boolean isZoomMode = false; // By default NOT expanded (Fit mode)
     private boolean destroyed = false;
     private final Handler progressHandler = new Handler(Looper.getMainLooper());
-    private ProgressBar currentProgressBar;
-    private ProgressBar currentBuffering;
-    private ImageView currentPlayPauseIndicator;
+    private ClipHolder currentHolder;
 
     private final Runnable progressTick = new Runnable() {
         @Override
         public void run() {
-            if (destroyed || player == null || currentProgressBar == null) return;
+            if (destroyed || player == null || currentHolder == null) return;
             if (currentPosition >= 0 && currentPosition < clips.size()) {
                 ClipServer.Clip clip = clips.get(currentPosition);
                 long pos = player.getCurrentPosition();
                 long dur = clip.durationSec * 1000L;
-                if (dur > 0) {
+                if (dur > 0 && currentHolder.progressBar != null) {
                     int percent = (int) Math.min(100, Math.max(0, (pos * 100L) / dur));
-                    currentProgressBar.setProgress(percent);
+                    currentHolder.progressBar.setProgress(percent);
                 }
             }
             progressHandler.postDelayed(this, 100);
@@ -93,11 +91,17 @@ public final class TikTokActivity extends Activity {
                 .setLoadControl(control)
                 .build();
 
+        playerView = new PlayerView(this);
+        playerView.setUseController(false);
+        playerView.setResizeMode(isZoomMode ? AspectRatioFrameLayout.RESIZE_MODE_ZOOM : AspectRatioFrameLayout.RESIZE_MODE_FIT);
+        playerView.setPlayer(player);
+        root.addView(playerView, new FrameLayout.LayoutParams(-1, -1));
+
         player.addListener(new Player.Listener() {
             @Override
             public void onPlaybackStateChanged(int state) {
-                if (currentBuffering != null) {
-                    currentBuffering.setVisibility(state == Player.STATE_BUFFERING ? View.VISIBLE : View.GONE);
+                if (currentHolder != null) {
+                    currentHolder.buffering.setVisibility(state == Player.STATE_BUFFERING ? View.VISIBLE : View.GONE);
                 }
                 if (state == Player.STATE_ENDED) {
                     if (autoScroll && currentPosition + 1 < clips.size()) {
@@ -110,16 +114,35 @@ public final class TikTokActivity extends Activity {
             }
 
             @Override
+            public void onRenderedFirstFrame() {
+                if (currentHolder != null && currentHolder.poster != null) {
+                    currentHolder.poster.animate()
+                            .alpha(0f)
+                            .setDuration(160)
+                            .withEndAction(() -> {
+                                if (currentHolder != null && currentHolder.poster != null) {
+                                    currentHolder.poster.setVisibility(View.INVISIBLE);
+                                }
+                            })
+                            .start();
+                }
+            }
+
+            @Override
             public void onIsPlayingChanged(boolean isPlaying) {
-                if (currentPlayPauseIndicator != null) {
+                if (currentHolder != null && currentHolder.playPauseCenter != null) {
                     if (!isPlaying) {
-                        currentPlayPauseIndicator.setVisibility(View.VISIBLE);
-                        currentPlayPauseIndicator.setAlpha(1f);
+                        currentHolder.playPauseCenter.setVisibility(View.VISIBLE);
+                        currentHolder.playPauseCenter.setAlpha(1f);
                     } else {
-                        currentPlayPauseIndicator.animate()
+                        currentHolder.playPauseCenter.animate()
                                 .alpha(0f)
-                                .setDuration(250)
-                                .withEndAction(() -> currentPlayPauseIndicator.setVisibility(View.GONE))
+                                .setDuration(200)
+                                .withEndAction(() -> {
+                                    if (currentHolder != null && currentHolder.playPauseCenter != null) {
+                                        currentHolder.playPauseCenter.setVisibility(View.GONE);
+                                    }
+                                })
                                 .start();
                     }
                 }
@@ -159,19 +182,13 @@ public final class TikTokActivity extends Activity {
         topBar.addView(back, Ui.lp(this, 40, 40));
 
         LinearLayout titleCol = Ui.column(this);
-        titleCol.setPadding(Ui.dp(this, 10), 0, Ui.dp(this, 10), 0);
+        titleCol.setPadding(Ui.dp(this, 12), 0, Ui.dp(this, 10), 0);
         TextView title = Ui.text(this, "Лента аниме", 16, Color.WHITE, true);
         titleCol.addView(title);
 
         TextView badge = Ui.text(this, "TikTok • 15–30 сек", 10, Ui.PURPLE, false);
         titleCol.addView(badge);
         topBar.addView(titleCol, new LinearLayout.LayoutParams(0, -2, 1));
-
-        TextView loopBtn = Ui.chip(this, autoScroll ? "▶ Автосвайп" : "🔁 Зациклить", false, () -> {
-            autoScroll = !autoScroll;
-            initTopBar();
-        });
-        topBar.addView(loopBtn, Ui.lp(this, -2, -2));
 
         Ui.gap(topBar, Ui.iconButton(this, "refresh", "Случайный", () -> {
             if (currentPosition + 1 < clips.size()) {
@@ -193,7 +210,7 @@ public final class TikTokActivity extends Activity {
                     clips.add(clip);
                     adapter.notifyItemInserted(clips.size() - 1);
                     if (currentPosition == -1) {
-                        checkActiveSnap();
+                        recycler.post(() -> checkActiveSnap());
                     }
                 }
 
@@ -228,6 +245,11 @@ public final class TikTokActivity extends Activity {
         int pos = layoutManager.getPosition(snapView);
         if (pos == currentPosition || pos < 0 || pos >= clips.size()) return;
 
+        if (currentHolder != null && currentHolder.poster != null) {
+            currentHolder.poster.setAlpha(1f);
+            currentHolder.poster.setVisibility(View.VISIBLE);
+        }
+
         currentPosition = pos;
         RecyclerView.ViewHolder vh = recycler.findViewHolderForAdapterPosition(pos);
         if (vh instanceof ClipHolder) {
@@ -243,14 +265,12 @@ public final class TikTokActivity extends Activity {
     private void playClip(ClipHolder holder, ClipServer.Clip clip) {
         if (player == null) return;
         progressHandler.removeCallbacks(progressTick);
+        currentHolder = holder;
 
-        currentProgressBar = holder.progressBar;
-        currentBuffering = holder.buffering;
-        currentPlayPauseIndicator = holder.playPauseCenter;
-
-        holder.playerView.setPlayer(player);
-        holder.playerView.setResizeMode(isZoomMode ? AspectRatioFrameLayout.RESIZE_MODE_ZOOM : AspectRatioFrameLayout.RESIZE_MODE_FIT);
+        holder.poster.setAlpha(1f);
+        holder.poster.setVisibility(View.VISIBLE);
         holder.buffering.setVisibility(View.VISIBLE);
+        holder.updateState();
 
         MediaItem.ClippingConfiguration clipping = new MediaItem.ClippingConfiguration.Builder()
                 .setStartPositionMs(clip.startMs)
@@ -268,30 +288,6 @@ public final class TikTokActivity extends Activity {
         player.play();
 
         progressHandler.post(progressTick);
-    }
-
-    private void showHeartBurst(float x, float y) {
-        Ui.Icon heart = new Ui.Icon(this, "heart");
-        heart.color = 0xfff43f5e;
-        heart.filled = true;
-
-        int size = Ui.dp(this, 88);
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(size, size);
-        lp.leftMargin = (int) (x - size / 2f);
-        lp.topMargin = (int) (y - size / 2f);
-        root.addView(heart, lp);
-
-        heart.setScaleX(0.2f);
-        heart.setScaleY(0.2f);
-        heart.setAlpha(0.9f);
-        heart.animate()
-                .scaleX(1.4f)
-                .scaleY(1.4f)
-                .alpha(0f)
-                .setDuration(600)
-                .setInterpolator(new AccelerateDecelerateInterpolator())
-                .withEndAction(() -> root.removeView(heart))
-                .start();
     }
 
     private final class ClipAdapter extends RecyclerView.Adapter<ClipHolder> {
@@ -315,9 +311,9 @@ public final class TikTokActivity extends Activity {
         }
     }
 
-    private final class ClipHolder extends RecyclerView.ViewHolder {
+    final class ClipHolder extends RecyclerView.ViewHolder {
         final FrameLayout container;
-        final PlayerView playerView;
+        final ImageView poster;
         final ProgressBar progressBar;
         final ProgressBar buffering;
         final ImageView playPauseCenter;
@@ -325,19 +321,20 @@ public final class TikTokActivity extends Activity {
         final TextView title;
         final TextView timing;
         final TextView details;
-        final TextView likeCount;
-        final Ui.Icon likeIcon;
-        final Ui.Icon muteIcon;
+        final Ui.Icon bookmarkIcon;
+        final Ui.Icon autoSwipeIcon;
         final Ui.Icon resizeIcon;
+        final Ui.Icon muteIcon;
         ClipServer.Clip clip;
 
         ClipHolder(@NonNull View itemView) {
             super(itemView);
             container = (FrameLayout) itemView;
 
-            playerView = new PlayerView(TikTokActivity.this);
-            playerView.setUseController(false);
-            container.addView(playerView, new FrameLayout.LayoutParams(-1, -1));
+            // Thumbnail / Poster background
+            poster = new ImageView(TikTokActivity.this);
+            poster.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            container.addView(poster, new FrameLayout.LayoutParams(-1, -1));
 
             // Top gradient
             View topGrad = new View(TikTokActivity.this);
@@ -371,9 +368,9 @@ public final class TikTokActivity extends Activity {
             // Right Action Column
             LinearLayout actions = Ui.column(TikTokActivity.this);
             actions.setGravity(Gravity.CENTER_HORIZONTAL);
-            actions.setPadding(0, 0, Ui.dp(TikTokActivity.this, 12), Ui.dp(TikTokActivity.this, 30));
+            actions.setPadding(0, 0, Ui.dp(TikTokActivity.this, 14), Ui.dp(TikTokActivity.this, 30));
 
-            // Avatar / Poster
+            // 1. Avatar / Poster
             FrameLayout avFrame = new FrameLayout(TikTokActivity.this);
             avFrame.setBackground(Ui.stroke(Ui.PURPLE, 24, TikTokActivity.this));
             avFrame.setClipToOutline(true);
@@ -383,88 +380,98 @@ public final class TikTokActivity extends Activity {
             avFrame.setOnClickListener(v -> {
                 if (clip != null) Ui.openDetails(TikTokActivity.this, clip.anime);
             });
-            actions.addView(avFrame, Ui.lp(TikTokActivity.this, 48, 48));
+            actions.addView(avFrame, Ui.lp(TikTokActivity.this, 46, 46));
 
-            Ui.space(actions, 18);
+            Ui.space(actions, 22);
 
-            // Like Button
-            likeIcon = new Ui.Icon(TikTokActivity.this, "heart");
-            likeIcon.color = Color.WHITE;
-            actions.addView(likeIcon, Ui.lp(TikTokActivity.this, 34, 34));
-            likeCount = Ui.text(TikTokActivity.this, "0", 11, Color.WHITE, true);
-            actions.addView(likeCount);
-            View.OnClickListener onLike = v -> {
-                if (clip == null) return;
-                clip.liked = !clip.liked;
-                clip.likes += clip.liked ? 1 : -1;
-                updateLikeState();
-                likeIcon.animate().scaleX(1.3f).scaleY(1.3f).setDuration(120).withEndAction(() ->
-                        likeIcon.animate().scaleX(1f).scaleY(1f).setDuration(120).start()).start();
-            };
-            likeIcon.setOnClickListener(onLike);
-
-            Ui.space(actions, 18);
-
-            // Collection / Bookmark Button
-            Ui.Icon bookmark = new Ui.Icon(TikTokActivity.this, "bookmark");
-            bookmark.color = Color.WHITE;
-            actions.addView(bookmark, Ui.lp(TikTokActivity.this, 30, 30));
-            TextView bookmarkTxt = Ui.text(TikTokActivity.this, "В план", 10, Color.WHITE, false);
-            actions.addView(bookmarkTxt);
-            bookmark.setOnClickListener(v -> {
-                if (clip != null) Ui.bucketDialog(TikTokActivity.this, clip.anime, null);
+            // 2. Favorite / Collection Button (WITHOUT text, WITHOUT "В план")
+            bookmarkIcon = new Ui.Icon(TikTokActivity.this, "bookmark");
+            bookmarkIcon.color = Color.WHITE;
+            bookmarkIcon.setContentDescription("В коллекцию");
+            bookmarkIcon.setOnClickListener(v -> {
+                if (clip != null) {
+                    Ui.bucketDialog(TikTokActivity.this, clip.anime, this::updateFavoriteState);
+                }
             });
+            Ui.press(bookmarkIcon);
+            actions.addView(bookmarkIcon, Ui.lp(TikTokActivity.this, 34, 34));
 
-            Ui.space(actions, 18);
+            Ui.space(actions, 20);
 
-            // Share Button
-            Ui.Icon share = new Ui.Icon(TikTokActivity.this, "share");
-            share.color = Color.WHITE;
-            actions.addView(share, Ui.lp(TikTokActivity.this, 30, 30));
-            TextView shareTxt = Ui.text(TikTokActivity.this, "Ссылка", 10, Color.WHITE, false);
-            actions.addView(shareTxt);
-            share.setOnClickListener(v -> {
-                if (clip == null) return;
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_TEXT, "Смотрите аниме \"" + clip.title + "\" (" + clip.timingText + ") в приложении Tsuyu!");
-                TikTokActivity.this.startActivity(Intent.createChooser(shareIntent, "Поделиться клипом"));
+            // 3. Auto-swipe Button (Directly under favorite icon, WITHOUT text, WITHOUT emoji)
+            autoSwipeIcon = new Ui.Icon(TikTokActivity.this, "autoswipe");
+            autoSwipeIcon.color = autoScroll ? Ui.PURPLE : Color.WHITE;
+            autoSwipeIcon.setContentDescription("Автосвайп");
+            autoSwipeIcon.setOnClickListener(v -> {
+                autoScroll = !autoScroll;
+                if (player != null) {
+                    player.setRepeatMode(autoScroll ? Player.REPEAT_MODE_OFF : Player.REPEAT_MODE_ONE);
+                }
+                updateAutoSwipeState();
+                Ui.toast(TikTokActivity.this, autoScroll ? "Автосвайп включён" : "Автосвайп выключен");
             });
+            Ui.press(autoSwipeIcon);
+            actions.addView(autoSwipeIcon, Ui.lp(TikTokActivity.this, 32, 32));
 
-            Ui.space(actions, 18);
+            Ui.space(actions, 20);
 
-            // Mute Button
+            // 4. Expansion / Resize Button (Under auto-swipe icon, WITHOUT text, WITHOUT emoji)
+            resizeIcon = new Ui.Icon(TikTokActivity.this, isZoomMode ? "shrink" : "expand");
+            resizeIcon.color = Color.WHITE;
+            resizeIcon.setContentDescription("Размер экрана");
+            resizeIcon.setOnClickListener(v -> {
+                isZoomMode = !isZoomMode;
+                if (playerView != null) {
+                    playerView.setResizeMode(isZoomMode ? AspectRatioFrameLayout.RESIZE_MODE_ZOOM : AspectRatioFrameLayout.RESIZE_MODE_FIT);
+                }
+                resizeIcon.setKind(isZoomMode ? "shrink" : "expand");
+                Ui.toast(TikTokActivity.this, isZoomMode ? "Экран расширен" : "Исходный размер");
+            });
+            Ui.press(resizeIcon);
+            actions.addView(resizeIcon, Ui.lp(TikTokActivity.this, 30, 30));
+
+            Ui.space(actions, 20);
+
+            // 5. Sound / Mute Toggle Button (WITHOUT text, WITHOUT emoji)
             muteIcon = new Ui.Icon(TikTokActivity.this, isMuted ? "mute" : "volume");
             muteIcon.color = Color.WHITE;
-            actions.addView(muteIcon, Ui.lp(TikTokActivity.this, 28, 28));
+            muteIcon.setContentDescription("Звук");
             muteIcon.setOnClickListener(v -> {
                 isMuted = !isMuted;
                 if (player != null) player.setVolume(isMuted ? 0f : 1f);
                 muteIcon.setKind(isMuted ? "mute" : "volume");
             });
+            Ui.press(muteIcon);
+            actions.addView(muteIcon, Ui.lp(TikTokActivity.this, 28, 28));
 
-            Ui.space(actions, 18);
+            Ui.space(actions, 20);
 
-            // Resize Button
-            resizeIcon = new Ui.Icon(TikTokActivity.this, isZoomMode ? "smartfill" : "fit");
-            resizeIcon.color = Color.WHITE;
-            actions.addView(resizeIcon, Ui.lp(TikTokActivity.this, 28, 28));
-            resizeIcon.setOnClickListener(v -> {
-                isZoomMode = !isZoomMode;
-                playerView.setResizeMode(isZoomMode ? AspectRatioFrameLayout.RESIZE_MODE_ZOOM : AspectRatioFrameLayout.RESIZE_MODE_FIT);
-                resizeIcon.setKind(isZoomMode ? "smartfill" : "fit");
+            // 6. Full Episode icon button
+            Ui.Icon fullEpIcon = new Ui.Icon(TikTokActivity.this, "play");
+            fullEpIcon.color = Ui.PURPLE;
+            fullEpIcon.setContentDescription("Серия");
+            fullEpIcon.setOnClickListener(v -> {
+                if (clip != null) {
+                    Ui.openPlayer(TikTokActivity.this, clip.anime, "yoru", clip.episode != null ? clip.episode.number : 1, clip.startMs);
+                }
             });
+            Ui.press(fullEpIcon);
+            actions.addView(fullEpIcon, Ui.lp(TikTokActivity.this, 28, 28));
 
             FrameLayout.LayoutParams ap = new FrameLayout.LayoutParams(-2, -2, Gravity.END | Gravity.BOTTOM);
             container.addView(actions, ap);
 
             // Bottom Info Column
             LinearLayout info = Ui.column(TikTokActivity.this);
-            info.setPadding(Ui.dp(TikTokActivity.this, 16), 0, Ui.dp(TikTokActivity.this, 90), Ui.dp(TikTokActivity.this, 24));
+            info.setPadding(Ui.dp(TikTokActivity.this, 16), 0, Ui.dp(TikTokActivity.this, 84), Ui.dp(TikTokActivity.this, 24));
 
             title = Ui.text(TikTokActivity.this, "", 18, Color.WHITE, true);
             title.setMaxLines(2);
             title.setShadowLayer(6, 0, 2, 0xcc000000);
+            title.setOnClickListener(v -> {
+                if (clip != null) Ui.openDetails(TikTokActivity.this, clip.anime);
+            });
+            Ui.press(title);
             info.addView(title);
 
             Ui.space(info, 5);
@@ -491,7 +498,7 @@ public final class TikTokActivity extends Activity {
             FrameLayout.LayoutParams ip = new FrameLayout.LayoutParams(-1, -2, Gravity.START | Gravity.BOTTOM);
             container.addView(info, ip);
 
-            // Double tap & single tap gestures
+            // Single tap gesture to pause / resume
             GestureDetector gestureDetector = new GestureDetector(TikTokActivity.this, new GestureDetector.SimpleOnGestureListener() {
                 @Override
                 public boolean onSingleTapConfirmed(MotionEvent e) {
@@ -501,20 +508,9 @@ public final class TikTokActivity extends Activity {
                     }
                     return true;
                 }
-
-                @Override
-                public boolean onDoubleTap(MotionEvent e) {
-                    if (clip != null && !clip.liked) {
-                        clip.liked = true;
-                        clip.likes++;
-                        updateLikeState();
-                    }
-                    showHeartBurst(e.getX(), e.getY());
-                    return true;
-                }
             });
 
-            playerView.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
+            container.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
         }
 
         void bind(ClipServer.Clip c) {
@@ -526,16 +522,37 @@ public final class TikTokActivity extends Activity {
                     : "Аниме";
             String score = c.anime != null && c.anime.score > 0 ? String.format(java.util.Locale.US, "★ %.1f • ", c.anime.score) : "";
             details.setText(score + genres);
-            updateLikeState();
-            if (c.anime != null) YoruApp.app().images.load(avatar, c.anime);
+            updateState();
+            if (c.anime != null) {
+                YoruApp.app().images.load(avatar, c.anime);
+                YoruApp.app().images.load(poster, c.anime);
+            }
         }
 
-        void updateLikeState() {
-            if (clip == null) return;
-            likeCount.setText(clip.likes > 999 ? String.format(java.util.Locale.US, "%.1fk", clip.likes / 1000f) : String.valueOf(clip.likes));
-            likeIcon.color = clip.liked ? 0xfff43f5e : Color.WHITE;
-            likeIcon.filled = clip.liked;
-            likeIcon.invalidate();
+        void updateState() {
+            updateFavoriteState();
+            updateAutoSwipeState();
+            if (resizeIcon != null) {
+                resizeIcon.setKind(isZoomMode ? "shrink" : "expand");
+            }
+            if (muteIcon != null) {
+                muteIcon.setKind(isMuted ? "mute" : "volume");
+            }
+        }
+
+        void updateFavoriteState() {
+            if (clip == null || bookmarkIcon == null) return;
+            boolean isFav = YoruApp.app().store.favorite(clip.anime);
+            bookmarkIcon.color = isFav ? Ui.PURPLE : Color.WHITE;
+            bookmarkIcon.filled = isFav;
+            bookmarkIcon.invalidate();
+        }
+
+        void updateAutoSwipeState() {
+            if (autoSwipeIcon == null) return;
+            autoSwipeIcon.color = autoScroll ? Ui.PURPLE : Color.WHITE;
+            autoSwipeIcon.setAlpha(autoScroll ? 1.0f : 0.8f);
+            autoSwipeIcon.invalidate();
         }
     }
 

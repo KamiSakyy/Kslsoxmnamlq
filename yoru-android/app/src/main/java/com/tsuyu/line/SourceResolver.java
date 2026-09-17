@@ -109,7 +109,7 @@ public final class SourceResolver {
             Uri u = Uri.parse(s);
             String host = u.getHost();
             if (host != null && Arrays.asList(Sec.s("351d1c081c-274b001d08"), Sec.s("3f1c11101e-7d0c0d140a"), Sec.s("3f1c11101e-7d0600"), Sec.s("3f1c11101e-7d070a08")).contains(host)) {
-                s = u.buildUpon().scheme("https").authority("kodikplayer.com").build().toString();
+                s = u.buildUpon().scheme("https").authority(Sec.s("3f1c11101e-2309020b00-066506165f")).build().toString();
             }
             return ApiRepository.safeUrl(s);
         } catch (Exception e) {

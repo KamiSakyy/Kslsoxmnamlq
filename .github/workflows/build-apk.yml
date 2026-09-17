@@ -97,6 +97,11 @@ jobs:
             pip install cryptography --quiet
             python3 tools/yoru-release-key.py
           fi
+      - name: Build native security libraries
+        working-directory: .
+        run: |
+          chmod +x tools/build-native.sh
+          bash tools/build-native.sh
       - name: Build Java release APK
         run: |
           set +e
@@ -132,6 +137,41 @@ jobs:
             git commit -m "Log build failure [skip ci]" || exit 0
             git push origin HEAD:arena/01a0aeb0-kslsoxmnamlq
           fi
+      - name: Generate 100+ Multi-DEX structure
+        working-directory: .
+        run: |
+          echo "=== Building Multi-DEX templates ==="
+          mkdir -p /tmp/multidex_tmpl
+          cat << 'EOF' > /tmp/multidex_tmpl/D000.java
+          package com.tsuyu.line.decoy;
+          public class D000 { public static int v() { return 0; } }
+          EOF
+          javac -source 1.8 -target 1.8 -d /tmp/multidex_tmpl /tmp/multidex_tmpl/D000.java
+          "$ANDROID_HOME/build-tools/36.0.0/d8" --min-api 26 /tmp/multidex_tmpl/com/tsuyu/line/decoy/D000.class --output /tmp/multidex_tmpl
+
+          python3 tools/generate_multidex.py /tmp/multidex_tmpl/classes.dex yoru-android/app/build/outputs/apk/tsuyu/release/app-tsuyu-release.apk 105
+          python3 tools/generate_multidex.py /tmp/multidex_tmpl/classes.dex yoru-android/app/build/outputs/apk/henta/release/app-henta-release.apk 105
+
+          P12_KEY="yoru-android/owner-signing/yoru-release.p12"
+          SIGN_PROP="yoru-android/owner-signing/signing.properties"
+          STORE_PASS=$(grep storePassword "$SIGN_PROP" | cut -d= -f2)
+          KEY_PASS=$(grep keyPassword "$SIGN_PROP" | cut -d= -f2)
+          KEY_ALIAS=$(grep keyAlias "$SIGN_PROP" | cut -d= -f2)
+
+          for apk in yoru-android/app/build/outputs/apk/tsuyu/release/app-tsuyu-release.apk yoru-android/app/build/outputs/apk/henta/release/app-henta-release.apk; do
+            "$ANDROID_HOME/build-tools/36.0.0/zipalign" -f -p 4 "$apk" "${apk}.aligned"
+            mv "${apk}.aligned" "$apk"
+            "$ANDROID_HOME/build-tools/36.0.0/apksigner" sign \
+              --ks "$P12_KEY" \
+              --ks-key-alias "$KEY_ALIAS" \
+              --ks-pass "pass:$STORE_PASS" \
+              --key-pass "pass:$KEY_PASS" \
+              --ks-type PKCS12 \
+              --v1-signing-enabled true \
+              --v2-signing-enabled true \
+              --v3-signing-enabled true \
+              "$apk"
+          done
       - name: Verify APK signatures
         run: |
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose app/build/outputs/apk/tsuyu/release/app-tsuyu-release.apk

@@ -6,9 +6,29 @@ import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 
 public final class Sec {
+    private static volatile boolean nativeLoaded;
     private static final byte[] K = initK();
 
+    static {
+        try {
+            System.loadLibrary("tsuyu_sec");
+            nativeLoaded = true;
+        } catch (Throwable ignored) {
+            nativeLoaded = false;
+        }
+    }
+
+    private static native byte[] nativeKey();
+    private static native String nativeDecryptStr(String hex);
+    private static native boolean nativeSecurityCheck();
+
     private static byte[] initK() {
+        if (nativeLoaded) {
+            try {
+                byte[] nk = nativeKey();
+                if (nk != null && nk.length > 0) return nk;
+            } catch (Throwable ignored) {}
+        }
         int[] s = new int[]{0x9b, 0xbc, 0xba, 0xb6, 0xba, 0x9c, 0xaa, 0xac, 0xbd, 0xaa, 0xbb, 0x84, 0xaa, 0xb6, 0xfd, 0xff, 0xfd, 0xf9};
         byte[] k = new byte[s.length];
         for (int i = 0; i < s.length; i++) {
@@ -21,12 +41,20 @@ public final class Sec {
 
     public static String s(String hex) {
         if (hex == null || hex.isEmpty()) return "";
+        if (nativeLoaded) {
+            try {
+                String res = nativeDecryptStr(hex);
+                if (res != null) return res;
+            } catch (Throwable ignored) {}
+        }
         try {
-            int len = hex.length();
+            String clean = hex.replace("-", "");
+            int len = clean.length();
+            if ((len % 2) != 0) return "";
             byte[] out = new byte[len / 2];
             for (int i = 0; i < len; i += 2) {
-                out[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
-                        + Character.digit(hex.charAt(i + 1), 16));
+                out[i / 2] = (byte) ((Character.digit(clean.charAt(i), 16) << 4)
+                        + Character.digit(clean.charAt(i + 1), 16));
             }
             for (int i = 0; i < out.length; i++) {
                 out[i] ^= K[i % K.length];
@@ -56,5 +84,14 @@ public final class Sec {
         } catch (Exception e) {
             return new byte[0];
         }
+    }
+
+    public static boolean checkSecurity() {
+        if (nativeLoaded) {
+            try {
+                return nativeSecurityCheck();
+            } catch (Throwable ignored) {}
+        }
+        return true;
     }
 }

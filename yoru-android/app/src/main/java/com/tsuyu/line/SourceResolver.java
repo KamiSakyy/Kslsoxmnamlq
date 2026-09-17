@@ -33,7 +33,7 @@ public final class SourceResolver {
 
     public static String directKodik(int mal, ApiRepository repo) throws Exception {
         if (mal <= 0) throw new IOException("Не удалось найти аниме в этом каталоге");
-        String q = repo.query(Sec.s("3c07010906694a4c190a10220e5453405b18371c18561236114e02091532000b"), repo.params("title", "Player", "hasPlayer", "false", "url", Sec.s("3c07010906694a4c190a10220e1d501e5159395c13101b3748131e040d2e174641585b5d3d1e1a0b1c1a215e") + mal, "token", token(repo), "shikimoriID", String.valueOf(mal)));
+        String q = repo.query(Sec.s("3c07010906-694a4c190a-10220e5453-405b18371c-1856123611-4e02091532-000b"), repo.params("title", "Player", "hasPlayer", "false", "url", Sec.s("3c07010906694a4c190a10220e1d501e5159395c13101b3748131e040d2e174641585b5d3d1e1a0b1c1a215e") + mal, "token", token(repo), "shikimoriID", String.valueOf(mal)));
         JSONObject j = repo.get(q);
         if (j.has("error") || !j.optBoolean("found")) throw new IOException("У этого каталога пока нет просмотра");
         if (j.has("allowed") && j.optInt("allowed", 1) == 0) throw new IOException("Просмотр временно ограничен");
@@ -108,7 +108,7 @@ public final class SourceResolver {
         try {
             Uri u = Uri.parse(s);
             String host = u.getHost();
-            if (host != null && Arrays.asList("aniqit.com", "kodik.info", "kodik.cc", "kodik.biz").contains(host)) {
+            if (host != null && Arrays.asList(Sec.s("351d1c081c-274b001d08"), Sec.s("3f1c11101e-7d0c0d140a"), Sec.s("3f1c11101e-7d0600"), Sec.s("3f1c11101e-7d070a08")).contains(host)) {
                 s = u.buildUpon().scheme("https").authority("kodikplayer.com").build().toString();
             }
             return ApiRepository.safeUrl(s);

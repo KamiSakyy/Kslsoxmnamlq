@@ -141,7 +141,7 @@ public final class CalendarApi {
                 final int p = page;
                 tasks.add(pool.submit(() -> {
                     TaskQueue.check();
-                    JSONArray rows = new JSONArray(repo.shikiRest("/api/animes?limit=50&page=" + p + "&status=" + status + "&order=" + (premiere ? "aired_on" : "popularity") + "&censored=false"));
+                    JSONArray rows = new JSONArray(repo.shikiRest(Sec.s("7b1205105a-320b0a1f00-077409105f-59460b6143-5309143400-5e") + p + "&status=" + status + "&order=" + (premiere ? "aired_on" : "popularity") + "&censored=false"));
                     ArrayList<ApiRepository.AiringItem> out = new ArrayList<>();
                     for (int i = 0; i < rows.length(); i++) {
                         JSONObject raw = rows.optJSONObject(i);

@@ -29,7 +29,7 @@ public final class HentaiEngine {
 
     public static boolean isHenta(){return "henta".equals(BuildConfig.FLAVOR);}
 
-    private static String host(String site){if(site.equals("hs"))return Sec.s("3c07010906694a4c1a001a3f040a5b430318201c05");if(site.equals("ah"))return Sec.s("3c07010906694a4c13091823001746515b5f7a150017");if(site.equals("hk"))return Sec.s("3c07010906694a4c04535a2300174651595a3d5d1a0b12");return Sec.s("3c07010906694a4c020a06250618565f1c553b1e");}
+    private static String host(String site){if(site.equals("hs"))return Sec.s("3c07010906694a4c1a001a3f040a5b430318201c05");if(site.equals("ah"))return Sec.s("3c07010906694a4c13091823001746515b5f7a150017");if(site.equals("hk"))return Sec.s("3c07010906694a4c04535a2300174651595a3d5d1a0b12");return Sec.s("3c07010906-694a4c020a-0625061856-5f1c553b1e");}
 
     private static int digit(String site){if(site.equals("hs"))return 1;if(site.equals("ah"))return 2;if(site.equals("hk"))return 3;if(site.equals("hn"))return 5;if(site.equals("an"))return 6;if(site.equals("he"))return 7;if(site.equals("htv"))return 8;return 4;}
 
@@ -42,13 +42,13 @@ public final class HentaiEngine {
 
     private List<Row> rowsHanime(int page)throws Exception{
         JSONObject body=hanimeSearchBody("",Math.max(0,page-1));
-        JSONObject data=new JSONObject(api.request(Sec.s("3c07010906694a4c0100153906111c5846407900100b033a0606014b17240856"),"POST",body.toString(),false));
+        JSONObject data=new JSONObject(api.request(Sec.s("3c07010906-694a4c0100-153906111c-5846407900-100b033a06-06014b1724-0856"),"POST",body.toString(),false));
         return parseHanimeSearch(data);
     }
 
     private List<Row> rowsHanimeSearch(String q)throws Exception{
         JSONObject body=hanimeSearchBody(q,0);
-        JSONObject data=new JSONObject(api.request(Sec.s("3c07010906694a4c0100153906111c5846407900100b033a0606014b17240856"),"POST",body.toString(),false));
+        JSONObject data=new JSONObject(api.request(Sec.s("3c07010906-694a4c0100-153906111c-5846407900-100b033a06-06014b1724-0856"),"POST",body.toString(),false));
         return parseHanimeSearch(data);
     }
 
@@ -699,7 +699,7 @@ public final class HentaiEngine {
     private static List<Row> parsePorncado(String html){
         List<Row> out=new ArrayList<>();
         LinkedHashMap<String,Integer> seen=new LinkedHashMap<>();
-        Matcher m=Pattern.compile("<a[^>]+href=\"(https://porncado\\.com/([1-9][0-9]{0,9})-[a-z0-9-]+/)\"").matcher(html);
+        Matcher m=Pattern.compile("<a[^>]+href=\"(" + Pattern.quote(host("pc")) + "/([1-9][0-9]{0,9})-[a-z0-9-]+/)\"").matcher(html);
         while(m.find()&&out.size()<40){
             String sid=m.group(2);
             if(seen.containsKey(sid))continue;

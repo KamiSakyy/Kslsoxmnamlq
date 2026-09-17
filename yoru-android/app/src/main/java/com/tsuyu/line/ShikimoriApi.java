@@ -8,13 +8,13 @@ import java.util.*;
 public final class ShikimoriApi {
     public static final String[] SHIKI_GRAPH = {
             Sec.s("3c07010906694a4c010d1d200c145d425b183b1d105614230c4c1517153b0d085e"),
-            Sec.s("3c07010906694a4c010d1d200c145d425b183d1c5a18053a4a04000404231415"),
-            Sec.s("3c07010906694a4c010d1d200c145d425b1839165a18053a4a04000404231415")
+            Sec.s("3c07010906-694a4c010d-1d200c145d-425b183d1c-5a18053a4a-0400040423-1415"),
+            Sec.s("3c07010906-694a4c010d-1d200c145d-425b183916-5a18053a4a-0400040423-1415")
     };
     public static final String[] SHIKI_REST = {
             Sec.s("3c07010906694a4c010d1d200c145d425b183b1d10"),
-            Sec.s("3c07010906694a4c010d1d200c145d425b183d1c"),
-            Sec.s("3c07010906694a4c010d1d200c145d425b183916")
+            Sec.s("3c07010906-694a4c010d-1d200c145d-425b183d1c"),
+            Sec.s("3c07010906-694a4c010d-1d200c145d-425b183916")
     };
     public static final String SH_FIELDS = "id malId name russian english kind rating score status episodes episodesAired nextEpisodeAt airedOn{year date} poster{mainUrl originalUrl} genres{id russian name}";
     private static final long DAY_MS = 24L * 60 * 60 * 1000L;
@@ -115,7 +115,7 @@ public final class ShikimoriApi {
     public static String shikiImage(String raw) {
         String s = raw == null ? "" : raw.trim();
         if (s.startsWith("//")) s = "https:" + s;
-        if (s.startsWith("/")) s = Sec.s("3c07010906694a4c010d1d200c145d425b183d1c") + s;
+        if (s.startsWith("/")) s = Sec.s("3c07010906-694a4c010d-1d200c145d-425b183d1c") + s;
         return ApiRepository.safeUrl(s);
     }
 
@@ -151,7 +151,7 @@ public final class ShikimoriApi {
         for (int attempt = 0; attempt < 2; attempt++) {
             try {
                 if (attempt > 0) Thread.sleep(1200);
-                JSONArray rows = shikiArray("/api/animes/" + mal + "/screenshots", repo);
+                JSONArray rows = shikiArray(Sec.s("7b1205105a-320b0a1f00-0764") + mal + Sec.s("7b00160b10-360b101a0a-0038"), repo);
                 for (int i = 0; i < rows.length() && out.size() < 12; i++) {
                     JSONObject row = rows.optJSONObject(i);
                     if (row == null) continue;
@@ -315,7 +315,7 @@ public final class ShikimoriApi {
     public static ArrayList<Integer> franchiseIds(int mal, LinkedHashMap<String, Anime> map, Anime self, ApiRepository repo) {
         ArrayList<Integer> ids = new ArrayList<>();
         try {
-            JSONObject root = new JSONObject(shikiRest("/api/animes/" + mal + "/franchise", repo));
+            JSONObject root = new JSONObject(shikiRest(Sec.s("7b1205105a-320b0a1f00-0764") + mal + Sec.s("7b1507181b-300d0a0100"), repo));
             JSONArray nodes = root.optJSONArray("nodes");
             for (int i = 0; nodes != null && i < nodes.length(); i++) {
                 JSONObject n = nodes.optJSONObject(i);

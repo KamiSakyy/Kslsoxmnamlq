@@ -224,7 +224,7 @@ public final class ImageLoader {
         out.add(safe);
         out.add(high);
         String low = safe.toLowerCase(Locale.ROOT);
-        if (low.contains("cover.cdnlibs.org") && low.endsWith(".jpg")) {
+        if (low.contains(Sec.s("371c031c07-7d06071c09-1d2916575d-4255")) && low.endsWith(".jpg")) {
             out.add(safe.replace("_thumb.jpg", ".jpg"));
         }
         if (low.contains("?size=min")) {

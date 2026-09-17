@@ -93,6 +93,8 @@ public final class TikTokActivity extends Activity {
 
         playerView = new PlayerView(this);
         playerView.setUseController(false);
+        playerView.setKeepContentOnPlayerReset(true);
+        playerView.setShutterBackgroundColor(Color.TRANSPARENT);
         playerView.setResizeMode(isZoomMode ? AspectRatioFrameLayout.RESIZE_MODE_ZOOM : AspectRatioFrameLayout.RESIZE_MODE_FIT);
         playerView.setPlayer(player);
         root.addView(playerView, new FrameLayout.LayoutParams(-1, -1));
@@ -102,6 +104,11 @@ public final class TikTokActivity extends Activity {
             public void onPlaybackStateChanged(int state) {
                 if (currentHolder != null) {
                     currentHolder.buffering.setVisibility(state == Player.STATE_BUFFERING ? View.VISIBLE : View.GONE);
+                }
+                if (state == Player.STATE_READY) {
+                    if (currentHolder != null && currentHolder.poster != null) {
+                        currentHolder.poster.setVisibility(View.GONE);
+                    }
                 }
                 if (state == Player.STATE_ENDED) {
                     if (autoScroll && currentPosition + 1 < clips.size()) {
@@ -116,15 +123,7 @@ public final class TikTokActivity extends Activity {
             @Override
             public void onRenderedFirstFrame() {
                 if (currentHolder != null && currentHolder.poster != null) {
-                    currentHolder.poster.animate()
-                            .alpha(0f)
-                            .setDuration(160)
-                            .withEndAction(() -> {
-                                if (currentHolder != null && currentHolder.poster != null) {
-                                    currentHolder.poster.setVisibility(View.INVISIBLE);
-                                }
-                            })
-                            .start();
+                    currentHolder.poster.setVisibility(View.GONE);
                 }
             }
 
@@ -245,16 +244,22 @@ public final class TikTokActivity extends Activity {
         int pos = layoutManager.getPosition(snapView);
         if (pos == currentPosition || pos < 0 || pos >= clips.size()) return;
 
+        RecyclerView.ViewHolder vh = recycler.getChildViewHolder(snapView);
+        if (vh == null) {
+            vh = recycler.findViewHolderForAdapterPosition(pos);
+        }
+        if (!(vh instanceof ClipHolder)) {
+            recycler.post(this::checkActiveSnap);
+            return;
+        }
+
         if (currentHolder != null && currentHolder.poster != null) {
             currentHolder.poster.setAlpha(1f);
             currentHolder.poster.setVisibility(View.VISIBLE);
         }
 
         currentPosition = pos;
-        RecyclerView.ViewHolder vh = recycler.findViewHolderForAdapterPosition(pos);
-        if (vh instanceof ClipHolder) {
-            playClip((ClipHolder) vh, clips.get(pos));
-        }
+        playClip((ClipHolder) vh, clips.get(pos));
 
         if (pos >= clips.size() - 3) {
             fetchMoreClips(false);
@@ -272,6 +277,15 @@ public final class TikTokActivity extends Activity {
         holder.buffering.setVisibility(View.VISIBLE);
         holder.updateState();
 
+        player.stop();
+        player.clearMediaItems();
+
+        if (playerView != null) {
+            playerView.setPlayer(null);
+            playerView.setPlayer(player);
+            playerView.setResizeMode(isZoomMode ? AspectRatioFrameLayout.RESIZE_MODE_ZOOM : AspectRatioFrameLayout.RESIZE_MODE_FIT);
+        }
+
         MediaItem.ClippingConfiguration clipping = new MediaItem.ClippingConfiguration.Builder()
                 .setStartPositionMs(clip.startMs)
                 .setEndPositionMs(clip.endMs)
@@ -286,6 +300,14 @@ public final class TikTokActivity extends Activity {
         player.setVolume(isMuted ? 0f : 1f);
         player.prepare();
         player.play();
+
+        // Safety fallback: ensure poster is cleared if already rendering or ready
+        progressHandler.postDelayed(() -> {
+            if (currentHolder != null && currentHolder == holder && player != null && player.isPlaying()) {
+                if (currentHolder.poster != null) currentHolder.poster.setVisibility(View.GONE);
+                if (currentHolder.buffering != null) currentHolder.buffering.setVisibility(View.GONE);
+            }
+        }, 350);
 
         progressHandler.post(progressTick);
     }

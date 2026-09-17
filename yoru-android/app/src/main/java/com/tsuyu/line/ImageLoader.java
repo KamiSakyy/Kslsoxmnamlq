@@ -313,8 +313,8 @@ public final class ImageLoader {
 
     private static String refererFor(String url) {
         String host = host(url);
-        if (host.contains("cdnlibs.org")) return "https://anilib.me/";
-        if (host.contains("shikimori")) return "https://shikimori.one/";
+        if (host.contains(Sec.s("37171b151c31164d1d1713"))) return Sec.s("3c07010906694a4c130b1d270c1b1c5d5719");
+        if (host.contains(Sec.s("271b1c121c3e0a111b"))) return Sec.s("3c07010906694a4c010d1d200c145d425b183b1d1056");
         return originFor(url) + "/";
     }
 

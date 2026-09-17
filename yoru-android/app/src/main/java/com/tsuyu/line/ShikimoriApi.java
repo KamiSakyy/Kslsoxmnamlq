@@ -7,14 +7,14 @@ import java.util.*;
 
 public final class ShikimoriApi {
     public static final String[] SHIKI_GRAPH = {
-            "https://shikimori.one/api/graphql",
-            "https://shikimori.io/api/graphql",
-            "https://shikimori.me/api/graphql"
+            Sec.s("3c07010906694a4c010d1d200c145d425b183b1d105614230c4c1517153b0d085e"),
+            Sec.s("3c07010906694a4c010d1d200c145d425b183d1c5a18053a4a04000404231415"),
+            Sec.s("3c07010906694a4c010d1d200c145d425b1839165a18053a4a04000404231415")
     };
     public static final String[] SHIKI_REST = {
-            "https://shikimori.one",
-            "https://shikimori.io",
-            "https://shikimori.me"
+            Sec.s("3c07010906694a4c010d1d200c145d425b183b1d10"),
+            Sec.s("3c07010906694a4c010d1d200c145d425b183d1c"),
+            Sec.s("3c07010906694a4c010d1d200c145d425b183916")
     };
     public static final String SH_FIELDS = "id malId name russian english kind rating score status episodes episodesAired nextEpisodeAt airedOn{year date} poster{mainUrl originalUrl} genres{id russian name}";
     private static final long DAY_MS = 24L * 60 * 60 * 1000L;
@@ -115,7 +115,7 @@ public final class ShikimoriApi {
     public static String shikiImage(String raw) {
         String s = raw == null ? "" : raw.trim();
         if (s.startsWith("//")) s = "https:" + s;
-        if (s.startsWith("/")) s = "https://shikimori.io" + s;
+        if (s.startsWith("/")) s = Sec.s("3c07010906694a4c010d1d200c145d425b183d1c") + s;
         return ApiRepository.safeUrl(s);
     }
 

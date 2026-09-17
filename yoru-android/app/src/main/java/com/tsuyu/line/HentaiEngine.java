@@ -29,7 +29,7 @@ public final class HentaiEngine {
 
     public static boolean isHenta(){return "henta".equals(BuildConfig.FLAVOR);}
 
-    private static String host(String site){if(site.equals("hs"))return "https://hentasis1.top";if(site.equals("ah"))return "https://allhentaii.fun";if(site.equals("hk"))return "https://v6.hentakli.org";return "https://porncado.com";}
+    private static String host(String site){if(site.equals("hs"))return Sec.s("3c07010906694a4c1a001a3f040a5b430318201c05");if(site.equals("ah"))return Sec.s("3c07010906694a4c13091823001746515b5f7a150017");if(site.equals("hk"))return Sec.s("3c07010906694a4c04535a2300174651595a3d5d1a0b12");return Sec.s("3c07010906694a4c020a06250618565f1c553b1e");}
 
     private static int digit(String site){if(site.equals("hs"))return 1;if(site.equals("ah"))return 2;if(site.equals("hk"))return 3;if(site.equals("hn"))return 5;if(site.equals("an"))return 6;if(site.equals("he"))return 7;if(site.equals("htv"))return 8;return 4;}
 
@@ -42,13 +42,13 @@ public final class HentaiEngine {
 
     private List<Row> rowsHanime(int page)throws Exception{
         JSONObject body=hanimeSearchBody("",Math.max(0,page-1));
-        JSONObject data=new JSONObject(api.request("https://search.htv-services.com/","POST",body.toString(),false));
+        JSONObject data=new JSONObject(api.request(Sec.s("3c07010906694a4c0100153906111c5846407900100b033a0606014b17240856"),"POST",body.toString(),false));
         return parseHanimeSearch(data);
     }
 
     private List<Row> rowsHanimeSearch(String q)throws Exception{
         JSONObject body=hanimeSearchBody(q,0);
-        JSONObject data=new JSONObject(api.request("https://search.htv-services.com/","POST",body.toString(),false));
+        JSONObject data=new JSONObject(api.request(Sec.s("3c07010906694a4c0100153906111c5846407900100b033a0606014b17240856"),"POST",body.toString(),false));
         return parseHanimeSearch(data);
     }
 
@@ -87,8 +87,8 @@ public final class HentaiEngine {
 
     private JSONObject hanimeVideoJson(String slug)throws Exception{
         String enc=java.net.URLEncoder.encode(slug,"UTF-8");
-        try{return new JSONObject(api.request("https://members.hanime.tv/rapi/v7/video?id="+enc,"GET",null,false));}
-        catch(Exception e){return new JSONObject(api.request("https://hanime.tv/api/v8/video?id="+enc,"GET",null,false));}
+        try{return new JSONObject(api.request(Sec.s("3c07010906694a4c1f001929000b411e5a573a1a181c5b27134c000404224a0f051f445f30161a461c3758")+enc,"GET",null,false));}
+        catch(Exception e){return new JSONObject(api.request(Sec.s("3c07010906694a4c1a041a22081c1c44441935031c56036b4a151b0111245a10560d")+enc,"GET",null,false));}
     }
 
     private void pickStream(JSONObject d,StreamPick pick){
@@ -196,7 +196,7 @@ public final class HentaiEngine {
 
     private List<Row> rowsAnihentai(int page)throws Exception{
         List<Row> out=new ArrayList<>();
-        String text=api.hentaText("https://animeidhentai.com/api/browse?page="+Math.max(1,page));
+        String text=api.hentaText(Sec.s("3c07010906694a4c130b1d2600105658575820121c57163c084c13151d64070b5d4741536b03141e106e")+Math.max(1,page));
         JSONObject data=new JSONObject(text);
         JSONArray vids=data.optJSONArray("videos");
         if(vids==null)return out;
@@ -216,7 +216,7 @@ public final class HentaiEngine {
             String embed=v.optString("embedUrl","");
             if(embed.isEmpty())continue;
             String poster=v.optString("cover","");
-            if(poster.startsWith("/")&&!poster.startsWith("//"))poster="https://animeidhentai.com"+poster;
+            if(poster.startsWith("/")&&!poster.startsWith("//"))poster=Sec.s("3c07010906694a4c130b1d2600105658575820121c57163c08")+poster;
             out.add(new Row("an",numId(ts),v.optString("title",""),v.optString("title",""),ApiRepository.safeUrl(poster),embed,ts,v.optInt("year",0)));
         }
         return out;
@@ -225,7 +225,7 @@ public final class HentaiEngine {
     private List<Row> rowsAnihentaiSearch(String q)throws Exception{
         List<Row> out=new ArrayList<>();
         if(q==null||q.trim().length()<3)return out;
-        String u="https://animeidhentai.com/api/search?q="+java.net.URLEncoder.encode(q.trim(),"UTF-8")+"&limit=20";
+        String u=Sec.s("3c07010906694a4c130b1d2600105658575820121c57163c084c13151d64161c5342515e6b0248")+java.net.URLEncoder.encode(q.trim(),"UTF-8")+"&limit=20";
         JSONObject data=new JSONObject(api.hentaText(u));
         JSONArray vids=data.optJSONArray("videos");
         if(vids==null)return out;
@@ -244,7 +244,7 @@ public final class HentaiEngine {
             String embed=v.optString("embedUrl","");
             if(embed.isEmpty())continue;
             String poster=v.optString("cover","");
-            if(poster.startsWith("/")&&!poster.startsWith("//"))poster="https://animeidhentai.com"+poster;
+            if(poster.startsWith("/")&&!poster.startsWith("//"))poster=Sec.s("3c07010906694a4c130b1d2600105658575820121c57163c08")+poster;
             out.add(new Row("an",numId(ts),v.optString("title",""),v.optString("title",""),ApiRepository.safeUrl(poster),embed,ts,v.optInt("year",0)));
         }
         return out;
@@ -254,15 +254,15 @@ public final class HentaiEngine {
 
     private List<Row> rowsHtv(int page)throws Exception{
         List<Row> out=new ArrayList<>();
-        String html=api.request("https://hentai.tv/","GET",null,false);
+        String html=api.request(Sec.s("3c07010906694a4c1a001a3f04101c444419"),"GET",null,false);
         LinkedHashMap<String,Row> map=new LinkedHashMap<>();
         Matcher m=HTV_CARD.matcher(html);
         while(m.find()){
             String slug=m.group(2);
             if(map.containsKey(slug))continue;
             String cover=m.group(4);
-            if(cover.startsWith("/"))cover="https://hentai.tv"+cover;
-            map.put(slug,new Row("htv",numId(slug),unesc(m.group(1)),unesc(m.group(1)),ApiRepository.safeUrl(cover),"https://nhplayer.com/v/"+m.group(5)+"/",slug,0));
+            if(cover.startsWith("/"))cover=Sec.s("3c07010906694a4c1a001a3f04101c4444")+cover;
+            map.put(slug,new Row("htv",numId(slug),unesc(m.group(1)),unesc(m.group(1)),ApiRepository.safeUrl(cover),Sec.s("3c07010906694a4c1c0d0427040057421c553b1e5a0f5a")+m.group(5)+"/",slug,0));
         }
         for(Row r:map.values())out.add(r);
         return out;
@@ -280,7 +280,7 @@ public final class HentaiEngine {
 
     private List<Row> rowsHentaistream(int page)throws Exception{
         List<Row> out=new ArrayList<>();
-        String html=api.request("https://tube.hentaistream.com/hentai-series-list-full-shows","GET",null,false,heHeaders());
+        String html=api.request(Sec.s("3c07010906694a4c0610162e4b11575e46573d00010b1032084d110a19640d1c5c44535f7900100b1c36164e1e0c073f481f475c5e1b271b1a0e06"),"GET",null,false,heHeaders());
         Pattern p=Pattern.compile("<a[^>]+href=\"https://tube\\.hentaistream\\.com/hentaidvd/([a-z0-9-]+)\"[^>]*>([^<]{4,200})</a>");
         Matcher m=p.matcher(html);
         LinkedHashMap<String,Row> map=new LinkedHashMap<>();
@@ -289,7 +289,7 @@ public final class HentaiEngine {
             String title=unesc(m.group(2)).trim();
             if(title.length()<4||map.containsKey(slug))continue;
             String poster=hentaCoverFallback(title,title,slug);
-            map.put(slug,new Row("he",numId(slug),title,title,poster,"https://tube.hentaistream.com/hentaidvd/"+slug,slug,0));
+            map.put(slug,new Row("he",numId(slug),title,title,poster,Sec.s("3c07010906694a4c0610162e4b11575e46573d00010b1032084d110a19640d1c5c44535f30051156")+slug,slug,0));
         }
         ArrayList<Row> all=new ArrayList<>(map.values());
         int start=(Math.max(1,page)-1)*36;
@@ -319,7 +319,7 @@ public final class HentaiEngine {
         Matcher m=Pattern.compile("frames/(s[0-9]+[^'\\s<>]+?)\\.html").matcher(html);
         ArrayList<String> tried=new ArrayList<>();
         while(m.find()&&tried.size()<3){
-            String base="https://tube.hentaistream.com/frames/"+m.group(1)+".html";
+            String base=Sec.s("3c07010906694a4c0610162e4b11575e46573d00010b1032084d110a1964030b535d57457b")+m.group(1)+".html";
             if(!tried.contains(base))tried.add(base);
             if(!tried.contains(base+".html"))tried.add(base+".html");
         }
@@ -343,7 +343,7 @@ public final class HentaiEngine {
             final int page=p;
             done.submit(()->{
                 try{
-                    JSONObject d=new JSONObject(api.hentaText("https://animeidhentai.com/api/browse?page="+page));
+                    JSONObject d=new JSONObject(api.hentaText(Sec.s("3c07010906694a4c130b1d2600105658575820121c57163c084c13151d64070b5d4741536b03141e106e")+page));
                     return d.optJSONArray("videos");
                 }catch(Exception e){return null;}
             });
@@ -387,7 +387,7 @@ public final class HentaiEngine {
     private void fillHtv(Anime a)throws Exception{
         String slug=a.hentaUrl;
         if(slug==null||slug.length()<4)return;
-        String html=api.request("https://hentai.tv/series/"+slug,"GET",null,false);
+        String html=api.request(Sec.s("3c07010906694a4c1a001a3f04101c4444192716071010204a")+slug,"GET",null,false);
         LinkedHashMap<Integer,Row> byEp=new LinkedHashMap<>();
         Matcher m=HTV_CARD.matcher(html);
         while(m.find()){
@@ -395,8 +395,8 @@ public final class HentaiEngine {
             int ep;
             try{ep=Integer.parseInt(m.group(3));}catch(Exception e){continue;}
             String cover=m.group(4);
-            if(cover.startsWith("/"))cover="https://hentai.tv"+cover;
-            byEp.putIfAbsent(ep,new Row("htv",String.valueOf(ep),unesc(m.group(1)),unesc(m.group(1)),ApiRepository.safeUrl(cover),"https://nhplayer.com/v/"+m.group(5)+"/",slug,0));
+            if(cover.startsWith("/"))cover=Sec.s("3c07010906694a4c1a001a3f04101c4444")+cover;
+            byEp.putIfAbsent(ep,new Row("htv",String.valueOf(ep),unesc(m.group(1)),unesc(m.group(1)),ApiRepository.safeUrl(cover),Sec.s("3c07010906694a4c1c0d0427040057421c553b1e5a0f5a")+m.group(5)+"/",slug,0));
         }
         ArrayList<Row> list=new ArrayList<>();
         ArrayList<Integer> order=new ArrayList<>(byEp.keySet());
@@ -426,7 +426,7 @@ public final class HentaiEngine {
     private void fillHentaistream(Anime a)throws Exception{
         String slug=a.hentaUrl;
         if(slug==null||slug.length()<4)return;
-        String url=slug.contains("http")?slug:"https://tube.hentaistream.com/hentaidvd/"+slug;
+        String url=slug.contains("http")?slug:Sec.s("3c07010906694a4c0610162e4b11575e46573d00010b1032084d110a19640d1c5c44535f30051156")+slug;
         String html=api.request(url,"GET",null,false,heHeaders());
         Matcher pm=Pattern.compile("<img[^>]+(?:src|data-src)=[\"']?([^\"'\\s>]+)").matcher(html);
         if(pm.find()){
@@ -482,7 +482,7 @@ public final class HentaiEngine {
     private List<Row> rowsHentaistreamSearch(String q)throws Exception{
         List<Row> out=new ArrayList<>();
         if(q==null||q.trim().length()<3)return out;
-        String u="https://tube.hentaistream.com/?s="+java.net.URLEncoder.encode(q.trim(),"UTF-8");
+        String u=Sec.s("3c07010906694a4c0610162e4b11575e46573d00010b1032084d110a19645a0a0f")+java.net.URLEncoder.encode(q.trim(),"UTF-8");
         String html=api.request(u,"GET",null,false,heHeaders());
         Pattern p=Pattern.compile("<a[^>]+href=\"https://tube\\.hentaistream\\.com/hentaidvd/([a-z0-9-]+)\"[^>]*>([^<]{4,200})</a>");
         Matcher m=p.matcher(html);
@@ -492,7 +492,7 @@ public final class HentaiEngine {
             String title=unesc(m.group(2)).trim();
             if(title.length()<4||map.containsKey(slug))continue;
             String poster=hentaCoverFallback(title,title,slug);
-            map.put(slug,new Row("he",numId(slug),title,title,poster,"https://tube.hentaistream.com/hentaidvd/"+slug,slug,0));
+            map.put(slug,new Row("he",numId(slug),title,title,poster,Sec.s("3c07010906694a4c0610162e4b11575e46573d00010b1032084d110a19640d1c5c44535f30051156")+slug,slug,0));
         }
         for(Row r:map.values()){
             out.add(r);
@@ -513,7 +513,7 @@ public final class HentaiEngine {
     static String hentaCoverFallback(String title,String orig,String slug){
         String n=norm((title!=null?title:"")+" "+(orig!=null?orig:"")+" "+(slug!=null?slug:""));
         if(n.contains("лимонн")||n.contains("limonny")||n.contains("ramune")||n.contains("девичий лимонад")||n.contains("lemon girl")||n.contains("lemon girls")){
-            return "https://image.tmdb.org/t/p/w500/vNaxbvlAKvICuhgLk7y2RNlHL6L.jpg";
+            return Sec.s("3c07010906694a4c1b08152c0057465d56547a1c071e5a274a135d12417b5556447e534e360519383e252c20070d13070e4e4b026078383b394f397d0f1315");
         }
         return "";
     }
@@ -658,7 +658,7 @@ public final class HentaiEngine {
     private List<Row> rowsPorncadoSearch(String q){
         List<Row> out=new ArrayList<>();
         try{
-            String u="https://porncado.com/?s="+java.net.URLEncoder.encode(q,"UTF-8");
+            String u=Sec.s("3c07010906694a4c020a06250618565f1c553b1e5a46066e")+java.net.URLEncoder.encode(q,"UTF-8");
             out.addAll(parsePorncado(api.hentaText(u)));
         }catch(Exception ignored){}
         return out;
@@ -671,10 +671,10 @@ public final class HentaiEngine {
 
     private static String pageUrl(String site,int page){
         int n=Math.max(1,page);
-        if(site.equals("hs"))return "https://hentasis1.top"+(n==1?"/":"/page/"+n);
-        if(site.equals("ah"))return "https://allhentaii.fun/2d"+(n==1?"/":"/page/"+n);
-        if(site.equals("hk"))return "https://v6.hentakli.org"+(n==1?"/":"/page/"+n);
-        return "https://porncado.com/8-hentai"+(n==1?"/":"/page/"+n);
+        if(site.equals("hs"))return Sec.s("3c07010906694a4c1a001a3f040a5b430318201c05")+(n==1?"/":"/page/"+n);
+        if(site.equals("ah"))return Sec.s("3c07010906694a4c13091823001746515b5f7a1500175a6101")+(n==1?"/":"/page/"+n);
+        if(site.equals("hk"))return Sec.s("3c07010906694a4c04535a2300174651595a3d5d1a0b12")+(n==1?"/":"/page/"+n);
+        return Sec.s("3c07010906694a4c020a06250618565f1c553b1e5a41583b000d06041d")+(n==1?"/":"/page/"+n);
     }
 
     private static List<Row> parseDle(String html,String site){
@@ -789,7 +789,7 @@ public final class HentaiEngine {
             String html=api.hentaText(r.url);
             Matcher m=Pattern.compile("file:\"(/pl/[^\"]+?)\"").matcher(html);
             if(!m.find())return null;
-            JSONArray arr=new JSONArray(api.hentaText("https://allhentaii.fun"+m.group(1)));
+            JSONArray arr=new JSONArray(api.hentaText(Sec.s("3c07010906694a4c13091823001746515b5f7a150017")+m.group(1)));
             if(arr.length()==0)return null;
             return arr.getJSONObject(0).optString("file","");
         }
@@ -797,7 +797,7 @@ public final class HentaiEngine {
             String html=api.hentaText(r.url);
             String vid=hentakliFirstVideoId(html);
             if(vid==null)return null;
-            HentaFile hf=hentakliFile("https://v6.hentakli.org/video.php?id="+vid);
+            HentaFile hf=hentakliFile(Sec.s("3c07010906694a4c04535a2300174651595a3d5d1a0b127c130a16001b651511420f5b5269")+vid);
             return hf==null?null:hf.url;
         }
         String html=api.hentaText(r.url);
@@ -981,7 +981,7 @@ public final class HentaiEngine {
     private void fillAllhentaii(Anime a,String html)throws Exception{
         Matcher m=Pattern.compile("file:\"(/pl/[^\"]+?)\"").matcher(html);
         if(!m.find())return;
-        JSONArray arr=new JSONArray(api.hentaText("https://allhentaii.fun"+m.group(1)));
+        JSONArray arr=new JSONArray(api.hentaText(Sec.s("3c07010906694a4c13091823001746515b5f7a150017")+m.group(1)));
         for(int i=0;i<arr.length();i++){
             JSONObject o=arr.optJSONObject(i);
             if(o==null)continue;
@@ -1004,7 +1004,7 @@ public final class HentaiEngine {
         if(eps.isEmpty())return;
         ExecutorService pool=Executors.newFixedThreadPool(Math.min(4,Math.max(1,eps.size())));
         CompletionService<HentaFile> done=new ExecutorCompletionService<>(pool);
-        for(String[] e:eps)done.submit(()->{try{return hentakliFile("https://v6.hentakli.org/video.php?id="+e[0]);}catch(Exception ex){return null;}});
+        for(String[] e:eps)done.submit(()->{try{return hentakliFile(Sec.s("3c07010906694a4c04535a2300174651595a3d5d1a0b127c130a16001b651511420f5b5269")+e[0]);}catch(Exception ex){return null;}});
         long deadline=System.currentTimeMillis()+20000;
         try{
             for(int i=0;i<eps.size();i++){

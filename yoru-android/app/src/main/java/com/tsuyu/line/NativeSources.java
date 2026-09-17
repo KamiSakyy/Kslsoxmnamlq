@@ -13,7 +13,7 @@ public final class NativeSources {
     public NativeSources(ApiRepository repository){api=repository;}
     private static String absolute(String base,String value){try{if(value==null||value.trim().isEmpty())return "";value=value.trim().replace(" ","%20").replace("&amp;","&");if(value.startsWith("//"))value="https:"+value;return ApiRepository.safeUrl(new URL(new URL(base),value).toString());}catch(Exception e){return "";}}
     public Anime.Page catalog(String source,String search,int page)throws Exception{
-        if(!source.equals("animedia"))throw new IOException("Неизвестный маршрут");String base="https://amd.online";String html;
+        if(!source.equals("animedia"))throw new IOException("Неизвестный маршрут");String base=Sec.s("3c07010906694a4c130810650a175e595c53");String html;
         if(search==null||search.trim().isEmpty()){html=api.document(base+(page==1?"/":"/page/"+page+"/"));}
         else{String body="do=search&subaction=search&full_search=0&result_from=1&search_start="+page+"&story="+URLEncoder.encode(search,"UTF-8");html=api.formPage(base+"/index.php?do=search",body);}
         Document doc=Jsoup.parse(html,base);Anime.Page result=new Anime.Page();result.page=page;LinkedHashMap<String,Anime> items=new LinkedHashMap<>();
@@ -22,7 +22,7 @@ public final class NativeSources {
         if(result.items.isEmpty()&&!doc.text().toLowerCase(Locale.ROOT).contains("найден"))throw new IOException("Страница временно изменилась Попробуйте позже");return result;
     }
     public Anime details(Anime base,boolean episodes)throws Exception{
-        String host="https://amd.online";String url=base.alias.startsWith("https://")?base.alias:absolute(host,base.alias);if(url.isEmpty()||!new URL(url).getHost().equals(new URL(host).getHost()))throw new IOException("Откройте карточку через Tsuyu");Document doc=Jsoup.parse(api.document(url),url);Anime a=Anime.from(base.json());a.alias=url;
+        String host=Sec.s("3c07010906694a4c130810650a175e595c53");String url=base.alias.startsWith("https://")?base.alias:absolute(host,base.alias);if(url.isEmpty()||!new URL(url).getHost().equals(new URL(host).getHost()))throw new IOException("Откройте карточку через Tsuyu");Document doc=Jsoup.parse(api.document(url),url);Anime a=Anime.from(base.json());a.alias=url;
         Element title=doc.selectFirst("h1");if(title!=null)a.title=title.text();Element description=doc.selectFirst(".page__text,.pmovie__description,.full-text,.fdesc");if(description!=null)a.description=description.text();Element picture=doc.selectFirst(".pmovie__poster img,.page__poster img,.poster__img img");if(picture!=null)a.poster=absolute(url,picture.attr("src"));String warnings=doc.select(".player-blocked,.alert-danger").text();if(warnings.contains("правообладател")){a.blocked=true;return a;}
         if(episodes){TreeMap<Double,Anime.Episode> rows=new TreeMap<>();for(Element e:doc.select("[data-vid][data-vlnk]")){double number;try{number=Double.parseDouble(e.attr("data-vid"));}catch(Exception bad){continue;}String vod=absolute(host,e.attr("data-vlnk"));if(number<1||vod.isEmpty()||!vod.contains("/vod/"))continue;if(rows.containsKey(number))continue;Anime.Episode ep=new Anime.Episode();ep.id=e.attr("data-vid");ep.number=number;ep.lazy="animedia";ep.resolverUrl=vod;rows.put(number,ep);}a.episodeList.addAll(rows.values());a.episodes=a.episodeList.size();if(a.episodes==0)throw new IOException("Пока нет доступных серий");}
         return api.remember(a);

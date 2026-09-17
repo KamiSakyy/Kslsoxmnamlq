@@ -203,7 +203,7 @@ public final class ApiRepository {
         switch(base.source){
             case "yoru":{a=yoruDetails(base,episodes);break;}
             case "anixsekai":{a=anixDetails(base,episodes);break;}
-            case "shikimori":{JSONArray rows=shiki("{animes(ids:"+JSONObject.quote(id)+",limit:1){"+SH_FIELDS+" descriptionHtml related{relationKind anime{"+SH_FIELDS+"}}}}").optJSONArray("animes");if(rows==null||rows.length()==0)throw new IOException("Аниме не найдено");JSONObject j=rows.getJSONObject(0);a=shikiAnime(j);a.description=plain(j.optString("descriptionHtml"));JSONArray rel=j.optJSONArray("related");for(int i=0;rel!=null&&i<rel.length();i++){JSONObject r=rel.getJSONObject(i).optJSONObject("anime");if(r!=null)a.related.add(remember(shikiAnime(r)));}break;}
+            case "shikimori":{JSONArray rows=shiki("{animes(ids:"+JSONObject.quote(id)+",limit:1){"+SH_FIELDS+" descriptionHtml related{relationKind anime{"+SH_FIELDS+"}}}}").optJSONArray("animes");if(rows==null||rows.length()==0)throw new IOException("Аниме не найдено");JSONObject j=rows.getJSONObject(0);a=shikiAnime(j);a.description=plain(j.optString("descriptionHtml"));JSONArray rel=j.optJSONArray("related");for(int i=0;rel!=null&&i<rel.length();i++){JSONObject r=rel.getJSONObject(i).optJSONObject("anime");if(r!=null)a.related.add(remember(shikiAnime(r)));}if(episodes){try{Anime y=yoruShell(a);Anime full=details(y,true);if(full!=null&&!full.episodeList.isEmpty()){a.episodeList.addAll(full.episodeList);a.episodes=Math.max(a.episodes,full.episodes);a.episodesAired=Math.max(a.episodesAired,full.episodesAired);}}catch(Exception ignored){}}break;}
             case "animevost":{JSONArray rows=postForm("https://api.animevost.org/v1/info","id",id).optJSONArray("data");if(rows==null||rows.length()==0)throw new IOException("Аниме не найдено");a=vostAnime(rows.getJSONObject(0));if(episodes){JSONArray list=new JSONArray(request("https://api.animevost.org/v1/playlist","POST","id="+enc(id),true));for(int i=0;i<list.length();i++){JSONObject e=list.getJSONObject(i);Anime.Episode ep=new Anime.Episode();ep.id=id+"-"+i;ep.name=e.optString("name","");ep.number=numberIn(ep.name,i+1);putStream(ep,480,e.optString("std"));putStream(ep,720,e.optString("hd"));a.episodeList.add(ep);}a.episodesAired=Math.max(a.episodesAired,a.episodeList.size());a.episodes=Math.max(a.episodes,a.episodeList.size());}break;}
             case "yummy":{JSONObject d=get("https://api.yani.tv/anime/"+enc(id)).optJSONObject("response");if(d==null)throw new IOException("Tsuyu не открыл карточку");a=yummyAnime(d);if(episodes){a.episodeList.addAll(YummyParser.episodes(id));a.episodesAired=Math.max(a.episodesAired,playableEpisodes(a));a.episodes=Math.max(a.episodes,a.episodeList.size());}break;}
             case "anidub":{a=anidubDetails(base,episodes);break;}
@@ -226,10 +226,19 @@ public final class ApiRepository {
                 runEnrich(a);
             }
         }
-        appendFutureEpisodes(a);applyEpisodeVisuals(a);if(db!=null&&fullMeta)db.detail(a);return remember(a);
+        appendFutureEpisodes(a);applyEpisodeVisuals(a);if(db!=null)db.detail(a);return remember(a);
     }
-    private static final ExecutorService ENRICH=Executors.newFixedThreadPool(6);
-    private void runEnrich(Anime a){ArrayList<Future<?>> jobs=new ArrayList<>();try{jobs.add(ENRICH.submit((Runnable)()->enrichSchedule(a)));jobs.add(ENRICH.submit((Runnable)()->enrichVisuals(a)));jobs.add(ENRICH.submit((Runnable)()->enrichRelated(a)));for(Future<?> j:jobs)try{j.get();}catch(ExecutionException ignored){}}catch(InterruptedException e){Thread.currentThread().interrupt();}catch(Exception ignored){}finally{for(Future<?> j:jobs)j.cancel(true);}}
+    private static final ExecutorService ENRICH=new ThreadPoolExecutor(
+            4, 16, 30L, TimeUnit.SECONDS,
+            new SynchronousQueue<>(),
+            r -> {
+                Thread t = new Thread(r, "yoru-enrich");
+                t.setPriority(Thread.NORM_PRIORITY - 1);
+                return t;
+            },
+            new ThreadPoolExecutor.CallerRunsPolicy()
+    );
+    private void runEnrich(Anime a){ArrayList<Future<?>> jobs=new ArrayList<>();try{jobs.add(ENRICH.submit((Runnable)()->enrichSchedule(a)));jobs.add(ENRICH.submit((Runnable)()->enrichVisuals(a)));jobs.add(ENRICH.submit((Runnable)()->enrichRelated(a)));for(Future<?> j:jobs)try{j.get(2500,TimeUnit.MILLISECONDS);}catch(Exception ignored){}}catch(InterruptedException e){Thread.currentThread().interrupt();}catch(Exception ignored){}finally{for(Future<?> j:jobs)j.cancel(true);}}
     public Anime.Playback playback(Anime input,String selectedMode)throws Exception{
         normalizeIds(input);
         String selected=selectedMode==null||selectedMode.trim().isEmpty()?"auto":selectedMode.trim();
@@ -237,8 +246,8 @@ public final class ApiRepository {
         if(input!=null&&"henta".equals(input.source)&&!selected.equals("henta"))selected="henta";
         if(!selected.equals("auto")){
             Anime video=findPlayableSource(input,selected);
-            if(video==null)throw new IOException("Просмотр сейчас не вернул серии");
-            return playbackResult(input,video,selected);
+            if(video!=null)return playbackResult(input,video,selected);
+            if("henta".equals(selected)||"henta".equals(input.source))throw new IOException("Просмотр сейчас не вернул серии");
         }
         ArrayList<String> order=SourceEngine.playbackOrder(input);
         ExecutorService pool=Executors.newFixedThreadPool(Math.max(1,Math.min(6,order.size())));
@@ -282,7 +291,7 @@ public final class ApiRepository {
 
     private Anime.Page yoruCatalog(String search,int page,Filter f)throws Exception{String q=search==null?"":search.trim();Anime.Page base;try{base=catalog("shikimori",q,page,f);}catch(Exception first){base=catalog("yummy",q,page,f);}Anime.Page out=new Anime.Page();out.page=base.page;out.total=base.total;out.more=base.more;out.note="Tsuyu";for(Anime item:base.items)out.items.add(remember(yoruShell(item)));ArrayList<Integer> anilistAt=new ArrayList<>();if(!q.isEmpty()){try{Anime.Page extra=anilistCatalog(q,1);for(Anime item:extra.items){if(out.items.size()>=24)break;boolean dup=false;for(Anime h:out.items){if(item.malId>0&&h.malId==item.malId){dup=true;break;}String hi=SourceEngine.identity(h);if(!hi.isEmpty()&&hi.equals(SourceEngine.identity(item))){dup=true;break;}if(!h.title.isEmpty()&&(h.title.equalsIgnoreCase(item.title)||h.original.equalsIgnoreCase(item.original))){dup=true;break;}}if(!dup){out.items.add(remember(yoruShell(item)));anilistAt.add(out.items.size()-1);}}}catch(Exception ignored){}}if(!anilistAt.isEmpty()&&page==1)canonicalize(out,anilistAt);return out;}
     private void canonicalize(Anime.Page out,ArrayList<Integer> at){ArrayList<Integer> need=new ArrayList<>();for(int idx:at){if(idx<0||idx>=out.items.size())continue;int id=out.items.get(idx).malId;if(id>0&&!need.contains(id))need.add(id);if(need.size()>=12)break;}if(need.isEmpty())return;StringBuilder ids=new StringBuilder();for(int id:need){if(ids.length()>0)ids.append(',');ids.append(id);}JSONArray rows;try{StringBuilder qs=new StringBuilder();qs.append("{animes(ids:\"").append(ids).append("\",limit:").append(need.size()).append("){").append(SH_FIELDS).append("}}");rows=shiki(qs.toString()).optJSONArray("animes");}catch(Exception ignored){return;}if(rows==null||rows.length()==0)return;Map<Integer,Anime> canon=new HashMap<>();for(int i=0;i<rows.length();i++){JSONObject raw=rows.optJSONObject(i);if(raw==null)continue;Anime e=shikiAnime(raw);if(e!=null&&e.malId>0&&Anime.valid(e))canon.put(e.malId,remember(e));}for(int idx:at){if(idx<0||idx>=out.items.size())continue;Anime e=canon.get(out.items.get(idx).malId);if(e!=null)out.items.set(idx,e);}}
-    private Anime yoruShell(Anime base){Anime a=Anime.from(base==null?new JSONObject():base.json());String originalSource=base==null?"":base.source;a.source="yoru";int id=a.malId>0?a.malId:("shikimori".equals(originalSource)?parseInt(base.id):0);if(id>0&&a.malId==0)a.malId=id;if(id<=0)id=(int)(1L+Integer.toUnsignedLong((base==null?"yoru":base.key()).hashCode())%999999999L);a.id=String.valueOf(id);a.blocked=false;return a;}
+    public Anime yoruShell(Anime base){Anime a=Anime.from(base==null?new JSONObject():base.json());String originalSource=base==null?"":base.source;a.source="yoru";int id=a.malId>0?a.malId:("shikimori".equals(originalSource)?parseInt(base.id):0);if(id>0&&a.malId==0)a.malId=id;if(id<=0)id=(int)(1L+Integer.toUnsignedLong((base==null?"yoru":base.key()).hashCode())%999999999L);a.id=String.valueOf(id);a.blocked=false;return a;}
     private Anime yoruDetails(Anime base,boolean episodes)throws Exception{
         Anime a=yoruShell(base);
         Future<Anime> yummyJob=ENRICH.submit(()->{try{return findYummy(base);}catch(Exception e){return null;}});
@@ -295,18 +304,34 @@ public final class ApiRepository {
         Anime y=null;
         try{y=yummyJob.get(50,TimeUnit.MILLISECONDS);if(y!=null)fillYoruMeta(a,y);}catch(Exception ignored){}
         if(episodes){
-            ArrayList<Anime> found=yoruFoundSources(base,a,yummyJob);
-            LinkedHashMap<String,Anime.Episode> map=new LinkedHashMap<>();
-            for(Anime source:found)mergeYoruEpisodes(map,source);
-            a.episodeList.clear();
-            a.episodeList.addAll(map.values());
-            a.episodeList.sort(Comparator.comparingDouble(e->e.number));
-            a.episodes=Math.max(a.episodes,a.episodeList.size());
-            appendFutureEpisodes(a);
-            applyEpisodeVisuals(a);
             YoruCache db=YoruApp.app()==null?null:YoruApp.app().cache;
-            if(db!=null&&!a.episodeList.isEmpty())db.detail(a);
-            if(a.episodeList.isEmpty())silentSweep(a,base);
+            if(db!=null){
+                try{
+                    Anime cached=db.detail(a,24*60*60*1000L);
+                    if(cached!=null&&!cached.episodeList.isEmpty()){
+                        a.episodeList.clear();
+                        a.episodeList.addAll(cached.episodeList);
+                        a.episodes=Math.max(a.episodes,a.episodeList.size());
+                        fillYoruMeta(a,cached);
+                    }
+                }catch(Exception ignored){}
+            }
+            if(a.episodeList.isEmpty()){
+                ArrayList<Anime> found=yoruFoundSources(base,a,yummyJob);
+                LinkedHashMap<String,Anime.Episode> map=new LinkedHashMap<>();
+                for(Anime source:found)mergeYoruEpisodes(map,source);
+                a.episodeList.clear();
+                a.episodeList.addAll(map.values());
+                a.episodeList.sort(Comparator.comparingDouble(e->e.number));
+                a.episodes=Math.max(a.episodes,a.episodeList.size());
+                appendFutureEpisodes(a);
+                applyEpisodeVisuals(a);
+                if(db!=null&&!a.episodeList.isEmpty())db.detail(a);
+                if(a.episodeList.isEmpty()){
+                    silentSweep(a,base);
+                    if(db!=null&&!a.episodeList.isEmpty())db.detail(a);
+                }
+            }
         }
         Anime meta=null;
         if(metaJob!=null){
@@ -334,7 +359,7 @@ public final class ApiRepository {
     private boolean enoughYoruSources(ArrayList<Anime> rows,String pref,boolean concrete,Anime shell){if(rows==null||rows.isEmpty())return false;int episodes=0;boolean preferred=false;for(Anime a:rows){episodes=Math.max(episodes,a==null?0:a.episodeList.size());if(concrete&&hasPreferredVoice(a,pref))preferred=true;}if(concrete&&preferred)return true;int target=shell==null?0:Math.max(shell.episodes,shell.episodesAired);return rows.size()>=2&&(target<=0?episodes>=6:episodes>=Math.min(target,12));}
     private boolean hasPreferredVoice(Anime a,String pref){if(a==null||voiceKey(pref).isEmpty())return false;if(voiceMatches(pref,sourceVoice(a.source)))return true;for(Anime.Episode e:a.episodeList)for(Anime.Variant v:e.variants){String label=(v==null?"":v.name+" "+v.displayName+" "+v.player);if(voiceMatches(pref,label))return true;}return false;}
     private boolean sourceLikelyHasVoice(String source,String voice){String key=voiceKey(voice),s=SourceEngine.sourceId(source);if(key.isEmpty())return true;if(key.equals("anidub"))return s.equals("anidub")||s.equals("yummy")||s.equals("anixsekai")||s.equals("kodik");if(key.equals("animevost"))return s.equals("animevost")||s.equals("yummy")||s.equals("kodik");if(key.equals("animedia"))return s.equals("animedia")||s.equals("yummy")||s.equals("kodik");if(key.equals("anilibria"))return s.equals("anilibria")||s.equals("animelib")||s.equals("animelib4k")||s.equals("yummy");return s.equals("yummy")||s.equals("anixsekai")||s.equals("kodik")||s.equals("animetka");}
-    private void silentSweep(Anime a,Anime base){if(a==null||!a.episodeList.isEmpty())return;long deadline=System.currentTimeMillis()+12000;ArrayList<String> order=null;try{order=SourceEngine.playbackOrder(base==null?a:base);}catch(Exception e){return;}if(order==null)return;for(String source:order){if(source==null||source.equals("yoru")||System.currentTimeMillis()>=deadline)continue;Anime got=null;try{got=findPlayableSource(a,source);}catch(Exception ignored){}if(got==null||got.episodeList.isEmpty())continue;LinkedHashMap<String,Anime.Episode> map=new LinkedHashMap<>();try{mergeYoruEpisodes(map,got);}catch(Exception ignored){}if(map.isEmpty())continue;a.episodeList.clear();a.episodeList.addAll(map.values());a.episodeList.sort(Comparator.comparingDouble(e->e.number));a.episodes=Math.max(a.episodes,a.episodeList.size());try{a.episodesAired=Math.max(a.episodesAired,playableEpisodes(a));}catch(Exception ignored){}try{appendFutureEpisodes(a);}catch(Exception ignored){}try{applyEpisodeVisuals(a);}catch(Exception ignored){}try{remember(a);}catch(Exception ignored){}break;}}
+    private void silentSweep(Anime a,Anime base){if(a==null||!a.episodeList.isEmpty())return;long deadline=System.currentTimeMillis()+12000;ArrayList<String> order=null;try{order=SourceEngine.playbackOrder(base==null?a:base);}catch(Exception e){return;}if(order==null)return;for(String source:order){if(source==null||source.equals("yoru")||System.currentTimeMillis()>=deadline)continue;Anime got=null;try{got=findPlayableSource(a,source);}catch(Exception ignored){}if(got==null||got.episodeList.isEmpty())continue;LinkedHashMap<String,Anime.Episode> map=new LinkedHashMap<>();try{mergeYoruEpisodes(map,got);}catch(Exception ignored){}if(map.isEmpty())continue;a.episodeList.clear();a.episodeList.addAll(map.values());a.episodeList.sort(Comparator.comparingDouble(e->e.number));a.episodes=Math.max(a.episodes,a.episodeList.size());try{a.episodesAired=Math.max(a.episodesAired,playableEpisodes(a));}catch(Exception ignored){}try{appendFutureEpisodes(a);}catch(Exception ignored){}try{applyEpisodeVisuals(a);}catch(Exception ignored){}try{remember(a);}catch(Exception ignored){}YoruCache db=YoruApp.app()==null?null:YoruApp.app().cache;if(db!=null)try{db.detail(a);}catch(Exception ignored){}break;}}
     private Anime yoruFindSource(Anime original,Anime shell,String source){long started=System.currentTimeMillis();try{Anime candidate;if(source.equals("kodik"))candidate=kodikShell(shell);else if(source.equals("anixsekai"))candidate=findAnix(shell);else if(source.equals("anilibria"))candidate=findAniLiberty(shell);else if(source.equals("hanime"))candidate=findHanime(shell);else if(source.equals("animetka")||source.equals("anidub")||source.equals("animevost")||source.equals("animedia"))candidate=searchSource(shell,source);else candidate=searchSource(shell,source);if(candidate==null&&original!=null&&!original.source.equals("yoru")&&original.source.equals(source))candidate=original;if(candidate==null){SourceEngine.record(source,false,System.currentTimeMillis()-started,0,0,0);return null;}Anime full=details(candidate,true);if(full.blocked||full.episodeList.isEmpty()){SourceEngine.record(source,false,System.currentTimeMillis()-started,0,0,0);return null;}SourceEngine.record(source,true,System.currentTimeMillis()-started,full.episodeList.size(),SourceEngine.optionCount(full),SourceEngine.maxQuality(full));return full;}catch(Exception e){SourceEngine.record(source,false,System.currentTimeMillis()-started,0,0,0);return null;}}
     private void mergeYoruEpisodes(LinkedHashMap<String,Anime.Episode> map,Anime source){String route=downloadSourceName(source.source);for(Anime.Episode e:source.episodeList){if(e==null||e.number<0||!Double.isFinite(e.number))continue;ArrayList<Anime.Variant> variants=new ArrayList<>();String baseVoice=sourceVoice(source.source);for(Map.Entry<Integer,String> stream:e.streams.entrySet()){String url=safeUrl(stream.getValue());if(url.isEmpty())continue;Anime.Variant v=new Anime.Variant(baseVoice,route,url);v.duration=e.duration;v.openingStart=e.openingStart;v.openingEnd=e.openingEnd;v.displayName=baseVoice;variants.add(v);}for(Anime.Variant row:e.variants){String url=embed(row.url);if(url.isEmpty())continue;String rowLabel=cleanLabel(row.name.isEmpty()?row.label():row.name),rowPlayer=cleanLabel(row.player);String voice=voiceTitle(rowLabel);if(voice.isEmpty())voice=sourceVoice(source.source);Anime.Variant v=new Anime.Variant(voice,rowPlayer.isEmpty()?route:route+" · "+rowPlayer,url);v.duration=row.duration;v.openingStart=row.openingStart;v.openingEnd=row.openingEnd;v.displayName=voice;variants.add(v);}if(variants.isEmpty())continue;String key=episodeParam(e.number);Anime.Episode ep=map.get(key);if(ep==null){ep=new Anime.Episode();ep.id="yoru-"+key;ep.number=e.number;ep.name="";ep.lazy="yoru";map.put(key,ep);}if(ep.poster.isEmpty()&&e.poster!=null&&!e.poster.isEmpty())ep.poster=e.poster;ep.duration=Math.max(ep.duration,e.duration);if(ep.openingEnd<=0&&e.openingEnd>0){ep.openingStart=e.openingStart;ep.openingEnd=e.openingEnd;}for(Anime.Variant v:variants)addVariant(ep,v);ep.variants.sort(Comparator.comparingInt(v->SourceEngine.variantRank(v)));}}
     private void loadYoruEpisode(Anime.Episode ep)throws Exception{if("yoru-ready".equals(ep.resolverUrl))return;if(ep.variants.isEmpty()&&!ep.streams.isEmpty()){ep.resolverUrl="yoru-ready";return;}ArrayList<Anime.Variant> sorted=SourceEngine.sortVariants(ep.variants);ArrayList<Anime.Variant> keep=new ArrayList<>();String preferred="";boolean strict=false;try{preferred=YoruApp.app().store.voicePreference();strict=!voiceKey(preferred).isEmpty();}catch(Exception ignored){}collectYoruVariants(sorted,keep,preferred,strict);if(keep.isEmpty()&&strict){collectYoruVariants(sorted,keep,"",false);try{YoruApp.app().store.onlyPreferredVoice(false);}catch(Exception ignored){}}if(keep.isEmpty())throw new IOException("Tsuyu пока не нашёл доступные озвучки для этой серии");ep.variants.clear();for(Anime.Variant v:keep)addVariant(ep,v);ep.variants.sort(Comparator.comparingInt(v->SourceEngine.variantRank(v)));ep.resolverUrl="yoru-ready";}

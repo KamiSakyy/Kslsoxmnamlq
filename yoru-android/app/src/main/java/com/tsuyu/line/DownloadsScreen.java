@@ -164,7 +164,7 @@ public final class DownloadsScreen extends LinearLayout {
             progress.setVisibility(View.GONE);size.setVisibility(View.GONE);primary.setVisibility(View.GONE);save.setVisibility(View.GONE);
             String url=ApiRepository.safeUrl(anime.poster),key="plan:"+value.id+"|"+url;
             poster.setVisibility(url.isEmpty()?View.GONE:View.VISIBLE);placeholder.setVisibility(url.isEmpty()?View.VISIBLE:View.GONE);placeholder.setText("Серия\n"+Ui.number(value.episode));
-            if(!key.equals(imageKey)){imageKey=key;poster.setTag(null);poster.setImageDrawable(null);if(!url.isEmpty())YoruApp.app().images.load(poster,url,key);}
+            if(!key.equals(imageKey)){imageKey=key;if(!url.isEmpty())YoruApp.app().images.load(poster,url,key);else poster.setImageDrawable(null);}
         }
         void bind(Download d,String resolved) {
             plan=null;primary.setVisibility(View.VISIBLE);size.setVisibility(View.VISIBLE);download=d;metadata=DownloadHub.metadata(d);anime=Anime.from(metadata.optJSONObject("anime"));
@@ -176,7 +176,7 @@ public final class DownloadsScreen extends LinearLayout {
             if(url.isEmpty()&&Anime.valid(anime)&&anime.screenshots.size()>=2)url=anime.screenshots.get(Math.abs((int)Math.floor(episode)-1)%anime.screenshots.size());
             String key=d.request.id+"|"+url;
             poster.setVisibility(url.isEmpty()?View.GONE:View.VISIBLE);placeholder.setVisibility(url.isEmpty()?View.VISIBLE:View.GONE);placeholder.setText("Серия\n"+Ui.number(episode));
-            if(!key.equals(imageKey)){imageKey=key;poster.setTag(null);poster.setImageDrawable(null);if(!url.isEmpty())YoruApp.app().images.load(poster,url,key);}
+            if(!key.equals(imageKey)){imageKey=key;if(!url.isEmpty())YoruApp.app().images.load(poster,url,key);else poster.setImageDrawable(null);}
             type.setText("Тип: "+OfflineExporter.format(d));
             String status=DownloadHub.status(d);
             if(d.state==Download.STATE_QUEUED&&YoruApp.app().store.wifiDownloads()&&YoruApp.app().traffic.metered())status="Ожидает Wi-Fi";

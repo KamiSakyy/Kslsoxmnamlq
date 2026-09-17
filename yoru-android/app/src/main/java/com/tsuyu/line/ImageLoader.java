@@ -19,13 +19,13 @@ public final class ImageLoader {
     private final Context context;
     private final ThreadPoolExecutor pool = new ThreadPoolExecutor(
             6, 16, 15L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>(260),
+            new LinkedBlockingQueue<>(500),
             r -> {
                 Thread t = new Thread(r, "yoru-image");
                 t.setPriority(Thread.NORM_PRIORITY - 1);
                 return t;
             },
-            new ThreadPoolExecutor.AbortPolicy()
+            new ThreadPoolExecutor.DiscardOldestPolicy()
     );
     private final ConcurrentHashMap<String, ArrayList<ImageView>> waiters = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Boolean> fixTried = new ConcurrentHashMap<>();
@@ -97,14 +97,23 @@ public final class ImageLoader {
     }
 
     private void loadInternal(ImageView view, String raw, String fallback, String asset, Anime a) {
+        if (view == null) return;
         String url = ApiRepository.safeUrl(raw);
         String key = !url.isEmpty() ? url : (fallback == null || fallback.isEmpty() ? "yoru" : fallback);
         Object oldTag = view.getTag();
         boolean sameKey = key.equals(oldTag);
+
+        // If this exact image key is already loaded on the view, do not reload or flash!
+        if (sameKey && view.getDrawable() != null) {
+            return;
+        }
+
         view.setTag(key);
 
         if (!sameKey) {
-            view.setImageResource(R.drawable.ic_tsuyu);
+            // Clear previous image so recycled view does not show stale image from another item,
+            // but DO NOT flash ic_tsuyu! The dark card background will show cleanly.
+            view.setImageDrawable(null);
         }
 
         boolean leader = false;
@@ -125,31 +134,31 @@ public final class ImageLoader {
                 Bitmap ready = null;
                 try {
                     File file = cacheFile(key);
-                    byte[] bytes = null;
                     if (file.exists()) {
-                        bytes = readBytes(new BufferedInputStream(new FileInputStream(file)), 12 * 1024 * 1024);
-                        if (decodeBytes(bytes) == null) {
+                        Bitmap b = BitmapFactory.decodeFile(file.getAbsolutePath(), decodeOptions());
+                        if (b != null) {
+                            file.setLastModified(System.currentTimeMillis());
+                            ready = b;
+                        } else {
                             long len = file.length();
                             if (file.delete()) currentDiskUsage.addAndGet(-len);
-                            bytes = null;
-                        } else {
-                            file.setLastModified(System.currentTimeMillis());
                         }
                     }
-                    if ((bytes == null || bytes.length < 64) && asset != null && !asset.isEmpty()) {
+                    if (ready == null && asset != null && !asset.isEmpty()) {
                         try (InputStream in = context.getAssets().open("posters/" + asset + ".webp")) {
-                            bytes = readBytes(in, 12 * 1024 * 1024);
+                            ready = BitmapFactory.decodeStream(in, null, decodeOptions());
                         } catch (Exception ignored) {}
                     }
                     YoruApp app = YoruApp.app();
                     boolean online = app != null && app.traffic != null && app.traffic.connected();
-                    if ((bytes == null || bytes.length < 64) && !url.isEmpty() && online) {
-                        bytes = downloadBytes(url);
+                    if (ready == null && !url.isEmpty() && online) {
+                        byte[] bytes = downloadBytes(url);
                         if (bytes != null && bytes.length >= 64) {
                             saveRaw(file, bytes);
+                            ready = decodeBytes(bytes);
                         }
                     }
-                    if ((bytes == null || bytes.length < 64) && !url.isEmpty() && a != null && a.malId > 0 && online
+                    if (ready == null && !url.isEmpty() && a != null && a.malId > 0 && online
                             && fixTried.putIfAbsent("fail:" + a.malId, Boolean.TRUE) == null) {
                         try {
                             ApiRepository.posterFixReplace(a, () -> {
@@ -159,10 +168,7 @@ public final class ImageLoader {
                             });
                         } catch (Exception ignored) {}
                     }
-                    Bitmap b = decodeBytes(bytes);
-                    if (b != null && gen == generation) {
-                        ready = b;
-                    }
+                    if (gen != generation) ready = null;
                 } catch (Exception ignored) {
                 } finally {
                     ArrayList<ImageView> targets;
@@ -171,12 +177,16 @@ public final class ImageLoader {
                     }
                     Bitmap bitmap = ready;
                     YoruApp current = YoruApp.app();
-                    if (bitmap != null && targets != null && current != null) {
+                    if (targets != null && current != null) {
                         current.main.post(() -> {
                             if (gen != generation) return;
                             for (ImageView target : targets) {
                                 if (target != null && key.equals(target.getTag())) {
-                                    target.setImageBitmap(bitmap);
+                                    if (bitmap != null) {
+                                        target.setImageBitmap(bitmap);
+                                    } else {
+                                        target.setImageResource(R.drawable.ic_tsuyu);
+                                    }
                                 }
                             }
                         });

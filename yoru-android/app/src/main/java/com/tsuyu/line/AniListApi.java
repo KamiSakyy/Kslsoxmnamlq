@@ -7,6 +7,7 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.regex.*;
 
 public final class AniListApi {
     private static final String GRAPHQL_URL = "https://graphql.anilist.co";
@@ -90,6 +91,36 @@ public final class AniListApi {
         }
         out.more = p != null && p.optJSONObject("pageInfo") != null && p.optJSONObject("pageInfo").optBoolean("hasNextPage", false);
         return out;
+    }
+
+    public static HashMap<Long, String> episodeThumbnails(int malId, int anilistId, ApiRepository repo) {
+        HashMap<Long, String> map = new HashMap<>();
+        if (malId <= 0 && anilistId <= 0) return map;
+        try {
+            String q = malId > 0
+                    ? "query($id:Int){Media(idMal:$id,type:ANIME){streamingEpisodes{title thumbnail}}}"
+                    : "query($id:Int){Media(id:$id,type:ANIME){streamingEpisodes{title thumbnail}}}";
+            JSONObject vars = new JSONObject().put("id", malId > 0 ? malId : anilistId);
+            JSONObject root = query(new JSONObject().put("query", q).put("variables", vars).toString(), repo);
+            JSONObject media = root == null ? null : root.optJSONObject("Media");
+            JSONArray list = media == null ? null : media.optJSONArray("streamingEpisodes");
+            if (list != null) {
+                Pattern numPattern = Pattern.compile("(?:Episode|Ep\\.|Серия|#)?\\s*(\\d+)", Pattern.CASE_INSENSITIVE);
+                for (int i = 0; i < list.length(); i++) {
+                    JSONObject row = list.optJSONObject(i);
+                    if (row == null) continue;
+                    String thumb = ApiRepository.safeUrl(row.optString("thumbnail", ""));
+                    if (thumb.isEmpty()) continue;
+                    String title = row.optString("title", "");
+                    Matcher m = numPattern.matcher(title);
+                    long num = (m.find()) ? Long.parseLong(m.group(1)) : (i + 1);
+                    if (num > 0 && !map.containsKey(num)) {
+                        map.put(num, thumb);
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+        return map;
     }
 
     public static void posterFix(Anime a, Runnable done) {

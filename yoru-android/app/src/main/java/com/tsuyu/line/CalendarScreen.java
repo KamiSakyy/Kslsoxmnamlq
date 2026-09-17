@@ -80,7 +80,7 @@ public final class CalendarScreen extends FrameLayout {
         public CalendarHolder onCreateViewHolder(ViewGroup parent,int type){return new CalendarHolder(type);}
         public void onBindViewHolder(CalendarHolder holder,int position){holder.bind(rows.get(position));}
         public void onBindViewHolder(CalendarHolder holder,int position,List<Object> payloads){holder.bind(rows.get(position));}
-        public void onViewRecycled(CalendarHolder holder){holder.item=null;if(holder.poster!=null){holder.poster.setTag(null);holder.poster.setImageDrawable(null);holder.imageKey="";}}
+        public void onViewRecycled(CalendarHolder holder){holder.item=null;}
     }
 
     private final class CalendarHolder extends RecyclerView.ViewHolder {
@@ -138,7 +138,7 @@ public final class CalendarScreen extends FrameLayout {
                 title.setText(YoruBrain.title(item.anime));line.setText(item.kind+" · серия "+Ui.number(item.episode)+" · "+time(item.time)+" МСК");line.setTextColor(kindColor(item));
                 meta.setText(countdown(item.time)+" · "+item.precision+statusSuffix(item));
                 String key=item.anime.key()+"|"+item.anime.poster;
-                if(!key.equals(imageKey)){imageKey=key;poster.setTag(null);poster.setImageDrawable(null);YoruApp.app().images.load(poster,item.anime);}
+                if(!key.equals(imageKey)){imageKey=key;YoruApp.app().images.load(poster,item.anime);}
                 boolean watched=SeriesWatcher.has(item.anime,item.episode);
                 bell.filled=watched;
                 bell.color=watched?Ui.PURPLE:Ui.MUTED;

@@ -288,7 +288,8 @@ public final class HentaiEngine {
             String slug=m.group(1);
             String title=unesc(m.group(2)).trim();
             if(title.length()<4||map.containsKey(slug))continue;
-            map.put(slug,new Row("he",numId(slug),title,title,"","https://tube.hentaistream.com/hentaidvd/"+slug,slug,0));
+            String poster=hentaCoverFallback(title,title,slug);
+            map.put(slug,new Row("he",numId(slug),title,title,poster,"https://tube.hentaistream.com/hentaidvd/"+slug,slug,0));
         }
         ArrayList<Row> all=new ArrayList<>(map.values());
         int start=(Math.max(1,page)-1)*36;
@@ -427,10 +428,13 @@ public final class HentaiEngine {
         if(slug==null||slug.length()<4)return;
         String url=slug.contains("http")?slug:"https://tube.hentaistream.com/hentaidvd/"+slug;
         String html=api.request(url,"GET",null,false,heHeaders());
-        Matcher pm=Pattern.compile("<img[^>]+src=(https?://[a-zA-Z0-9._/%-]+)").matcher(html);
+        Matcher pm=Pattern.compile("<img[^>]+(?:src|data-src)=[\"']?([^\"'\\s>]+)").matcher(html);
         if(pm.find()){
             String poster=pm.group(1);
-            if(poster.length()>12)a.poster=poster;
+            if(poster.length()>12)a.poster=ApiRepository.safeUrl(poster);
+        }
+        if(a.poster==null||a.poster.isEmpty()){
+            a.poster=hentaCoverFallback(a.title,a.original,a.hentaUrl);
         }
         Pattern p=Pattern.compile("https://tube\\.hentaistream\\.com/([a-z0-9-]+)-episode-(\\d+)");
         Matcher m=p.matcher(html);
@@ -487,7 +491,8 @@ public final class HentaiEngine {
             String slug=m.group(1);
             String title=unesc(m.group(2)).trim();
             if(title.length()<4||map.containsKey(slug))continue;
-            map.put(slug,new Row("he",numId(slug),title,title,"","https://tube.hentaistream.com/hentaidvd/"+slug,slug,0));
+            String poster=hentaCoverFallback(title,title,slug);
+            map.put(slug,new Row("he",numId(slug),title,title,poster,"https://tube.hentaistream.com/hentaidvd/"+slug,slug,0));
         }
         for(Row r:map.values()){
             out.add(r);
@@ -496,8 +501,21 @@ public final class HentaiEngine {
         if(!out.isEmpty())return out;
         Pattern ep=Pattern.compile("https://tube\\.hentaistream\\.com/([a-z0-9-]+)-episode-\\d+");
         Matcher m2=ep.matcher(html);
-        if(m2.find())out.add(new Row("he",numId("he-"+m2.group(1)),slugTitle(m2.group(0)),"","",m2.group(0),m2.group(0),0));
+        if(m2.find()){
+            String epSlug=m2.group(1);
+            String title=slugTitle(m2.group(0));
+            String poster=hentaCoverFallback(title,title,epSlug);
+            out.add(new Row("he",numId("he-"+epSlug),title,"",poster,m2.group(0),m2.group(0),0));
+        }
         return out;
+    }
+
+    static String hentaCoverFallback(String title,String orig,String slug){
+        String n=norm((title!=null?title:"")+" "+(orig!=null?orig:"")+" "+(slug!=null?slug:""));
+        if(n.contains("лимонн")||n.contains("limonny")||n.contains("ramune")||n.contains("девичий лимонад")||n.contains("lemon girl")||n.contains("lemon girls")){
+            return "https://image.tmdb.org/t/p/w500/vNaxbvlAKvICuhgLk7y2RNlHL6L.jpg";
+        }
+        return "";
     }
 
     private static String hentaQueryAlias(String q){
@@ -739,6 +757,9 @@ public final class HentaiEngine {
             a.title=r.title;
             a.original=r.orig;
             a.poster=r.poster;
+            if(a.poster==null||a.poster.isEmpty()){
+                a.poster=hentaCoverFallback(a.title,a.original,r.slug);
+            }
             a.hentaUrl=r.ref.isEmpty()?r.url:r.ref;
             a.year=r.year;
             a.type="Хентай";
@@ -823,6 +844,9 @@ public final class HentaiEngine {
         }catch(Exception ignored){}
         if(a.type.isEmpty())a.type="Хентай";
         if(a.age.isEmpty())a.age="18+";
+        if(a.poster==null||a.poster.isEmpty()){
+            a.poster=hentaCoverFallback(a.title,a.original,a.hentaUrl);
+        }
         return a;
     }
 

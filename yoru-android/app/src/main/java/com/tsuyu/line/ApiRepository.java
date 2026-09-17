@@ -123,9 +123,8 @@ public final class ApiRepository {
     public HashMap<Long,String> episodeShots(Anime a){
         HashMap<Long,String> out=new HashMap<>();
         int mal=malIdOf(a);
-        if(mal<=0)return out;
         YoruCache db=YoruApp.app()==null?null:YoruApp.app().cache;
-        if(db!=null)try{
+        if(mal>0&&db!=null)try{
             JSONArray cached=db.shots(mal,21*DAY_MS);
             for(int i=0;i<cached.length();i++){
                 JSONObject row=cached.optJSONObject(i);
@@ -136,28 +135,65 @@ public final class ApiRepository {
             }
             if(!out.isEmpty())return out;
         }catch(Exception ignored){}
-        try{
-            JSONArray rows=shikiArray("/api/animes/"+mal+"/episodes");
-            JSONArray store=new JSONArray();
-            for(int i=0;i<rows.length();i++){
-                JSONObject row=rows.optJSONObject(i);
-                if(row==null)continue;
-                double n=row.optDouble("number",-1);
-                if(n<=0||!Double.isFinite(n))continue;
-                String url="";
-                JSONArray ss=row.optJSONArray("screenshots");
-                if(ss!=null&&ss.length()>0){JSONObject shot=ss.optJSONObject(0);if(shot!=null)url=safeUrl(shot.optString("original",shot.optString("preview","")));}
-                if(url.isEmpty())continue;
-                Long key=Math.round(n);
-                if(!out.containsKey(key))out.put(key,url);
-                store.put(new JSONObject().put("n",n).put("u",url));
-                if(store.length()>=400)break;
+        if(a!=null&&!a.episodeList.isEmpty()){
+            for(Anime.Episode ep:a.episodeList){
+                if(ep!=null&&!ep.future&&ep.poster!=null&&!ep.poster.isEmpty()&&!ep.poster.equals(a.poster)){
+                    Long key=Math.round(ep.number);
+                    if(key>0&&!out.containsKey(key))out.put(key,safeUrl(ep.poster));
+                }
             }
-            if(db!=null&&store.length()>0)db.shots(mal,store);
-        }catch(Exception ignored){}
+            if(!out.isEmpty()){
+                if(mal>0&&db!=null){
+                    JSONArray store=new JSONArray();
+                    for(Map.Entry<Long,String> en:out.entrySet()){
+                        try{store.put(new JSONObject().put("n",en.getKey()).put("u",en.getValue()));}catch(Exception ignored){}
+                    }
+                    if(store.length()>0)db.shots(mal,store);
+                }
+                return out;
+            }
+        }
+        if(mal>0||(a!=null&&a.anilistId>0)){
+            try{
+                HashMap<Long,String> ani=AniListApi.episodeThumbnails(mal,a!=null?a.anilistId:0,this);
+                if(ani!=null&&!ani.isEmpty()){
+                    out.putAll(ani);
+                    if(mal>0&&db!=null){
+                        JSONArray store=new JSONArray();
+                        for(Map.Entry<Long,String> en:out.entrySet()){
+                            try{store.put(new JSONObject().put("n",en.getKey()).put("u",en.getValue()));}catch(Exception ignored){}
+                        }
+                        if(store.length()>0)db.shots(mal,store);
+                    }
+                    return out;
+                }
+            }catch(Exception ignored){}
+        }
+        if(a!=null&&mal>0){
+            try{
+                ArrayList<String> shots=screenshotsOf(a);
+                if(shots!=null&&!shots.isEmpty()){
+                    for(int i=0;i<shots.size();i++){
+                        String u=safeUrl(shots.get(i));
+                        if(!u.isEmpty()){
+                            Long key=(long)(i+1);
+                            if(!out.containsKey(key))out.put(key,u);
+                        }
+                    }
+                    if(db!=null&&!out.isEmpty()){
+                        JSONArray store=new JSONArray();
+                        for(Map.Entry<Long,String> en:out.entrySet()){
+                            try{store.put(new JSONObject().put("n",en.getKey()).put("u",en.getValue()));}catch(Exception ignored){}
+                        }
+                        if(store.length()>0)db.shots(mal,store);
+                    }
+                    return out;
+                }
+            }catch(Exception ignored){}
+        }
         return out;
     }
-    public void fillEpisodePosters(Anime anime,Runnable done){if(anime==null)return;YoruApp app=YoruApp.app();app.discovery.execute(()->{try{HashMap<Long,String> shots=episodeShots(anime);if(!shots.isEmpty())for(Anime.Episode e:anime.episodeList){if(e==null||e.future||!e.poster.isEmpty())continue;String url=shots.get(Math.round(e.number));if(url!=null&&!url.isEmpty())e.poster=url;}}catch(Exception ignored){}finally{if(done!=null)app.main.post(done);}});}
+    public void fillEpisodePosters(Anime anime,Runnable done){if(anime==null)return;YoruApp app=YoruApp.app();app.discovery.execute(()->{try{HashMap<Long,String> shots=episodeShots(anime);if(!shots.isEmpty())for(Anime.Episode e:anime.episodeList){if(e==null||e.future)continue;if(!e.poster.isEmpty()&&!e.poster.equals(anime.poster))continue;String url=shots.get(Math.round(e.number));if(url!=null&&!url.isEmpty())e.poster=url;}}catch(Exception ignored){}finally{if(done!=null)app.main.post(done);}});}
     public void refreshFranchise(Anime base,Runnable done){if(base==null)return;YoruApp app=YoruApp.app();app.discovery.execute(()->{try{enrichRelated(base);}catch(Exception ignored){}finally{if(done!=null)app.main.post(done);}});}
     private Anime shikiQuick(int id,String source)throws Exception{return ShikimoriApi.shikiQuick(id,source,this);}
     public Anime details(Anime base,boolean episodes)throws Exception{
@@ -376,11 +412,12 @@ public final class ApiRepository {
     private static void applyEpisodeVisuals(Anime a){
         if(a==null)return;
         int shots=a.screenshots.size();
-        for(Anime.Episode ep:a.episodeList){
+        for(int i=0;i<a.episodeList.size();i++){
+            Anime.Episode ep=a.episodeList.get(i);
             if(ep==null)continue;
             if(ep.future){ep.poster="";continue;}
-            if(ep.poster.isEmpty()&&shots>0)ep.poster=a.screenshots.get(Math.abs((int)Math.floor(ep.number)-1)%shots);
-            if(ep.poster.isEmpty())ep.poster=a.poster;
+            if(ep.poster.equals(a.poster))ep.poster="";
+            if(ep.poster.isEmpty()&&i<shots)ep.poster=a.screenshots.get(i);
             if(ep.duration<=0&&a.type.toLowerCase(Locale.ROOT).contains("фильм"))ep.duration=90*60;
         }
     }

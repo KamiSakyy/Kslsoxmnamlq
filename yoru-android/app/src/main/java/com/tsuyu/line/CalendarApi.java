@@ -298,9 +298,8 @@ public final class CalendarApi {
         item.kind = "Новая серия";
         item.precision = "Точная дата";
         item.source = "Tsuyu";
-        String key = (fav.malId > 0 ? Sec.s("39121943") + fav.malId : fav.key()) + "|" + item.episode + "|" + startOfDay(at);
-        ApiRepository.AiringItem old = map.get(key);
-        if (old == null || !"Точная дата".equals(old.precision)) map.put(key, item);
+        String key = (fav.malId > 0 ? Sec.s("39121943") + fav.malId : fav.key()) + "|" + item.episode;
+        map.put(key, item);
     }
 
     private static long estimateWeekly(JSONObject j, long now, long end) {

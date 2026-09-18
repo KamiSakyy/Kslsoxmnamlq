@@ -127,7 +127,16 @@ public final class ShikimoriApi {
         a.source = source == null || source.isEmpty() ? Sec.s("271b1c121c3e0a111b") : source;
         if (a.malId <= 0) a.malId = id;
         if ("yoru".equals(a.source)) a.id = String.valueOf(id);
-        a.description = ApiRepository.plain(j.optString(Sec.s("3016061a073a15171b0a1a0311145e")));
+        String desc = j.optString(Sec.s("3016061a073a15171b0a1a0311145e"));
+        if (desc.isEmpty() || desc.equals("null")) desc = j.optString("description");
+        a.description = ApiRepository.plain(desc);
+        if (a.description.isEmpty()) {
+            try {
+                JSONObject rest = new JSONObject(repo.shikiRest(Sec.s("7b1205105a-320b0a1f00-077409105f-59460b6143-5309143400-5e") + id));
+                String rDesc = rest.optString("description_html", rest.optString("description", ""));
+                if (!rDesc.isEmpty() && !rDesc.equals("null")) a.description = ApiRepository.plain(rDesc);
+            } catch (Exception ignored) {}
+        }
         YoruCache db = YoruApp.app() == null ? null : YoruApp.app().cache;
         if (db != null) db.detail(a);
         return repo.remember(a);

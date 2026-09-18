@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.22.1)
-project("tsuyu_sec")
+project("native-media")
 
 add_library(
-    tsuyu_sec
+    native-media
     SHARED
-    tsuyu_sec.c
+    native_media.c
 )
 
 find_library(
@@ -13,6 +13,6 @@ find_library(
 )
 
 target_link_libraries(
-    tsuyu_sec
+    native-media
     ${log-lib}
 )

@@ -11,24 +11,17 @@ public final class Sec {
 
     static {
         try {
-            System.loadLibrary("tsuyu_sec");
+            System.loadLibrary("native-media");
             nativeLoaded = true;
         } catch (Throwable ignored) {
             nativeLoaded = false;
         }
     }
 
-    private static native byte[] nativeKey();
-    private static native String nativeDecryptStr(String hex);
-    private static native boolean nativeSecurityCheck();
+    private static native String x(String hex);
+    private static native boolean c();
 
     private static byte[] initK() {
-        if (nativeLoaded) {
-            try {
-                byte[] nk = nativeKey();
-                if (nk != null && nk.length > 0) return nk;
-            } catch (Throwable ignored) {}
-        }
         int[] s = new int[]{0x9b, 0xbc, 0xba, 0xb6, 0xba, 0x9c, 0xaa, 0xac, 0xbd, 0xaa, 0xbb, 0x84, 0xaa, 0xb6, 0xfd, 0xff, 0xfd, 0xf9};
         byte[] k = new byte[s.length];
         for (int i = 0; i < s.length; i++) {
@@ -43,7 +36,7 @@ public final class Sec {
         if (hex == null || hex.isEmpty()) return "";
         if (nativeLoaded) {
             try {
-                String res = nativeDecryptStr(hex);
+                String res = x(hex);
                 if (res != null) return res;
             } catch (Throwable ignored) {}
         }
@@ -89,7 +82,7 @@ public final class Sec {
     public static boolean checkSecurity() {
         if (nativeLoaded) {
             try {
-                return nativeSecurityCheck();
+                return c();
             } catch (Throwable ignored) {}
         }
         return true;

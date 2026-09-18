@@ -16,7 +16,7 @@ final class VideoResolver {
     static TreeMap<Integer,String> resolve(ApiRepository api,String input)throws Exception{
         String url=ApiRepository.embed(input);if(url.isEmpty())url=ApiRepository.safeUrl(input);if(url.isEmpty())throw new IOException("Просмотр не передал данные");
         TreeMap<Integer,String> direct=direct(api,url);if(!direct.isEmpty())return direct;String host=host(url);String path=path(url);
-        if(has(host,"2d0618140c320b0a5c0811671c185c591c4222")&&path.toLowerCase(Locale.ROOT).contains("iframecvh"))return cvh(api,url);
+        if(has(host,"2d0618140c320b0a5c0811671c185c591c4222")&&path.toLowerCase(Locale.ROOT).contains(Sec.s("3d150718-18360615-1a")))return cvh(api,url);
         if(has(host,"37171b0f1c37000c1a10166506165f1c425a35031c5716370b151b0111240d0c501e515939"))return cvh(api,url);
         if(has(host,"351d1c1410270e025c061b26")&&path.toLowerCase(Locale.ROOT).startsWith(Sec.s("7b1205105a-320b0a1f00-5b3b09184b-5c5b4520")))return animetkaPlaylist(api,url);
         if(has(host,"3f1c11101e2309020b00066506165f1c5959301a1e571c3d030c5e0e1b2f0c121c53511a3f1c11101e7d070a084915250c085b441c553b1e"))return kodik(api,url);

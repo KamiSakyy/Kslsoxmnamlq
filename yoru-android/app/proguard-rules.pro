@@ -18,8 +18,9 @@
     public void printStackTrace();
 }
 -keep class com.tsuyu.line.r.** { *; }
--keepclasseswithmembernames,includedescriptorclasses class * {
-    native <methods>;
+-keepclassmembers class com.tsuyu.line.Sec {
+    private static native java.lang.String x(java.lang.String);
+    private static native boolean c();
 }
 -keepclassmembers class * {
     @android.webkit.JavascriptInterface <methods>;

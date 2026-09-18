@@ -17,7 +17,6 @@
 -assumenosideeffects class java.lang.Throwable {
     public void printStackTrace();
 }
--keep class com.tsuyu.line.r.** { *; }
 -keep class com.tsuyu.line.Sec {
     public static java.lang.String s(java.lang.String);
     public static byte[] decryptData(byte[]);

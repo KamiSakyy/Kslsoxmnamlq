@@ -248,7 +248,7 @@ public final class TikTokActivity extends Activity {
                 Sec.s("151d1c1410050a1006"),
                 Sec.s("151d1c3d2011"),
                 "AniFilm",
-                "AniStar",
+                Sec.s("151d1c2a013217"),
                 "JAM",
                 "Субтитры",
                 "Дубляж"

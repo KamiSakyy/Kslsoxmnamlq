@@ -627,7 +627,7 @@ public final class HentaiEngine {
 
     private ArrayList<String[]> shikiTitles(String q)throws Exception{
         ArrayList<String[]> out=new ArrayList<>();
-        JSONObject data=api.hentaShiki("{animes(search:"+JSONObject.quote(q)+",limit:20,censored:false){"+FIELDS+"}}");
+        JSONObject data=api.hentaShiki(Sec.s("2f121b101836164b01001539061108")+JSONObject.quote(q)+Sec.s("781f1c141c275f514249172e0b0a5d4257526e15141506364c18")+FIELDS+Sec.s("290e"));
         JSONArray rows=data==null?null:data.optJSONArray("animes");
         if(rows==null)return out;
         for(int i=0;i<rows.length();i++){
@@ -782,7 +782,7 @@ public final class HentaiEngine {
         }
         if(r.site.equals("hs")){
             String html=api.hentaText(r.url);
-            Matcher m=Pattern.compile("file:\"(https://svt[^\"]+\\.mp4)\"").matcher(html);
+            Matcher m=Pattern.compile(Sec.s("321a191c4f714d0b061104385f561d4344420f2d57245e0f4b0e02515d69")).matcher(html);
             return m.find()?m.group(1):null;
         }
         if(r.site.equals("ah")){
@@ -801,7 +801,7 @@ public final class HentaiEngine {
             return hf==null?null:hf.url;
         }
         String html=api.hentaText(r.url);
-        Matcher m=Pattern.compile("<source[^>]+src=\"(https://xcdn[^\"]+)\"").matcher(html);
+        Matcher m=Pattern.compile(Sec.s("68001a0c073000382c5b2960160b510d101e3c07010906694a4c0a0610253e27106d191f76")).matcher(html);
         return m.find()?m.group(1):null;
     }
 
@@ -852,7 +852,7 @@ public final class HentaiEngine {
 
     private JSONObject shikiSearch(String q)throws Exception{
         if(q.isEmpty())return null;
-        JSONObject data=api.hentaShiki("{animes(search:"+JSONObject.quote(q)+",limit:15,censored:false){"+FIELDS+"}}");
+        JSONObject data=api.hentaShiki(Sec.s("2f121b101836164b01001539061108")+JSONObject.quote(q)+Sec.s("781f1c141c275f524749172e0b0a5d4257526e15141506364c18")+FIELDS+Sec.s("290e"));
         JSONArray rows=data==null?null:data.optJSONArray("animes");
         if(rows==null)return null;
         JSONObject best=null;
@@ -956,7 +956,7 @@ public final class HentaiEngine {
     }
 
     private void fillHentasis(Anime a,String html){
-        Pattern p=Pattern.compile("file:\"(https://svt[^\"]+\\.mp4)\",title:\"([^\"]*)\"");
+        Pattern p=Pattern.compile(Sec.s("321a191c4f714d0b061104385f561d4344420f2d57245e0f4b0e02515d69490d5b445e536e515d222b7138495b47"));
         LinkedHashMap<Integer,Anime.Episode> map=new LinkedHashMap<>();
         Matcher m=p.matcher(html);
         while(m.find()){
@@ -1029,7 +1029,7 @@ public final class HentaiEngine {
 
     private void fillPorncado(Anime a,String html){
         ArrayList<Anime.Variant> vs=new ArrayList<>();
-        Matcher m=Pattern.compile("<source[^>]*xcdn[^>]*>").matcher(html);
+        Matcher m=Pattern.compile(Sec.s("68001a0c073000382c5b29611d1a565e69686a2e5f47")).matcher(html);
         while(m.find()&&vs.size()<4){
             String tag=m.group(0);
             String u=attr(tag,"src");

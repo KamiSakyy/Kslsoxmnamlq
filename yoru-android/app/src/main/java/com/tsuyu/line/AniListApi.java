@@ -11,7 +11,7 @@ import java.util.regex.*;
 
 public final class AniListApi {
     private static final String GRAPHQL_URL = Sec.s("3c07010906694a4c1517153b0d085e1e53583d1f1c0a017d060c");
-    private static final String ANI_FIELDS = "id idMal title{romaji english native} bannerImage coverImage{extraLarge large medium} format status episodes duration genres averageScore startDate{year month day} season description(asHtml:false)";
+    private static final String ANI_FIELDS = Sec.s("3d175510111e040f52111d3f091c49425d5b35191c59103d020f1b161c6b0b1846594453295317181b3d00113b08152c0059515f4453263a181812361e060a11062a2918405757163812071e10730806160c01261859545f405b3507550a013211160145113b0c0a5d5457457417000b14270c0c1c45132e0b0b5743125722160718123636001d17116b160d53424672350710020c36041152081b2511111254534f2953061c14200a0d52011138060b5b40465f3b1d5d18061b110e1e5f122a090a5719");
 
     private static final ConcurrentHashMap<String, String> POSTER_FIX = new ConcurrentHashMap<>();
     private static final Set<String> POSTER_BUSY = ConcurrentHashMap.newKeySet();
@@ -34,7 +34,7 @@ public final class AniListApi {
     public static Anime anilistAnime(JSONObject j) {
         if (j == null) return null;
         Anime a = new Anime();
-        a.source = "anilist";
+        a.source = Sec.s("351d1c151c2011");
         a.anilistId = j.optInt("id", 0);
         a.malId = j.optInt("idMal", j.optInt("malId", 0));
         int use = a.malId > 0 ? a.malId : a.anilistId;
@@ -78,7 +78,7 @@ public final class AniListApi {
         out.page = page;
         String q = search == null ? "" : search.trim();
         if (q.isEmpty()) return out;
-        String query = "query($q:String,$p:Int){Page(page:$p,perPage:24){pageInfo{hasNextPage} media(search:$q,type:ANIME){" + ANI_FIELDS + "}}}";
+        String query = Sec.s("2506100b0c7b4112483600390c17551c16466e3a1b0d5c28350215005c3b041e570a16467803100b25320206485740621e095357577f3a151a021d32162d171d001b041e574d125b31171c185d20000200061c7141081e444b46314934373c1e204a09") + ANI_FIELDS + Sec.s("290e08");
         JSONObject vars = new JSONObject().put("q", q).put("p", page);
         JSONObject root = query(new JSONObject().put("query", query).put("variables", vars).toString(), repo);
         JSONObject p = root.optJSONObject("Page");
@@ -98,12 +98,12 @@ public final class AniListApi {
         if (malId <= 0 && anilistId <= 0) return map;
         try {
             String q = malId > 0
-                    ? "query($id:Int){Media(idMal:$id,type:ANIME){streamingEpisodes{title thumbnail}}}"
-                    : "query($id:Int){Media(id:$id,type:ANIME){streamingEpisodes{title thumbnail}}}";
+                    ? Sec.s("2506100b0c7b410a165f3d251150497d57523d125d10111e040f48411d2f490d4b40570c153d3c34307a1e100617112a08105c5777463d001a1d10201e171b11182e450d5a455f543a121c15082e18")
+                    : Sec.s("2506100b0c7b410a165f3d251150497d57523d125d101169410a16490032151c08717c7f19365c020627170613081d25023c4259415930160602013a110f174500231014505e535f380e0804");
             JSONObject vars = new JSONObject().put("id", malId > 0 ? malId : anilistId);
             JSONObject root = query(new JSONObject().put("query", q).put("variables", vars).toString(), repo);
             JSONObject media = root == null ? null : root.optJSONObject("Media");
-            JSONArray list = media == null ? null : media.optJSONArray("streamingEpisodes");
+            JSONArray list = media == null ? null : media.optJSONArray(Sec.s("2707071c143e0c0d152004221616565541"));
             if (list != null) {
                 Pattern numPattern = Pattern.compile("(?:Episode|Ep\\.|Серия|#)?\\s*(\\d+)", Pattern.CASE_INSENSITIVE);
                 for (int i = 0; i < list.length(); i++) {
@@ -190,7 +190,7 @@ public final class AniListApi {
             c.setRequestProperty("Content-Type", "application/json");
             c.setRequestProperty("Accept", "application/json");
             JSONObject vars = new JSONObject().put("id", mal);
-            String payload = new JSONObject().put("query", "query($id:Int){Media(idMal:$id,type:ANIME){coverImage{extraLarge large}}}").put("variables", vars).toString();
+            String payload = new JSONObject().put("query", Sec.s("2506100b0c7b410a165f3d251150497d57523d125d10111e040f48411d2f490d4b40570c153d3c34307a1e001d1311392c145357574d310b010b141f041115005427040b55554f4b29")).put("variables", vars).toString();
             byte[] out = payload.getBytes(StandardCharsets.UTF_8);
             c.setFixedLengthStreamingMode(out.length);
             try (OutputStream os = c.getOutputStream()) {

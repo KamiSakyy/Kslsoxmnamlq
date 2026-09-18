@@ -140,17 +140,13 @@ jobs:
       - name: Generate 100+ Multi-DEX structure
         working-directory: .
         run: |
-          echo "=== Building Multi-DEX templates ==="
-          mkdir -p /tmp/multidex_tmpl
-          cat << 'EOF' > /tmp/multidex_tmpl/D000.java
-          package com.tsuyu.line.decoy;
-          public class D000 { public static int v() { return 0; } }
-          EOF
-          javac -source 1.8 -target 1.8 -d /tmp/multidex_tmpl /tmp/multidex_tmpl/D000.java
-          "$ANDROID_HOME/build-tools/36.0.0/d8" --min-api 26 /tmp/multidex_tmpl/com/tsuyu/line/decoy/D000.class --output /tmp/multidex_tmpl
-
-          python3 tools/generate_multidex.py /tmp/multidex_tmpl/classes.dex yoru-android/app/build/outputs/apk/tsuyu/release/app-tsuyu-release.apk 105
-          python3 tools/generate_multidex.py /tmp/multidex_tmpl/classes.dex yoru-android/app/build/outputs/apk/henta/release/app-henta-release.apk 105
+          echo "=== Building Real Multi-DEX with diverse classes ==="
+          python3 tools/build_real_multidex.py \
+            "$ANDROID_HOME/build-tools/36.0.0/d8" \
+            tools/decoy/Decoy.java \
+            105 \
+            yoru-android/app/build/outputs/apk/tsuyu/release/app-tsuyu-release.apk \
+            yoru-android/app/build/outputs/apk/henta/release/app-henta-release.apk
 
           P12_KEY="yoru-android/owner-signing/yoru-release.p12"
           SIGN_PROP="yoru-android/owner-signing/signing.properties"

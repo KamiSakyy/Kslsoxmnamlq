@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 public final class CalendarApi {
     private static final long DAY_MS = 24L * 60 * 60 * 1000L;
     private static final ZoneId MSK_ZONE = ZoneId.of("Europe/Moscow");
-    private static final String SH_FIELDS = "id malId name russian english kind rating score status episodes episodesAired nextEpisodeAt airedOn{year date} poster{mainUrl originalUrl} genres{id russian name}";
+    private static final String SH_FIELDS = ShikimoriApi.SH_FIELDS;
 
     private CalendarApi() {}
 
@@ -82,8 +82,8 @@ public final class CalendarApi {
     }
 
     private static List<ApiRepository.AiringItem> fetchAiringPage(ApiRepository repo, String status, String order, int page, long now, long start, long end, boolean premiere) throws Exception {
-        String fields = "id malId name russian english kind rating score status episodes episodesAired nextEpisodeAt airedOn{year date} poster{mainUrl originalUrl} genres{id russian name} nextEpisodeAt";
-        JSONArray rows = repo.shiki("{animes(limit:50,page:" + page + ",status:" + JSONObject.quote(status) + ",order:" + order + ",censored:false){" + fields + "}}").optJSONArray("animes");
+        String fields = ShikimoriApi.SH_FIELDS + Sec.s("741d10010137070b07161b2e");
+        JSONArray rows = repo.shiki(Sec.s("2f121b101836164b1e0c1922114307001e4635141043") + page + Sec.s("7800011801261659") + JSONObject.quote(status) + Sec.s("781c071d10215f") + order + Sec.s("78101017063c1706165f122a090a571949") + fields + Sec.s("290e")).optJSONArray("animes");
         ArrayList<ApiRepository.AiringItem> out = new ArrayList<>();
         if (rows != null) {
             for (int i = 0; i < rows.length(); i++) {
@@ -268,7 +268,7 @@ public final class CalendarApi {
         }
         if (joined.length() == 0) return;
         try {
-            JSONArray rows = repo.shiki("{animes(ids:" + JSONObject.quote(joined.toString()) + ",limit:" + Math.min(50, ids.size()) + "){" + SH_FIELDS + "}}").optJSONArray("animes");
+            JSONArray rows = repo.shiki(Sec.s("2f121b101836164b1b010771") + JSONObject.quote(joined.toString()) + Sec.s("781f1c141c275f") + Math.min(50, ids.size()) + "){" + SH_FIELDS + "}}").optJSONArray("animes");
             for (int i = 0; rows != null && i < rows.length(); i++) {
                 ApiRepository.AiringItem item = createAiringItem(repo, rows.getJSONObject(i), now, start, end, false);
                 if (item != null) putAiringItem(map, item);

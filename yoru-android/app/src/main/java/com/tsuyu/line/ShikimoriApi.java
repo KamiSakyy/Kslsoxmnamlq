@@ -16,7 +16,7 @@ public final class ShikimoriApi {
             Sec.s("3c07010906-694a4c010d-1d200c145d-425b183d1c"),
             Sec.s("3c07010906-694a4c010d-1d200c145d-425b183916")
     };
-    public static final String SH_FIELDS = "id malId name russian english kind rating score status episodes episodesAired nextEpisodeAt airedOn{year date} poster{mainUrl originalUrl} genres{id russian name}";
+    public static final String SH_FIELDS = Sec.s("3d175514143f2c07520b15260059404541453d121b59103d020f1b161c6b0e105c54124435071c17127316001d17116b160d5344474574160510063c01060145113b0c0a5d545745151a071c11730b060a11313b0c0a5d545777205314100736012c1c1e0d2e040b12545342310e55091a201106001e192a0c1767425e163b011c1e1c3d040f27171836451e575e405327081c1d55211010010c15254517535d574b");
     private static final long DAY_MS = 24L * 60 * 60 * 1000L;
 
     private ShikimoriApi() {}
@@ -26,14 +26,14 @@ public final class ShikimoriApi {
         for (String url : SHIKI_GRAPH) {
             try {
                 JSONObject j = new JSONObject(repo.request(url, "POST", new JSONObject().put("query", q).toString(), false));
-                if (j.has("errors")) throw new IOException("Shikimori не ответил");
+                if (j.has("errors")) throw new IOException(Sec.s("071b1c121c3e0a111b45a4f6b5cc12e08ce7d6a3c7a9c082e7b3cab5cf"));
                 return j.getJSONObject("data");
             } catch (Exception e) {
                 last = e;
             }
         }
         if (last != null) throw last;
-        throw new IOException("Shikimori не ответил");
+        throw new IOException(Sec.s("071b1c121c3e0a111b45a4f6b5cc12e08ce7d6a3c7a9c082e7b3cab5cf"));
     }
 
     public static String shikiRest(String path, ApiRepository repo) throws Exception {
@@ -46,7 +46,7 @@ public final class ShikimoriApi {
             }
         }
         if (last != null) throw last;
-        throw new IOException("Shikimori не ответил");
+        throw new IOException(Sec.s("071b1c121c3e0a111b45a4f6b5cc12e08ce7d6a3c7a9c082e7b3cab5cf"));
     }
 
     public static String shikiText(String path, ApiRepository repo) throws Exception {
@@ -79,7 +79,7 @@ public final class ShikimoriApi {
 
     public static Anime shikiAnime(JSONObject j) {
         Anime a = new Anime();
-        a.source = "shikimori";
+        a.source = Sec.s("271b1c121c3e0a111b");
         a.id = j.optString("id");
         a.malId = j.optInt("malId", 0);
         if (a.malId == 0) try { a.malId = Integer.parseInt(a.id); } catch (Exception ignored) {}
@@ -120,7 +120,7 @@ public final class ShikimoriApi {
     }
 
     public static Anime shikiQuick(int id, String source, ApiRepository repo) throws Exception {
-        JSONArray rows = shiki("{animes(ids:" + JSONObject.quote(String.valueOf(id)) + ",limit:1){" + SH_FIELDS + " descriptionHtml}}", repo).optJSONArray("animes");
+        JSONArray rows = shiki(Sec.s("2f121b101836164b1b010771") + JSONObject.quote(String.valueOf(id)) + Sec.s("781f1c141c275f525b1e") + SH_FIELDS + Sec.s("7417100a16210c13060c1b252d0d5f5c4f4b"), repo).optJSONArray("animes");
         if (rows == null || rows.length() == 0) throw new IOException("Аниме не найдено");
         JSONObject j = rows.getJSONObject(0);
         Anime a = shikiAnime(j);
@@ -136,7 +136,7 @@ public final class ShikimoriApi {
     public static ArrayList<String> screenshotsOf(Anime a, ApiRepository repo) throws Exception {
         ArrayList<String> out = new ArrayList<>();
         if (a == null) return out;
-        int mal = a.malId > 0 ? a.malId : ("shikimori".equals(a.source) ? CalendarApi.parseInt(a.id) : 0);
+        int mal = a.malId > 0 ? a.malId : (Sec.s("271b1c121c3e0a111b").equals(a.source) ? CalendarApi.parseInt(a.id) : 0);
         if (mal <= 0) return out;
         YoruCache db = YoruApp.app() == null ? null : YoruApp.app().cache;
         if (db != null) {
@@ -177,10 +177,10 @@ public final class ShikimoriApi {
 
     public static void enrichSchedule(Anime a, ApiRepository repo) {
         if (a == null) return;
-        int mal = a.malId > 0 ? a.malId : ("shikimori".equals(a.source) ? CalendarApi.parseInt(a.id) : 0);
+        int mal = a.malId > 0 ? a.malId : (Sec.s("271b1c121c3e0a111b").equals(a.source) ? CalendarApi.parseInt(a.id) : 0);
         if (mal <= 0) return;
         try {
-            JSONArray rows = shiki("{animes(ids:" + JSONObject.quote(String.valueOf(mal)) + ",limit:1){id status episodes episodesAired nextEpisodeAt airedOn{year date}}}", repo).optJSONArray("animes");
+            JSONArray rows = shiki(Sec.s("2f121b101836164b1b010771") + JSONObject.quote(String.valueOf(mal)) + Sec.s("781f1c141c275f525b1e1d2f450a46514643275310091c200a071716542e1510415f565327321c0b1037450d171d000e1510415f5653150755181c2100073d0b0f320018401056572016080408"), repo).optJSONArray("animes");
             JSONObject j = rows != null && rows.length() > 0 ? rows.optJSONObject(0) : null;
             if (j == null) return;
             int total = j.optInt("episodes", 0), aired = j.optInt("episodesAired", 0);
@@ -195,7 +195,7 @@ public final class ShikimoriApi {
 
     public static void enrichVisuals(Anime a, ApiRepository repo) {
         if (a == null) return;
-        int mal = a.malId > 0 ? a.malId : ("shikimori".equals(a.source) ? CalendarApi.parseInt(a.id) : 0);
+        int mal = a.malId > 0 ? a.malId : (Sec.s("271b1c121c3e0a111b").equals(a.source) ? CalendarApi.parseInt(a.id) : 0);
         if (mal <= 0) return;
         YoruCache db = YoruApp.app() == null ? null : YoruApp.app().cache;
         if (db != null && a.screenshots.isEmpty()) {
@@ -213,7 +213,7 @@ public final class ShikimoriApi {
         for (Anime row : a.related) {
             if (Anime.valid(row) && !row.key().equals(a.key())) map.put(SourceEngine.identity(row), row);
         }
-        int mal = a.malId > 0 ? a.malId : ("shikimori".equals(a.source) ? CalendarApi.parseInt(a.id) : 0);
+        int mal = a.malId > 0 ? a.malId : (Sec.s("271b1c121c3e0a111b").equals(a.source) ? CalendarApi.parseInt(a.id) : 0);
         if (mal <= 0) {
             try {
                 for (String term : repo.searchTerms(a)) {
@@ -238,7 +238,7 @@ public final class ShikimoriApi {
         }
         if (mal > 0) {
             try {
-                JSONArray rows = shiki("{animes(ids:" + JSONObject.quote(String.valueOf(mal)) + ",limit:1){related{relationKind anime{" + SH_FIELDS + "}}}}", repo).optJSONArray("animes");
+                JSONArray rows = shiki(Sec.s("2f121b101836164b1b010771") + JSONObject.quote(String.valueOf(mal)) + Sec.s("781f1c141c275f525b1e062e09184655564d26161918013a0a0d390c1a2f45185c595f532f") + SH_FIELDS + Sec.s("290e0804"), repo).optJSONArray("animes");
                 JSONObject first = rows != null && rows.length() > 0 ? rows.optJSONObject(0) : null;
                 JSONArray rel = first == null ? null : first.optJSONArray("related");
                 for (int i = 0; rel != null && i < rel.length(); i++) {
@@ -251,7 +251,7 @@ public final class ShikimoriApi {
         }
         if (mal > 0) {
             try {
-                JSONObject data = AniListApi.query("{Media(mal_id:" + mal + "){relations{edges{relation node{id idMal title{romaji english native} bannerImage coverImage{extraLarge large medium} format status episodes duration genres averageScore startDate{year month day} season description(asHtml:false)}}}}}", repo);
+                JSONObject data = AniListApi.query(Sec.s("2f3e101d1c324d0e13092b220143") + mal + Sec.s("7d08071c1932110a1d0b0730001d5555414d26161918013a0a0d520b1b2f00025b54125f303e141555270c171e000f390a14535a5b16311d12151c200d431c040022131c4f1050573a1d100b3c3e040417451724131c40795f5733160e1c0d2717023e04062c00595e5140513153181c113a100e0f4512241714534412452012010c067300131b161b2f000a1254474435071c161b7302061c1711384518445540573316261a1a21004301111539113d5344574d2d16140b553e0a0d060d542f04004f10415335001a175537001011171d3b11105d5e1a57273b0114196903021e16116218044f4d4f"), repo);
                 JSONObject media = data.optJSONObject("Media");
                 JSONObject rels = media == null ? null : media.optJSONObject("relations");
                 JSONArray edges = rels == null ? null : rels.optJSONArray("edges");
@@ -283,7 +283,7 @@ public final class ShikimoriApi {
                         joined.append(id);
                     }
                     if (joined.length() == 0) continue;
-                    JSONArray rows = shiki("{animes(ids:" + JSONObject.quote(joined.toString()) + ",limit:" + part.size() + "){" + SH_FIELDS + "}}", repo).optJSONArray("animes");
+                    JSONArray rows = shiki(Sec.s("2f121b101836164b1b010771") + JSONObject.quote(joined.toString()) + Sec.s("781f1c141c275f") + part.size() + "){" + SH_FIELDS + "}}", repo).optJSONArray("animes");
                     for (int i = 0; rows != null && i < rows.length(); i++) {
                         Anime item = repo.remember(shikiAnime(rows.getJSONObject(i)));
                         if (Anime.valid(item) && !item.key().equals(a.key())) map.put(SourceEngine.identity(item), item);
@@ -323,7 +323,7 @@ public final class ShikimoriApi {
                 int id = n.optInt("id", 0);
                 if (id <= 0) continue;
                 Anime item = new Anime();
-                item.source = "shikimori";
+                item.source = Sec.s("271b1c121c3e0a111b");
                 item.id = String.valueOf(id);
                 item.malId = id;
                 item.title = n.optString("name", n.optString("russian", "Аниме"));

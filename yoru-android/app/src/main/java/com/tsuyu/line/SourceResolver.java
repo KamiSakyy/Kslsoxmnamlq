@@ -131,7 +131,7 @@ public final class SourceResolver {
 
     public static Anime kodikDetails(Anime base, boolean episodes, ApiRepository repo) throws Exception {
         Anime shell = kodikShell(base);
-        if (shell.description.isEmpty() || shell.poster.isEmpty()) {
+        if (!episodes && (shell.description.isEmpty() || shell.poster.isEmpty())) {
             try {
                 Anime sh = new Anime();
                 sh.source = Sec.s("271b1c121c3e0a111b");
@@ -145,7 +145,7 @@ public final class SourceResolver {
         if (episodes) {
             int mal = shell.malId > 0 ? shell.malId : CalendarApi.parseInt(shell.id);
             String url = directKodik(mal, repo);
-            int count = Math.max(1, Math.min(250, shell.episodes > 0 ? shell.episodes : 1));
+            int count = Math.max(1, Math.min(250, shell.episodes > 0 ? shell.episodes : (shell.episodesAired > 0 ? shell.episodesAired : (base.episodes > 0 ? base.episodes : (base.episodesAired > 0 ? base.episodesAired : 12)))));
             for (int i = 1; i <= count; i++) {
                 Anime.Episode ep = new Anime.Episode();
                 ep.id = shell.id + "-" + i;

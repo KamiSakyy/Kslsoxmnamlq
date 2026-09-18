@@ -178,6 +178,8 @@ public final class Net {
 
     public static void prewarmConnections(String... urls) {
         if (urls == null) return;
+        YoruApp app = YoruApp.app();
+        if (app != null && app.traffic != null && (app.traffic.mobile() || app.traffic.metered())) return;
         for (String url : urls) {
             if (url == null || url.isEmpty()) continue;
             try {
@@ -200,7 +202,7 @@ public final class Net {
                         YoruApp app = YoruApp.app();
                         if (app != null && app.getCacheDir() != null) {
                             File dir = new File(app.getCacheDir(), "http-cache");
-                            diskCache = new Cache(dir, 35L * 1024L * 1024L);
+                            diskCache = new Cache(dir, 50L * 1024L * 1024L);
                         }
                     } catch (Exception ignored) {}
                 }
@@ -208,6 +210,46 @@ public final class Net {
         }
         return diskCache;
     }
+
+    private static final Interceptor REWRITE_RESPONSE_INTERCEPTOR = chain -> {
+        Request request = chain.request();
+        Response originalResponse = chain.proceed(request);
+        if (!"GET".equalsIgnoreCase(request.method()) || !originalResponse.isSuccessful()) {
+            return originalResponse;
+        }
+        String path = request.url().encodedPath();
+        if (path.endsWith(".m3u8") || path.endsWith(".ts")) {
+            return originalResponse;
+        }
+        YoruApp app = YoruApp.app();
+        boolean mobile = app != null && app.traffic != null && (app.traffic.mobile() || app.traffic.metered());
+        String contentType = originalResponse.header("Content-Type");
+        if (contentType != null && contentType.startsWith("image/")) {
+            return originalResponse.newBuilder()
+                    .removeHeader("Pragma")
+                    .removeHeader("Cache-Control")
+                    .header("Cache-Control", "public, max-age=604800")
+                    .build();
+        }
+        int maxAge = mobile ? 600 : 180;
+        return originalResponse.newBuilder()
+                .removeHeader("Pragma")
+                .removeHeader("Cache-Control")
+                .header("Cache-Control", "public, max-age=" + maxAge)
+                .build();
+    };
+
+    private static final Interceptor OFFLINE_INTERCEPTOR = chain -> {
+        Request request = chain.request();
+        YoruApp app = YoruApp.app();
+        boolean connected = app == null || app.traffic == null || app.traffic.connected();
+        if (!connected && "GET".equalsIgnoreCase(request.method())) {
+            request = request.newBuilder()
+                    .header("Cache-Control", "public, only-if-cached, max-stale=604800")
+                    .build();
+        }
+        return chain.proceed(request);
+    };
 
     static {
         ThreadPoolExecutor dispatcherPool = new ThreadPoolExecutor(
@@ -230,6 +272,8 @@ public final class Net {
                 .followRedirects(false)
                 .followSslRedirects(false)
                 .retryOnConnectionFailure(true)
+                .addInterceptor(OFFLINE_INTERCEPTOR)
+                .addNetworkInterceptor(REWRITE_RESPONSE_INTERCEPTOR)
                 .connectTimeout(2000, TimeUnit.MILLISECONDS)
                 .readTimeout(4500, TimeUnit.MILLISECONDS)
                 .writeTimeout(4500, TimeUnit.MILLISECONDS)

@@ -193,7 +193,7 @@ public final class ImageLoader {
 
     private static BitmapFactory.Options decodeOptions() {
         BitmapFactory.Options o = new BitmapFactory.Options();
-        o.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        o.inPreferredConfig = Bitmap.Config.RGB_565;
         o.inDither = true;
         return o;
     }
@@ -220,17 +220,21 @@ public final class ImageLoader {
         LinkedHashSet<String> out = new LinkedHashSet<>();
         String safe = ApiRepository.safeUrl(url);
         if (safe.isEmpty()) return new ArrayList<>();
-        String high = highQuality(safe);
         out.add(safe);
-        out.add(high);
-        String low = safe.toLowerCase(Locale.ROOT);
-        if (low.contains(Sec.s("371c031c07-7d06071c09-1d2916575d-4255")) && low.endsWith(".jpg")) {
-            out.add(safe.replace("_thumb.jpg", ".jpg"));
-        }
-        if (low.contains("?size=min")) {
-            out.add(safe.replace("?size=min", ""));
-            out.add(safe.replace("size=min", "size=orig"));
-            out.add(safe.replace("size=min", "size=max"));
+        YoruApp app = YoruApp.app();
+        boolean saveMobile = app != null && app.traffic != null && (app.traffic.mobile() || app.savingMobile());
+        if (!saveMobile) {
+            String high = highQuality(safe);
+            out.add(high);
+            String low = safe.toLowerCase(Locale.ROOT);
+            if (low.contains(Sec.s("371c031c07-7d06071c09-1d2916575d-4255")) && low.endsWith(".jpg")) {
+                out.add(safe.replace("_thumb.jpg", ".jpg"));
+            }
+            if (low.contains("?size=min")) {
+                out.add(safe.replace("?size=min", ""));
+                out.add(safe.replace("size=min", "size=orig"));
+                out.add(safe.replace("size=min", "size=max"));
+            }
         }
         return new ArrayList<>(out);
     }

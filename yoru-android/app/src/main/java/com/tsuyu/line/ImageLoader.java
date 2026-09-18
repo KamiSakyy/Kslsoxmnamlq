@@ -130,7 +130,7 @@ public final class ImageLoader {
                 try {
                     File file = cacheFile(key);
                     if (file.exists()) {
-                        Bitmap b = BitmapFactory.decodeFile(file.getAbsolutePath(), decodeOptions());
+                        Bitmap b = decodeFileFast(file);
                         if (b != null) {
                             file.setLastModified(System.currentTimeMillis());
                             ready = b;
@@ -160,7 +160,7 @@ public final class ImageLoader {
                         byte[] bytes = downloadBytes(url);
                         if (bytes != null && bytes.length >= 64) {
                             saveRaw(file, bytes);
-                            ready = decodeBytes(bytes);
+                            ready = decodeBytesFast(bytes);
                         }
                     }
                     if (ready == null && !url.isEmpty() && a != null && a.malId > 0 && online
@@ -205,20 +205,52 @@ public final class ImageLoader {
         }
     }
 
-    private static BitmapFactory.Options decodeOptions() {
-        BitmapFactory.Options o = new BitmapFactory.Options();
-        o.inPreferredConfig = Bitmap.Config.RGB_565;
-        o.inDither = true;
-        return o;
-    }
-
-    private Bitmap decodeBytes(byte[] data) {
-        if (data == null || data.length < 64) return null;
+    private static Bitmap decodeFileFast(File file) {
         try {
-            return BitmapFactory.decodeByteArray(data, 0, data.length, decodeOptions());
-        } catch (Exception e) {
+            if (file == null || !file.exists()) return null;
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(file.getAbsolutePath(), o);
+            if (o.outWidth <= 0 || o.outHeight <= 0) return null;
+            o.inSampleSize = calculateInSampleSize(o, 420, 640);
+            o.inJustDecodeBounds = false;
+            o.inPreferredConfig = Bitmap.Config.RGB_565;
+            o.inDither = true;
+            return BitmapFactory.decodeFile(file.getAbsolutePath(), o);
+        } catch (Throwable e) {
             return null;
         }
+    }
+
+    private static Bitmap decodeBytesFast(byte[] data) {
+        if (data == null || data.length < 64) return null;
+        try {
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeByteArray(data, 0, data.length, o);
+            if (o.outWidth <= 0 || o.outHeight <= 0) return null;
+            o.inSampleSize = calculateInSampleSize(o, 420, 640);
+            o.inJustDecodeBounds = false;
+            o.inPreferredConfig = Bitmap.Config.RGB_565;
+            o.inDither = true;
+            return BitmapFactory.decodeByteArray(data, 0, data.length, o);
+        } catch (Throwable e) {
+            return null;
+        }
+    }
+
+    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        int height = options.outHeight;
+        int width = options.outWidth;
+        int inSampleSize = 1;
+        if (height > reqHeight || width > reqWidth) {
+            int halfHeight = height / 2;
+            int halfWidth = width / 2;
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        return Math.max(1, inSampleSize);
     }
 
     private byte[] downloadBytes(String url) {

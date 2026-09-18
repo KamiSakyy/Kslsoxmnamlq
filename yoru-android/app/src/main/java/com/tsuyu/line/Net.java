@@ -179,9 +179,10 @@ public final class Net {
     public static void prewarmConnections(String... urls) {
         if (urls == null) return;
         YoruApp app = YoruApp.app();
-        if (app != null && app.traffic != null && (app.traffic.mobile() || app.traffic.metered())) return;
+        boolean mobile = app != null && app.traffic != null && (app.traffic.mobile() || app.traffic.metered());
         for (String url : urls) {
             if (url == null || url.isEmpty()) continue;
+            if (mobile && !url.contains("kodik") && !url.contains("shiki")) continue;
             try {
                 Request req = new Request.Builder().url(url).head().tag(String.class, BG).build();
                 BASE.newCall(req).enqueue(new Callback() {
@@ -354,14 +355,14 @@ public final class Net {
     private static OkHttpClient client(int connectMs, int readMs, boolean follow) {
         String key = connectMs + "|" + readMs + "|" + (follow ? 1 : 0);
         OkHttpClient cached = CLIENTS.get(key);
-        if (cached != null) return cached;
+        Cache c = getCache();
+        if (cached != null && (cached.cache() != null || c == null)) return cached;
         OkHttpClient.Builder b = BASE.newBuilder()
                 .connectTimeout(Math.max(600, connectMs), TimeUnit.MILLISECONDS)
                 .readTimeout(Math.max(1000, readMs), TimeUnit.MILLISECONDS)
                 .writeTimeout(Math.max(1000, readMs), TimeUnit.MILLISECONDS)
                 .followRedirects(follow)
                 .followSslRedirects(follow);
-        Cache c = getCache();
         if (c != null) b.cache(c);
         OkHttpClient built = b.build();
         CLIENTS.put(key, built);

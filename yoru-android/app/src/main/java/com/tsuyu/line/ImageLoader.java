@@ -18,7 +18,7 @@ public final class ImageLoader {
 
     private final Context context;
     private final ThreadPoolExecutor pool = new ThreadPoolExecutor(
-            6, 16, 15L, TimeUnit.SECONDS,
+            12, 32, 15L, TimeUnit.SECONDS,
             new LinkedBlockingQueue<>(500),
             r -> {
                 Thread t = new Thread(r, "yoru-image");

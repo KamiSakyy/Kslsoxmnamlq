@@ -2,42 +2,94 @@ package com.tsuyu.line;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
+import java.net.InetAddress;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import okhttp3.ConnectionPool;
-import okhttp3.Dispatcher;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
+import java.util.*;
+import java.util.concurrent.*;
+import okhttp3.*;
 
 public final class Net {
     static final String BG = "yoru-bg";
     static final String FG = "yoru-fg";
-    private static final Dispatcher DISPATCHER = new Dispatcher();
-    private static final ConnectionPool POOL = new ConnectionPool(32, 5L, TimeUnit.MINUTES);
+    private static final Dispatcher DISPATCHER;
+    private static final ConnectionPool POOL = new ConnectionPool(128, 10L, TimeUnit.MINUTES);
     private static final OkHttpClient BASE;
     private static final ConcurrentHashMap<String, OkHttpClient> CLIENTS = new ConcurrentHashMap<>();
     private static final ThreadLocal<Boolean> BG_FLAG = new ThreadLocal<>();
     private static volatile String focusScreen = "";
-    private static volatile okhttp3.Cache diskCache;
+    private static volatile Cache diskCache;
 
-    private static okhttp3.Cache getCache() {
+    public static final class FastDns implements Dns {
+        private static final ConcurrentHashMap<String, DnsEntry> CACHE = new ConcurrentHashMap<>();
+        private static final long TTL = 15 * 60 * 1000L;
+
+        static final class DnsEntry {
+            final List<InetAddress> addresses;
+            final long expiresAt;
+            DnsEntry(List<InetAddress> addresses, long expiresAt) {
+                this.addresses = addresses;
+                this.expiresAt = expiresAt;
+            }
+        }
+
+        @Override
+        public List<InetAddress> lookup(String hostname) throws UnknownHostException {
+            if (hostname == null) throw new UnknownHostException("hostname == null");
+            long now = System.currentTimeMillis();
+            DnsEntry entry = CACHE.get(hostname);
+            if (entry != null && now < entry.expiresAt) {
+                return entry.addresses;
+            }
+            try {
+                List<InetAddress> addresses = Arrays.asList(InetAddress.getAllByName(hostname));
+                if (!addresses.isEmpty()) {
+                    CACHE.put(hostname, new DnsEntry(addresses, now + TTL));
+                    return addresses;
+                }
+            } catch (Exception e) {
+                if (entry != null && !entry.addresses.isEmpty()) {
+                    return entry.addresses;
+                }
+                if (e instanceof UnknownHostException) throw (UnknownHostException) e;
+                UnknownHostException uhe = new UnknownHostException("DNS lookup failed: " + hostname);
+                uhe.initCause(e);
+                throw uhe;
+            }
+            throw new UnknownHostException("No address found for " + hostname);
+        }
+
+        public static void prewarm(String... hosts) {
+            if (hosts == null) return;
+            for (String h : hosts) {
+                if (h == null || h.isEmpty() || CACHE.containsKey(h)) continue;
+                YoruApp app = YoruApp.app();
+                if (app != null && app.io != null) {
+                    app.io.execute(() -> {
+                        try {
+                            List<InetAddress> addresses = Arrays.asList(InetAddress.getAllByName(h));
+                            if (!addresses.isEmpty()) CACHE.put(h, new DnsEntry(addresses, System.currentTimeMillis() + TTL));
+                        } catch (Exception ignored) {}
+                    });
+                }
+            }
+        }
+    }
+
+    private static Cache getCache() {
         if (diskCache == null) {
             synchronized (Net.class) {
                 if (diskCache == null) {
                     try {
                         YoruApp app = YoruApp.app();
                         if (app != null && app.getCacheDir() != null) {
-                            java.io.File dir = new java.io.File(app.getCacheDir(), "http-cache");
-                            diskCache = new okhttp3.Cache(dir, 25L * 1024L * 1024L);
+                            File dir = new File(app.getCacheDir(), "http-cache");
+                            diskCache = new Cache(dir, 35L * 1024L * 1024L);
                         }
                     } catch (Exception ignored) {}
                 }
@@ -47,17 +99,29 @@ public final class Net {
     }
 
     static {
-        DISPATCHER.setMaxRequests(64);
-        DISPATCHER.setMaxRequestsPerHost(16);
+        ThreadPoolExecutor dispatcherPool = new ThreadPoolExecutor(
+                16, 64, 30L, TimeUnit.SECONDS,
+                new SynchronousQueue<>(),
+                r -> {
+                    Thread t = new Thread(r, "yoru-net-disp");
+                    t.setDaemon(true);
+                    return t;
+                }
+        );
+        DISPATCHER = new Dispatcher(dispatcherPool);
+        DISPATCHER.setMaxRequests(256);
+        DISPATCHER.setMaxRequestsPerHost(64);
         BASE = new OkHttpClient.Builder()
                 .dispatcher(DISPATCHER)
                 .connectionPool(POOL)
+                .dns(new FastDns())
+                .protocols(Arrays.asList(Protocol.HTTP_2, Protocol.HTTP_1_1))
                 .followRedirects(false)
                 .followSslRedirects(false)
                 .retryOnConnectionFailure(true)
-                .connectTimeout(4500, TimeUnit.MILLISECONDS)
-                .readTimeout(6500, TimeUnit.MILLISECONDS)
-                .writeTimeout(6500, TimeUnit.MILLISECONDS)
+                .connectTimeout(2500, TimeUnit.MILLISECONDS)
+                .readTimeout(5000, TimeUnit.MILLISECONDS)
+                .writeTimeout(5000, TimeUnit.MILLISECONDS)
                 .build();
     }
     private Net() {
@@ -134,12 +198,12 @@ public final class Net {
         OkHttpClient cached = CLIENTS.get(key);
         if (cached != null) return cached;
         OkHttpClient.Builder b = BASE.newBuilder()
-                .connectTimeout(Math.max(800, connectMs), TimeUnit.MILLISECONDS)
-                .readTimeout(Math.max(1200, readMs), TimeUnit.MILLISECONDS)
-                .writeTimeout(Math.max(1200, readMs), TimeUnit.MILLISECONDS)
+                .connectTimeout(Math.max(600, connectMs), TimeUnit.MILLISECONDS)
+                .readTimeout(Math.max(1000, readMs), TimeUnit.MILLISECONDS)
+                .writeTimeout(Math.max(1000, readMs), TimeUnit.MILLISECONDS)
                 .followRedirects(follow)
                 .followSslRedirects(follow);
-        okhttp3.Cache c = getCache();
+        Cache c = getCache();
         if (c != null) b.cache(c);
         OkHttpClient built = b.build();
         CLIENTS.put(key, built);
@@ -163,6 +227,7 @@ public final class Net {
         Request.Builder builder = new Request.Builder().url(url).tag(String.class, isBg() ? BG : FG);
         if (accept != null && !accept.isEmpty()) builder.header("Accept", accept);
         builder.header("Accept-Language", "ru-RU,ru;q=0.9,en;q=0.5");
+        builder.header("Connection", "keep-alive");
         if (ua != null && !ua.isEmpty()) builder.header("User-Agent", ua);
         if (headers != null) for (Map.Entry<String, String> entry : headers.entrySet())
             if (entry.getKey() != null && entry.getValue() != null) builder.header(entry.getKey(), entry.getValue());
@@ -177,7 +242,7 @@ public final class Net {
     }
     private static String resolve(String base, String location) {
         try {
-            return new java.net.URL(new java.net.URL(base), location).toString();
+            return new URL(new URL(base), location).toString();
         } catch (Exception e) {
             return "";
         }
@@ -263,6 +328,7 @@ public final class Net {
         Request.Builder builder = new Request.Builder().url(url).tag(String.class, isBg() ? BG : FG).get();
         if (accept != null && !accept.isEmpty()) builder.header("Accept", accept);
         builder.header("Accept-Language", "ru-RU,ru;q=0.9,en;q=0.5");
+        builder.header("Connection", "keep-alive");
         if (ua != null && !ua.isEmpty()) builder.header("User-Agent", ua);
         if (referer != null && !referer.isEmpty()) builder.header("Referer", referer);
         try (Response response = http.newCall(builder.build()).execute()) {

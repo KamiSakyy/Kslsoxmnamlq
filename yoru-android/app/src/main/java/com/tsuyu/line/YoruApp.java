@@ -20,10 +20,10 @@ public final class YoruApp extends Application {
     public MediaCache mediaCache;
     private DownloadHub downloads;
     public volatile int activePlayers,calendarTodayCount;private volatile boolean warmed;
-    private static ExecutorService pool(String name,int core,int max,int priority){ThreadPoolExecutor e=new TaskQueue.Executor(core,max,20L,TimeUnit.SECONDS,new LinkedBlockingQueue<>(256),r->{Thread t=new Thread(r,name);t.setPriority(priority);return t;},new TaskQueue.Policy());e.allowCoreThreadTimeOut(true);return e;}
-    private static ExecutorService ioPool(){int cores=Math.max(2,Runtime.getRuntime().availableProcessors());return pool("yoru-io",Math.max(4,Math.min(8,cores)),Math.max(10,Math.min(16,cores*3)),Thread.NORM_PRIORITY);}
-    private static ExecutorService uiPool(){int cores=Math.max(4,Runtime.getRuntime().availableProcessors());return pool("yoru-ui",Math.max(4,Math.min(6,cores)),Math.max(10,Math.min(16,cores*3)),Thread.NORM_PRIORITY+1);}
-    private static ExecutorService discoveryPool(){int cores=Math.max(2,Runtime.getRuntime().availableProcessors());return pool("yoru-bg",2,Math.max(3,Math.min(6,cores)),Thread.NORM_PRIORITY-1);}
+    private static ExecutorService pool(String name,int core,int max,int priority){ThreadPoolExecutor e=new TaskQueue.Executor(core,max,20L,TimeUnit.SECONDS,new LinkedBlockingQueue<>(512),r->{Thread t=new Thread(r,name);t.setPriority(priority);return t;},new TaskQueue.Policy());e.allowCoreThreadTimeOut(true);return e;}
+    private static ExecutorService ioPool(){int cores=Math.max(4,Runtime.getRuntime().availableProcessors());return pool("yoru-io",Math.max(16,cores*4),Math.max(32,cores*8),Thread.NORM_PRIORITY);}
+    private static ExecutorService uiPool(){int cores=Math.max(4,Runtime.getRuntime().availableProcessors());return pool("yoru-ui",Math.max(8,cores*2),Math.max(20,cores*4),Thread.NORM_PRIORITY+1);}
+    private static ExecutorService discoveryPool(){int cores=Math.max(2,Runtime.getRuntime().availableProcessors());return pool("yoru-bg",Math.max(6,cores*2),Math.max(16,cores*4),Thread.NORM_PRIORITY-1);}
     public synchronized DownloadHub downloads(){if(downloads==null)downloads=new DownloadHub(this,mediaCache);return downloads;}
     public void focusNow(String screen){Net.focus(screen);if(!"details".equals(screen)&&!"player".equals(screen))return;try{if(discovery instanceof java.util.concurrent.ThreadPoolExecutor){java.util.concurrent.ThreadPoolExecutor pool=(java.util.concurrent.ThreadPoolExecutor)discovery;for(Runnable task:pool.getQueue().toArray(new Runnable[0]))if(task instanceof Future)try{((Future<?>)task).cancel(false);}catch(Exception ignored){}pool.purge();}}catch(Exception ignored){}}
     public boolean savingMobile(){return store!=null&&traffic!=null&&store.dataSaver()&&traffic.mobile();}

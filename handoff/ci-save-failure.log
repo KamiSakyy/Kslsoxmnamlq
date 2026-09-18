@@ -5,8 +5,8 @@ Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
   (use "git restore <file>..." to discard changes in working directory)
 	modified:   handoff/ci-save-failure.log
-	modified:   yoru-android/app/src/main/jniLibs/arm64-v8a/libnative-media.so
-	modified:   yoru-android/app/src/main/jniLibs/armeabi-v7a/libnative-media.so
+	modified:   yoru-android/app/src/main/jniLibs/arm64-v8a/libc++_shared.so
+	modified:   yoru-android/app/src/main/jniLibs/armeabi-v7a/libc++_shared.so
 
 Untracked files:
   (use "git add <file>..." to include in what will be committed)
@@ -18,38 +18,38 @@ Untracked files:
 	yoru-android/owner-signing/yoru-release.p12
 
 no changes added to commit (use "git add" and/or "git commit -a")
-1929434 Log build failure [skip ci]
-8ee902b Disguise native library, register JNI dynamically, mask strings, and encrypt all source names
-total 73004
-drwxr-xr-x 2 runner runner    4096 Sep 18 07:53 .
-drwxr-xr-x 9 runner runner    4096 Sep 18 07:53 ..
--rw-r--r-- 1 runner runner 7662992 Sep 18 07:53 Tsuyu-1.13-debug.apk
--rw-r--r-- 1 runner runner      98 Sep 18 07:53 Tsuyu-1.13-debug.apk.sha256
--rw-r--r-- 1 runner runner 2561922 Sep 18 07:53 Tsuyu-1.13-release.apk
--rw-r--r-- 1 runner runner     100 Sep 18 07:53 Tsuyu-1.13-release.apk.sha256
--rw-r--r-- 1 runner runner 7898225 Sep 18 07:53 Tsuyu-1.14-debug.apk
--rw-r--r-- 1 runner runner      98 Sep 18 07:53 Tsuyu-1.14-debug.apk.sha256
--rw-r--r-- 1 runner runner 2791879 Sep 18 07:53 Tsuyu-1.14-release.apk
--rw-r--r-- 1 runner runner     100 Sep 18 07:53 Tsuyu-1.14-release.apk.sha256
--rw-r--r-- 1 runner runner 7899661 Sep 18 07:53 Tsuyu-1.15-debug.apk
--rw-r--r-- 1 runner runner      98 Sep 18 07:53 Tsuyu-1.15-debug.apk.sha256
--rw-r--r-- 1 runner runner 2793179 Sep 18 07:53 Tsuyu-1.15-release.apk
--rw-r--r-- 1 runner runner     100 Sep 18 07:53 Tsuyu-1.15-release.apk.sha256
--rw-r--r-- 1 runner runner 7900509 Sep 18 07:53 Tsuyu-1.16-debug.apk
--rw-r--r-- 1 runner runner      98 Sep 18 07:53 Tsuyu-1.16-debug.apk.sha256
--rw-r--r-- 1 runner runner 2793823 Sep 18 07:53 Tsuyu-1.16-release.apk
--rw-r--r-- 1 runner runner     100 Sep 18 07:53 Tsuyu-1.16-release.apk.sha256
--rw-r--r-- 1 runner runner 7900797 Sep 18 07:53 Tsuyu-1.17-debug.apk
--rw-r--r-- 1 runner runner      98 Sep 18 07:53 Tsuyu-1.17-debug.apk.sha256
--rw-r--r-- 1 runner runner 2793847 Sep 18 07:53 Tsuyu-1.17-release.apk
--rw-r--r-- 1 runner runner     100 Sep 18 07:53 Tsuyu-1.17-release.apk.sha256
--rw-r--r-- 1 runner runner 7487683 Sep 18 07:53 Tsuyu-1.18-debug.apk
--rw-r--r-- 1 runner runner      98 Sep 18 07:53 Tsuyu-1.18-debug.apk.sha256
--rw-r--r-- 1 runner runner 2384572 Sep 18 07:53 Tsuyu-1.18-release.apk
--rw-r--r-- 1 runner runner     100 Sep 18 07:53 Tsuyu-1.18-release.apk.sha256
--rw-r--r-- 1 runner runner 7518003 Sep 18 07:53 Tsuyu-1.19-debug.apk
--rw-r--r-- 1 runner runner      98 Sep 18 07:53 Tsuyu-1.19-debug.apk.sha256
--rw-r--r-- 1 runner runner 2138877 Sep 18 07:53 Tsuyu-1.19-release.apk
--rw-r--r-- 1 runner runner     100 Sep 18 07:53 Tsuyu-1.19-release.apk.sha256
--rw-r--r-- 1 runner runner 2126589 Sep 18 07:53 TsuyuHentai-1.3-release.apk
--rw-r--r-- 1 runner runner     105 Sep 18 07:53 TsuyuHentai-1.3-release.apk.sha256
+224ec7d Log build failure [skip ci]
+e9057d5 Distribute classes across 100+ DEX files and encrypt all remaining exposed API strings
+total 73016
+drwxr-xr-x 2 runner runner    4096 Sep 18 09:13 .
+drwxr-xr-x 9 runner runner    4096 Sep 18 09:13 ..
+-rw-r--r-- 1 runner runner 7662992 Sep 18 09:13 Tsuyu-1.13-debug.apk
+-rw-r--r-- 1 runner runner      98 Sep 18 09:13 Tsuyu-1.13-debug.apk.sha256
+-rw-r--r-- 1 runner runner 2561922 Sep 18 09:13 Tsuyu-1.13-release.apk
+-rw-r--r-- 1 runner runner     100 Sep 18 09:13 Tsuyu-1.13-release.apk.sha256
+-rw-r--r-- 1 runner runner 7898225 Sep 18 09:13 Tsuyu-1.14-debug.apk
+-rw-r--r-- 1 runner runner      98 Sep 18 09:13 Tsuyu-1.14-debug.apk.sha256
+-rw-r--r-- 1 runner runner 2791879 Sep 18 09:13 Tsuyu-1.14-release.apk
+-rw-r--r-- 1 runner runner     100 Sep 18 09:13 Tsuyu-1.14-release.apk.sha256
+-rw-r--r-- 1 runner runner 7899661 Sep 18 09:13 Tsuyu-1.15-debug.apk
+-rw-r--r-- 1 runner runner      98 Sep 18 09:13 Tsuyu-1.15-debug.apk.sha256
+-rw-r--r-- 1 runner runner 2793179 Sep 18 09:13 Tsuyu-1.15-release.apk
+-rw-r--r-- 1 runner runner     100 Sep 18 09:13 Tsuyu-1.15-release.apk.sha256
+-rw-r--r-- 1 runner runner 7900509 Sep 18 09:13 Tsuyu-1.16-debug.apk
+-rw-r--r-- 1 runner runner      98 Sep 18 09:13 Tsuyu-1.16-debug.apk.sha256
+-rw-r--r-- 1 runner runner 2793823 Sep 18 09:13 Tsuyu-1.16-release.apk
+-rw-r--r-- 1 runner runner     100 Sep 18 09:13 Tsuyu-1.16-release.apk.sha256
+-rw-r--r-- 1 runner runner 7900797 Sep 18 09:13 Tsuyu-1.17-debug.apk
+-rw-r--r-- 1 runner runner      98 Sep 18 09:13 Tsuyu-1.17-debug.apk.sha256
+-rw-r--r-- 1 runner runner 2793847 Sep 18 09:13 Tsuyu-1.17-release.apk
+-rw-r--r-- 1 runner runner     100 Sep 18 09:13 Tsuyu-1.17-release.apk.sha256
+-rw-r--r-- 1 runner runner 7487683 Sep 18 09:13 Tsuyu-1.18-debug.apk
+-rw-r--r-- 1 runner runner      98 Sep 18 09:13 Tsuyu-1.18-debug.apk.sha256
+-rw-r--r-- 1 runner runner 2384572 Sep 18 09:13 Tsuyu-1.18-release.apk
+-rw-r--r-- 1 runner runner     100 Sep 18 09:13 Tsuyu-1.18-release.apk.sha256
+-rw-r--r-- 1 runner runner 7520473 Sep 18 09:13 Tsuyu-1.19-debug.apk
+-rw-r--r-- 1 runner runner      98 Sep 18 09:13 Tsuyu-1.19-debug.apk.sha256
+-rw-r--r-- 1 runner runner 2142975 Sep 18 09:13 Tsuyu-1.19-release.apk
+-rw-r--r-- 1 runner runner     100 Sep 18 09:13 Tsuyu-1.19-release.apk.sha256
+-rw-r--r-- 1 runner runner 2130687 Sep 18 09:13 TsuyuHentai-1.3-release.apk
+-rw-r--r-- 1 runner runner     105 Sep 18 09:13 TsuyuHentai-1.3-release.apk.sha256

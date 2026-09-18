@@ -22,11 +22,14 @@ public final class Sec {
     private static native boolean c();
 
     private static byte[] initK() {
-        int[] s = new int[]{0x9b, 0xbc, 0xba, 0xb6, 0xba, 0x9c, 0xaa, 0xac, 0xbd, 0xaa, 0xbb, 0x84, 0xaa, 0xb6, 0xfd, 0xff, 0xfd, 0xf9};
-        byte[] k = new byte[s.length];
-        for (int i = 0; i < s.length; i++) {
-            k[i] = (byte) (s[i] ^ 0xcf);
-        }
+        byte[] k = new byte[18];
+        long h1 = 0x123456789abcdef0L ^ 0x46472301efefbb93L;
+        long h2 = 0x9876543210fedcbaL ^ 0xea1320797587ee8aL;
+        int h3 = 0xfeed ^ 0xccdb;
+        for (int i = 0; i < 8; i++) k[i] = (byte) ((h1 >>> ((7 - i) * 8)) & 0xff);
+        for (int i = 0; i < 8; i++) k[8 + i] = (byte) ((h2 >>> ((7 - i) * 8)) & 0xff);
+        k[16] = (byte) ((h3 >>> 8) & 0xff);
+        k[17] = (byte) (h3 & 0xff);
         return k;
     }
 

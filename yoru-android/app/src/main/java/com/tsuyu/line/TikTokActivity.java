@@ -76,11 +76,24 @@ public final class TikTokActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         getWindow().setNavigationBarColor(Color.TRANSPARENT);
-        hideNavigationBar();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            getWindow().setNavigationBarContrastEnforced(false);
+        }
 
         root = new FrameLayout(this);
         root.setBackgroundColor(Color.BLACK);
         setContentView(root);
+        hideNavigationBar();
+        root.post(this::hideNavigationBar);
+
+        View decor = getWindow().getDecorView();
+        if (decor != null) {
+            decor.setOnSystemUiVisibilityChangeListener(visibility -> {
+                if ((visibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0) {
+                    decor.postDelayed(this::hideNavigationBar, 300);
+                }
+            });
+        }
 
         initPlayer();
         initRecycler();
@@ -173,6 +186,7 @@ public final class TikTokActivity extends Activity {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView rv, int newState) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    hideNavigationBar();
                     checkActiveSnap();
                 }
             }
@@ -1080,6 +1094,12 @@ public final class TikTokActivity extends Activity {
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         );
+    }
+
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        hideNavigationBar();
     }
 
     @Override

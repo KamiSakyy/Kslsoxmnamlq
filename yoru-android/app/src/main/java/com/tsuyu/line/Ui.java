@@ -15,7 +15,7 @@ import java.io.File;
 import java.util.*;
 
 public final class Ui {
-    public static final int BG=0xff09090b,CARD=0xff17171a,SURFACE=0xff101012,PURPLE=0xffa1a1aa,TEXT=0xfffafafa,MUTED=0xff71717a,LINE=0x12ffffff;
+    public static final int BG=0xff09090b,CARD=0xff17171a,SURFACE=0xff101012,PURPLE=0xffa78bfa,TEXT=0xfffafafa,MUTED=0xff71717a,LINE=0x12ffffff;
     public static final int WHITE=0xffffffff,ZINC=0xffd4d4d8,ZINC4=0xffa1a1aa,ZINC6=0xff52525b,AMBER=0xfffbbf24,EMERALD=0xff34d399,NAV=0xff0c0c0f;
     private static Typeface cachedFont;private static long cachedFontAt;
     public interface Choice {void pick(int index);}

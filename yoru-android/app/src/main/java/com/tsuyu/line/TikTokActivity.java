@@ -312,6 +312,7 @@ public final class TikTokActivity extends Activity {
             int width = getResources().getDisplayMetrics().widthPixels;
             w.setLayout(Math.min(width, Ui.dp(this, 560)), WindowManager.LayoutParams.WRAP_CONTENT);
         }
+        d.setOnDismissListener(di -> hideNavigationBar());
         d.show();
     }
 
@@ -476,6 +477,7 @@ public final class TikTokActivity extends Activity {
             int width = getResources().getDisplayMetrics().widthPixels;
             w.setLayout(Math.min(width, Ui.dp(this, 560)), WindowManager.LayoutParams.WRAP_CONTENT);
         }
+        d.setOnDismissListener(di -> hideNavigationBar());
         d.show();
     }
 

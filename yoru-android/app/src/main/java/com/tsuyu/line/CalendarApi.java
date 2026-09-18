@@ -268,7 +268,7 @@ public final class CalendarApi {
         }
         if (joined.length() == 0) return;
         try {
-            JSONArray rows = repo.shiki(Sec.s("2f121b101836164b1b010771") + JSONObject.quote(joined.toString()) + Sec.s("781f1c141c275f") + Math.min(50, ids.size()) + "){" + SH_FIELDS + "}}").optJSONArray("animes");
+            JSONArray rows = repo.shiki(Sec.s("2f121b101836164b1b010771") + JSONObject.quote(joined.toString()) + Sec.s("781f1c141c275f") + Math.min(50, ids.size()) + Sec.s("7d08") + SH_FIELDS + Sec.s("290e")).optJSONArray("animes");
             for (int i = 0; rows != null && i < rows.length(); i++) {
                 ApiRepository.AiringItem item = createAiringItem(repo, rows.getJSONObject(i), now, start, end, false);
                 if (item != null) putAiringItem(map, item);

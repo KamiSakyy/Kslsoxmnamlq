@@ -283,7 +283,7 @@ public final class ShikimoriApi {
                         joined.append(id);
                     }
                     if (joined.length() == 0) continue;
-                    JSONArray rows = shiki(Sec.s("2f121b101836164b1b010771") + JSONObject.quote(joined.toString()) + Sec.s("781f1c141c275f") + part.size() + "){" + SH_FIELDS + "}}", repo).optJSONArray("animes");
+                    JSONArray rows = shiki(Sec.s("2f121b101836164b1b010771") + JSONObject.quote(joined.toString()) + Sec.s("781f1c141c275f") + part.size() + Sec.s("7d08") + SH_FIELDS + Sec.s("290e"), repo).optJSONArray("animes");
                     for (int i = 0; rows != null && i < rows.length(); i++) {
                         Anime item = repo.remember(shikiAnime(rows.getJSONObject(i)));
                         if (Anime.valid(item) && !item.key().equals(a.key())) map.put(SourceEngine.identity(item), item);

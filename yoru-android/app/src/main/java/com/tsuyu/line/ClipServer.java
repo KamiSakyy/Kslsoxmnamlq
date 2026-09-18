@@ -241,10 +241,10 @@ public final class ClipServer {
         if (filter != null && !filter.isEmpty()) {
             String fLower = filter.toLowerCase(Locale.ROOT);
             String sourceKey = "";
-            if (fLower.contains(Sec.s("351d1c15-1c31170a-13")) || fLower.contains(Sec.s("84c3a5c4-a5ebb5d8-a2dda4fa-b4f9e288-85fc"))) sourceKey = Sec.s("351d1c15-1c31170a-13");
-            else if (fLower.contains(Sec.s("351d1c14-10250a10-06")) || fLower.contains(Sec.s("84c3a5c4-a5ebb5df-a2d0a4f9-b5c7e3b1-85f1"))) sourceKey = Sec.s("351d1c14-10250a10-06");
-            else if (fLower.contains(Sec.s("351d1c1d-0031")) || fLower.contains(Sec.s("84c3a5c4-a5ebb5d7-a2d5a4fa"))) sourceKey = Sec.s("351d1c1d-0031");
-            else if (fLower.contains(Sec.s("351d1c14-10370c02")) || fLower.contains(Sec.s("84c3a5c4-a5ebb5df-a2d0a4ff-b5c1e280"))) sourceKey = Sec.s("351d1c14-10370c02");
+            if (fLower.contains(Sec.s("351d1c151c31170a13")) || fLower.contains(Sec.s("84c3a5c4a5ebb5d8a2dda4fab4f9e288e3b9"))) sourceKey = Sec.s("351d1c151c31170a13");
+            else if (fLower.contains(Sec.s("351d1c1410250a1006")) || fLower.contains(Sec.s("84c3a5c4a5ebb5dfa2d0a4f9b5c7e3b1e3b4"))) sourceKey = Sec.s("351d1c1410250a1006");
+            else if (fLower.contains(Sec.s("351d1c1d0031")) || fLower.contains(Sec.s("84c3a5c4a5ebb5d7a2d5a4fa"))) sourceKey = Sec.s("351d1c1d0031");
+            else if (fLower.contains(Sec.s("351d1c1410370c02")) || fLower.contains(Sec.s("84c3a5c4a5ebb5dfa2d0a4ffb5c1e280"))) sourceKey = Sec.s("351d1c1410370c02");
             if (!sourceKey.isEmpty()) {
                 try {
                     int p = 1 + random.nextInt(8);

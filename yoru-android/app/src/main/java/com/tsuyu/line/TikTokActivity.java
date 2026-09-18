@@ -241,12 +241,12 @@ public final class TikTokActivity extends Activity {
 
         String[] voices = new String[]{
                 "Все озвучки",
-                Sec.s("151d1c35-1c31170a-13"),
+                Sec.s("151d1c351c31170a13"),
                 "Dream Cast",
                 "StudioBand",
                 "SHIZA Project",
-                Sec.s("151d1c14-10050a10-06"),
-                Sec.s("151d1c3d-2011"),
+                Sec.s("151d1c1410050a1006"),
+                Sec.s("151d1c3d2011"),
                 "AniFilm",
                 "AniStar",
                 "JAM",

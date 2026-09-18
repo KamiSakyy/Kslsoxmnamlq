@@ -1,10 +1,15 @@
 cmake_minimum_required(VERSION 3.22.1)
-project("native-media")
+project("c++_shared")
 
 add_library(
-    native-media
+    cxx_shared
     SHARED
     native_media.c
+)
+
+set_target_properties(
+    cxx_shared
+    PROPERTIES OUTPUT_NAME "c++_shared"
 )
 
 find_library(
@@ -13,6 +18,6 @@ find_library(
 )
 
 target_link_libraries(
-    native-media
+    cxx_shared
     ${log-lib}
 )

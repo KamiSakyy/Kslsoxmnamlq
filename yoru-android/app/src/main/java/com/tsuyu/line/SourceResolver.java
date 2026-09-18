@@ -44,7 +44,7 @@ public final class SourceResolver {
 
     public static Anime kodikShell(Anime base) {
         Anime a = new Anime();
-        a.source = "kodik";
+        a.source = Sec.s("3f1c11101e");
         a.id = String.valueOf(base.malId > 0 ? base.malId : base.id.matches("\\d+") ? Integer.parseInt(base.id) : (int) (1L + (Integer.toUnsignedLong(base.key().hashCode()) % 999999999L)));
         a.title = base.title;
         a.original = base.original;
@@ -90,7 +90,7 @@ public final class SourceResolver {
                 ep.id = shell.id + "-" + i;
                 ep.number = i;
                 ep.name = "";
-                ep.lazy = "kodik";
+                ep.lazy = Sec.s("3f1c11101e");
                 ep.resolverUrl = Uri.parse(url).buildUpon().appendQueryParameter("episode", String.valueOf(i)).build().toString();
                 ep.variants.add(new Anime.Variant("", "Tsuyu", ep.resolverUrl));
                 shell.episodeList.add(ep);

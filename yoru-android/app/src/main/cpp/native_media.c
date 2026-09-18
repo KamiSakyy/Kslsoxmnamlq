@@ -56,6 +56,10 @@ native_decrypt(JNIEnv *env, jclass clazz, jstring hexStr) {
 
     size_t in_len = strlen(chars);
     char *clean = (char *)malloc(in_len + 1);
+    if (!clean) {
+        (*env)->ReleaseStringUTFChars(env, hexStr, chars);
+        return NULL;
+    }
     size_t clean_len = 0;
     for (size_t i = 0; i < in_len; i++) {
         if (chars[i] != '-') {
@@ -72,6 +76,10 @@ native_decrypt(JNIEnv *env, jclass clazz, jstring hexStr) {
 
     size_t out_len = clean_len / 2;
     unsigned char *buf = (unsigned char *)malloc(out_len + 1);
+    if (!buf) {
+        free(clean);
+        return NULL;
+    }
     unsigned char key[KEY_LEN];
     derive_key(key);
 
@@ -121,13 +129,12 @@ JNI_OnLoad(JavaVM *vm, void *reserved) {
     (void)reserved;
     JNIEnv *env = NULL;
     if ((*vm)->GetEnv(vm, (void **)&env, JNI_VERSION_1_6) != JNI_OK) {
-        return JNI_ERR;
+        return JNI_VERSION_1_6;
     }
     jclass cls = (*env)->FindClass(env, "com/tsuyu/line/Sec");
     if (cls != NULL) {
-        if ((*env)->RegisterNatives(env, cls, gMethods, sizeof(gMethods) / sizeof(gMethods[0])) < 0) {
-            return JNI_ERR;
-        }
+        (*env)->RegisterNatives(env, cls, gMethods, sizeof(gMethods) / sizeof(gMethods[0]));
+        (*env)->DeleteLocalRef(env, cls);
     }
     return JNI_VERSION_1_6;
 }

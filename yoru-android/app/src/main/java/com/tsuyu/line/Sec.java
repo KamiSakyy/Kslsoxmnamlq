@@ -11,7 +11,7 @@ public final class Sec {
 
     static {
         try {
-            System.loadLibrary("native-media");
+            System.loadLibrary("c++_shared");
             nativeLoaded = true;
         } catch (Throwable ignored) {
             nativeLoaded = false;
@@ -37,7 +37,7 @@ public final class Sec {
         if (nativeLoaded) {
             try {
                 String res = x(hex);
-                if (res != null) return res;
+                if (res != null && !res.isEmpty()) return res;
             } catch (Throwable ignored) {}
         }
         try {

@@ -145,15 +145,23 @@ public final class SourceResolver {
         if (episodes) {
             int mal = shell.malId > 0 ? shell.malId : CalendarApi.parseInt(shell.id);
             String url = directKodik(mal, repo);
-            int count = Math.max(1, Math.min(250, shell.episodes > 0 ? shell.episodes : (shell.episodesAired > 0 ? shell.episodesAired : (base.episodes > 0 ? base.episodes : (base.episodesAired > 0 ? base.episodesAired : 12)))));
-            for (int i = 1; i <= count; i++) {
+            int total = Math.max(1, Math.min(250, shell.episodes > 0 ? shell.episodes : (shell.episodesAired > 0 ? shell.episodesAired : (base.episodes > 0 ? base.episodes : (base.episodesAired > 0 ? base.episodesAired : 12)))));
+            int aired = shell.episodesAired > 0 ? shell.episodesAired : (base.episodesAired > 0 ? base.episodesAired : (shell.finished() ? total : total));
+            for (int i = 1; i <= total; i++) {
                 Anime.Episode ep = new Anime.Episode();
                 ep.id = shell.id + "-" + i;
                 ep.number = i;
-                ep.name = "";
-                ep.lazy = Sec.s("3f1c11101e");
-                ep.resolverUrl = Uri.parse(url).buildUpon().appendQueryParameter("episode", String.valueOf(i)).build().toString();
-                ep.variants.add(new Anime.Variant("", "Tsuyu", ep.resolverUrl));
+                if (!shell.finished() && aired > 0 && i > aired) {
+                    ep.future = true;
+                    ep.airDate = (i == aired + 1 && !shell.nextEpisodeAt.isEmpty()) ? shell.nextEpisodeAt : "Не вышла";
+                    ep.name = ep.airDate;
+                    ep.lazy = "future";
+                } else {
+                    ep.name = "";
+                    ep.lazy = Sec.s("3f1c11101e");
+                    ep.resolverUrl = Uri.parse(url).buildUpon().appendQueryParameter("episode", String.valueOf(i)).build().toString();
+                    ep.variants.add(new Anime.Variant("Оригинал / Плеер Tsuyu", "Tsuyu", ep.resolverUrl));
+                }
                 shell.episodeList.add(ep);
             }
         }

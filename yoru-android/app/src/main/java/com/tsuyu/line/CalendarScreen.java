@@ -30,7 +30,7 @@ public final class CalendarScreen extends FrameLayout {
     private JSONArray readLegacyCache(){try{return new JSONArray(YoruApp.app().store.calendarCache());}catch(Exception e){return new JSONArray();}}
     private boolean alive(){return attached&&!activity.isFinishing();}
     private void stopSwipe(){try{if(swipe!=null)swipe.setRefreshing(false);}catch(Exception ignored){}}
-    private boolean staleCalendar(){try{return System.currentTimeMillis()-YoruApp.app().store.calendarCacheAt()>15*60*1000L;}catch(Exception e){return true;}}
+    private boolean staleCalendar(){try{return System.currentTimeMillis()-YoruApp.app().store.calendarCacheAt()>60*60*1000L;}catch(Exception e){return true;}}
     private void setItems(List<ApiRepository.AiringItem> rows,boolean keepPosition){final int gen=generation;final ArrayList<ApiRepository.AiringItem> fresh=new ArrayList<>();if(rows!=null)for(ApiRepository.AiringItem it:rows)if(it!=null&&it.anime!=null)fresh.add(it);YoruApp.app().io.execute(()->{boolean unavail=!fresh.isEmpty();for(ApiRepository.AiringItem item:fresh)if(!"personal-fallback".equals(item.source)){unavail=false;break;}BucketData d=computeBuckets(fresh);final boolean ua=unavail;YoruApp.app().main.post(()->{if(!alive()||gen!=generation)return;items.clear();items.addAll(fresh);generalUnavailable=ua;buckets.clear();buckets.putAll(d.buckets);filterCounts.clear();filterCounts.putAll(d.counts);bucketsDirty=false;if(selected>=DAYS)selected=-1;rebuildVisible(true);adapter.publish();if(!keepPosition)recycler.scrollToPosition(0);});});}
     private static final class BucketData{final HashMap<String,ArrayList<ArrayList<ApiRepository.AiringItem>>> buckets=new HashMap<>();final HashMap<String,Integer> counts=new HashMap<>();}
     private void refreshBuckets(){final int gen=generation;final ArrayList<ApiRepository.AiringItem> snapshot=new ArrayList<>(items);YoruApp.app().io.execute(()->{BucketData d=computeBuckets(snapshot);YoruApp.app().main.post(()->{if(!alive()||gen!=generation)return;buckets.clear();buckets.putAll(d.buckets);filterCounts.clear();filterCounts.putAll(d.counts);bucketsDirty=false;rebuildVisible(false);adapter.publish();});});}
@@ -46,7 +46,7 @@ public final class CalendarScreen extends FrameLayout {
     private void prepareDays(){long base=todayStart();if(base==starts[0]&&shortDays[0]!=null)return;for(int i=0;i<DAYS;i++){starts[i]=base+i*24L*60*60*1000;shortDays[i]=i==0?"Сегодня":i==1?"Завтра":new SimpleDateFormat("EEE dd.MM",ru).format(new Date(starts[i])).replaceFirst("\\.","");longDays[i]=i==0?"Сегодня":i==1?"Завтра":new SimpleDateFormat("EEEE, dd MMMM",ru).format(new Date(starts[i]));}}
     private long todayStart(){Calendar c=Calendar.getInstance(MSK);c.set(Calendar.HOUR_OF_DAY,0);c.set(Calendar.MINUTE,0);c.set(Calendar.SECOND,0);c.set(Calendar.MILLISECOND,0);return c.getTimeInMillis();}
     private String time(long t){SimpleDateFormat f=new SimpleDateFormat("HH:mm",ru);f.setTimeZone(MSK);return f.format(new Date(t));}
-    private String countdown(long t){long diff=t-System.currentTimeMillis();if(diff<=-90*60*1000)return "уже вышло";if(diff<=0)return "выходит сейчас";long min=diff/60000,h=min/60,d=h/24;if(d>0)return "через "+d+" д "+(h%24)+" ч";if(h>0)return "через "+h+" ч "+(min%60)+" мин";return "через "+Math.max(1,min)+" мин";}
+    private String countdown(ApiRepository.AiringItem item){if(item==null)return "";long t=item.time;long diff=t-System.currentTimeMillis();boolean hasAired=item.anime!=null&&item.anime.episodesAired>=item.episode;if(hasAired)return "уже вышло";if(item.anime!=null&&item.anime.episodesAired<item.episode&&diff<=0){if(diff>=-2*60*60*1000L)return "выходит сейчас";return "ожидается выход";}if(diff<=0)return "выходит сейчас";long min=diff/60000,h=min/60,d=h/24;if(d>0)return "через "+d+" д "+(h%24)+" ч";if(h>0)return "через "+h+" ч "+(min%60)+" мин";return "через "+Math.max(1,min)+" мин";}
     private final class CalendarEntry {
         final int type;
         final ApiRepository.AiringItem item;
@@ -54,7 +54,7 @@ public final class CalendarScreen extends FrameLayout {
         CalendarEntry(int type,ApiRepository.AiringItem item) {
             this.type=type;this.item=item;
             key=item==null?"section:"+type:item.anime.key()+"|"+item.episode+"|"+item.kind;
-            signature=item==null?state+"|"+filter+"|"+selected+"|"+filterCounts.toString()+"|"+Arrays.toString(shortDays)+"|"+allRows.size()+"|"+visible.size():YoruBrain.title(item.anime)+"|"+item.anime.poster+"|"+item.time+"|"+item.precision+"|"+statusSuffix(item)+"|"+countdown(item.time)+"|"+SeriesWatcher.has(item.anime,item.episode);
+            signature=item==null?state+"|"+filter+"|"+selected+"|"+filterCounts.toString()+"|"+Arrays.toString(shortDays)+"|"+allRows.size()+"|"+visible.size():YoruBrain.title(item.anime)+"|"+item.anime.poster+"|"+item.time+"|"+item.precision+"|"+statusSuffix(item)+"|"+countdown(item)+"|"+SeriesWatcher.has(item.anime,item.episode);
         }
     }
 
@@ -136,7 +136,7 @@ public final class CalendarScreen extends FrameLayout {
             if(entry.type==0){header.bind();return;}
             if(entry.type==1) {
                 title.setText(YoruBrain.title(item.anime));line.setText(item.kind+" · серия "+Ui.number(item.episode)+" · "+time(item.time)+" МСК");line.setTextColor(kindColor(item));
-                meta.setText(countdown(item.time)+" · "+item.precision+statusSuffix(item));
+                meta.setText(countdown(item)+" · "+item.precision+statusSuffix(item));
                 String key=item.anime.key()+"|"+item.anime.poster;
                 if(!key.equals(imageKey)){imageKey=key;YoruApp.app().images.load(poster,item.anime);}
                 boolean watched=SeriesWatcher.has(item.anime,item.episode);
@@ -174,7 +174,7 @@ public final class CalendarScreen extends FrameLayout {
         LinearLayout horizontal(){HorizontalScrollView scroll=new HorizontalScrollView(activity);scroll.setHorizontalScrollBarEnabled(false);LinearLayout row=Ui.row(activity);scroll.addView(row);addView(scroll,Ui.lp(activity,-1,-2));return row;}
         TextView chip(LinearLayout row,Runnable click){TextView view=Ui.chip(activity,"",false,click);LinearLayout.LayoutParams p=Ui.lp(activity,-2,-2);p.rightMargin=Ui.dp(activity,7);row.addView(view,p);return view;}
         void select(){rebuildVisible(true);adapter.publish();recycler.scrollToPosition(0);}
-        void style(TextView view,String value,boolean active){view.setText(value);view.setTextColor(active?0xff09090b:Ui.ZINC);view.setBackground(active?Ui.shape(0xffffffff,999,activity):Ui.shape(0x0aFFFFFF,999,activity));view.setSelected(active);view.setPadding(Ui.dp(activity,14),Ui.dp(activity,10),Ui.dp(activity,14),Ui.dp(activity,10));}
+        void style(TextView view,String value,boolean active){view.setText(value);if(view.isSelected()!=active){view.setSelected(active);view.setTextColor(active?0xff09090b:Ui.ZINC);view.setBackground(active?Ui.shape(0xffffffff,999,activity):Ui.shape(0x0aFFFFFF,999,activity));view.setPadding(Ui.dp(activity,14),Ui.dp(activity,10),Ui.dp(activity,14),Ui.dp(activity,10));}}
         void bind(){
             status.setText(state);
             style(all,"Все дни · "+filteredCount(),selected<0);

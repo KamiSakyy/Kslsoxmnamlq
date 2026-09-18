@@ -23,17 +23,17 @@ public final class CalendarApi {
         CalendarFeed.Result<String, ApiRepository.AiringItem> map = CalendarFeed.collect(
                 rows -> {
                     Exception failure = null;
-                    ExecutorService pool = Executors.newFixedThreadPool(6);
+                    ExecutorService pool = Executors.newFixedThreadPool(4);
                     try {
                         ArrayList<Future<List<ApiRepository.AiringItem>>> tasks = new ArrayList<>();
-                        for (int page = 1; page <= 8; page++) {
+                        for (int page = 1; page <= 3; page++) {
                             final int p = page;
                             tasks.add(pool.submit(() -> {
                                 TaskQueue.check();
                                 return fetchAiringPage(repo, "ongoing", "popularity", p, now, start, end, false);
                             }));
                         }
-                        for (int page = 1; page <= 3; page++) {
+                        for (int page = 1; page <= 1; page++) {
                             final int p = page;
                             tasks.add(pool.submit(() -> {
                                 TaskQueue.check();
@@ -98,9 +98,9 @@ public final class CalendarApi {
 
     private static void putAiringItem(LinkedHashMap<String, ApiRepository.AiringItem> map, ApiRepository.AiringItem item) {
         if (item == null || item.anime == null) return;
-        String key = (item.anime.malId > 0 ? Sec.s("39121943") + item.anime.malId : item.anime.key()) + "|" + item.episode + "|" + startOfDay(item.time);
+        String key = (item.anime.malId > 0 ? Sec.s("39121943") + item.anime.malId : item.anime.key()) + "|" + item.episode;
         ApiRepository.AiringItem old = map.get(key);
-        if (old == null || ("Точная дата".equals(item.precision) && !"Точная дата".equals(old.precision))) {
+        if (old == null || "Точная дата".equals(item.precision) || item.time != old.time) {
             map.put(key, item);
         }
     }
@@ -133,9 +133,9 @@ public final class CalendarApi {
     }
 
     private static void airingRest(LinkedHashMap<String, ApiRepository.AiringItem> map, ApiRepository repo, String status, long now, long start, long end, boolean premiere) throws Exception {
-        ExecutorService pool = Executors.newFixedThreadPool(4);
+        ExecutorService pool = Executors.newFixedThreadPool(3);
         try {
-            int maxPages = premiere ? 3 : 8;
+            int maxPages = premiere ? 1 : 3;
             ArrayList<Future<List<ApiRepository.AiringItem>>> tasks = new ArrayList<>();
             for (int page = 1; page <= maxPages; page++) {
                 final int p = page;

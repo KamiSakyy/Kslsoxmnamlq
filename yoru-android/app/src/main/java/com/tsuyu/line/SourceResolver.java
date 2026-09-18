@@ -117,6 +117,8 @@ public final class SourceResolver {
         a.status = base.status;
         a.age = base.age;
         a.episodes = base.episodes;
+        a.episodesAired = base.episodesAired;
+        a.nextEpisodeAt = base.nextEpisodeAt;
         a.malId = base.malId > 0 ? base.malId : CalendarApi.parseInt(base.id);
         a.anilistId = base.anilistId;
         a.kpId = base.kpId;
@@ -146,12 +148,12 @@ public final class SourceResolver {
             int mal = shell.malId > 0 ? shell.malId : CalendarApi.parseInt(shell.id);
             String url = directKodik(mal, repo);
             int total = Math.max(1, Math.min(250, shell.episodes > 0 ? shell.episodes : (shell.episodesAired > 0 ? shell.episodesAired : (base.episodes > 0 ? base.episodes : (base.episodesAired > 0 ? base.episodesAired : 12)))));
-            int aired = shell.episodesAired > 0 ? shell.episodesAired : (base.episodesAired > 0 ? base.episodesAired : (shell.finished() ? total : total));
+            int aired = shell.episodesAired > 0 ? shell.episodesAired : (base.episodesAired > 0 ? base.episodesAired : (shell.finished() ? total : 0));
             for (int i = 1; i <= total; i++) {
                 Anime.Episode ep = new Anime.Episode();
                 ep.id = shell.id + "-" + i;
                 ep.number = i;
-                if (!shell.finished() && aired > 0 && i > aired) {
+                if (!shell.finished() && (aired > 0 ? i > aired : i > 0)) {
                     ep.future = true;
                     ep.airDate = (i == aired + 1 && !shell.nextEpisodeAt.isEmpty()) ? shell.nextEpisodeAt : "Не вышла";
                     ep.name = ep.airDate;

@@ -98,7 +98,7 @@ public final class CalendarApi {
 
     private static void putAiringItem(LinkedHashMap<String, ApiRepository.AiringItem> map, ApiRepository.AiringItem item) {
         if (item == null || item.anime == null) return;
-        String key = (item.anime.malId > 0 ? "mal:" + item.anime.malId : item.anime.key()) + "|" + item.episode + "|" + startOfDay(item.time);
+        String key = (item.anime.malId > 0 ? Sec.s("39121943") + item.anime.malId : item.anime.key()) + "|" + item.episode + "|" + startOfDay(item.time);
         ApiRepository.AiringItem old = map.get(key);
         if (old == null || ("Точная дата".equals(item.precision) && !"Точная дата".equals(old.precision))) {
             map.put(key, item);
@@ -246,7 +246,7 @@ public final class CalendarApi {
     private static int searchScheduleId(ApiRepository repo, Anime fav) {
         try {
             for (String q : repo.searchTerms(fav)) {
-                Anime.Page page = repo.catalog("shikimori", q, 1, new ApiRepository.Filter());
+                Anime.Page page = repo.catalog(Sec.s("271b1c121c3e0a111b"), q, 1, new ApiRepository.Filter());
                 for (Anime candidate : page.items) {
                     if (repo.matchesAnime(candidate, fav)
                             || ApiRepository.plainName(candidate.title).equals(ApiRepository.plainName(fav.title))
@@ -279,7 +279,7 @@ public final class CalendarApi {
     public static int scheduleId(Anime a) {
         if (a == null) return 0;
         if (a.malId > 0) return a.malId;
-        if ("shikimori".equals(a.source) || "yoru".equals(a.source)) return parseInt(a.id);
+        if (Sec.s("271b1c121c3e0a111b").equals(a.source) || "yoru".equals(a.source)) return parseInt(a.id);
         return 0;
     }
 
@@ -298,7 +298,7 @@ public final class CalendarApi {
         item.kind = "Новая серия";
         item.precision = "Точная дата";
         item.source = "Tsuyu";
-        String key = (fav.malId > 0 ? "mal:" + fav.malId : fav.key()) + "|" + item.episode + "|" + startOfDay(at);
+        String key = (fav.malId > 0 ? Sec.s("39121943") + fav.malId : fav.key()) + "|" + item.episode + "|" + startOfDay(at);
         ApiRepository.AiringItem old = map.get(key);
         if (old == null || !"Точная дата".equals(old.precision)) map.put(key, item);
     }

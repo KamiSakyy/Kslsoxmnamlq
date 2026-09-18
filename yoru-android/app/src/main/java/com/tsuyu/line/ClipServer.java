@@ -265,7 +265,7 @@ public final class ClipServer {
                 int page = 1 + random.nextInt(15);
                 ApiRepository.Filter filterObj = new ApiRepository.Filter();
                 filterObj.sort = "POPULARITY";
-                Anime.Page p = YoruApp.app().api.catalog("shikimori", "", page, filterObj);
+                Anime.Page p = YoruApp.app().api.catalog(Sec.s("271b1c121c3e0a111b"), "", page, filterObj);
                 if (p != null && !p.items.isEmpty()) candidates.addAll(p.items);
             } catch (Exception ignored) {}
         }

@@ -36,7 +36,7 @@ public final class AniListApi {
         Anime a = new Anime();
         a.source = Sec.s("351d1c151c2011");
         a.anilistId = j.optInt("id", 0);
-        a.malId = j.optInt("idMal", j.optInt("malId", 0));
+        a.malId = j.optInt(Sec.s("3d17381819"), j.optInt(Sec.s("3912193011"), 0));
         int use = a.malId > 0 ? a.malId : a.anilistId;
         if (use <= 0) return null;
         a.id = String.valueOf(use);
@@ -125,7 +125,7 @@ public final class AniListApi {
 
     public static void posterFix(Anime a, Runnable done) {
         if (a == null || a.malId <= 0) return;
-        String key = "mal:" + a.malId;
+        String key = Sec.s("39121943") + a.malId;
         String hit = POSTER_FIX.get(key);
         if (hit != null) {
             if (!hit.isEmpty() && (a.poster == null || a.poster.isEmpty())) {
@@ -147,7 +147,7 @@ public final class AniListApi {
 
     public static void posterFixReplace(Anime a, Runnable done) {
         if (a == null || a.malId <= 0) return;
-        String key = "mal:" + a.malId;
+        String key = Sec.s("39121943") + a.malId;
         String hit = POSTER_FIX.get(key);
         if (hit != null) {
             if (!hit.isEmpty()) {

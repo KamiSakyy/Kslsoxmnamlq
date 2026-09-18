@@ -124,10 +124,10 @@ public final class ShikimoriApi {
         if (rows == null || rows.length() == 0) throw new IOException("Аниме не найдено");
         JSONObject j = rows.getJSONObject(0);
         Anime a = shikiAnime(j);
-        a.source = source == null || source.isEmpty() ? "shikimori" : source;
+        a.source = source == null || source.isEmpty() ? Sec.s("271b1c121c3e0a111b") : source;
         if (a.malId <= 0) a.malId = id;
         if ("yoru".equals(a.source)) a.id = String.valueOf(id);
-        a.description = ApiRepository.plain(j.optString("descriptionHtml"));
+        a.description = ApiRepository.plain(j.optString(Sec.s("3016061a073a15171b0a1a0311145e")));
         YoruCache db = YoruApp.app() == null ? null : YoruApp.app().cache;
         if (db != null) db.detail(a);
         return repo.remember(a);
@@ -217,7 +217,7 @@ public final class ShikimoriApi {
         if (mal <= 0) {
             try {
                 for (String term : repo.searchTerms(a)) {
-                    Anime.Page page = repo.catalog("shikimori", term, 1, new ApiRepository.Filter());
+                    Anime.Page page = repo.catalog(Sec.s("271b1c121c3e0a111b"), term, 1, new ApiRepository.Filter());
                     for (Anime item : page.items) {
                         if (repo.matchesAnime(item, a)) {
                             mal = item.malId > 0 ? item.malId : CalendarApi.parseInt(item.id);

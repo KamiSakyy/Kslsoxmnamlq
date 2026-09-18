@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 public final class HentaiEngine {
     private static final String[] SITES={"hs","ah","hk","an","he","hn","pc","htv"};
-    private static final String FIELDS="id malId name russian english kind rating score status episodes episodesAired nextEpisodeAt airedOn{year date} poster{mainUrl originalUrl} genres{id russian name} descriptionHtml";
+    private static final String FIELDS=ShikimoriApi.SH_FIELDS + Sec.s("7417100a16210c13060c1b252d0d5f5c");
     private final ApiRepository api;
     private static final ExecutorService PROBE_POOL=Executors.newFixedThreadPool(10);
 
@@ -250,7 +250,7 @@ public final class HentaiEngine {
         return out;
     }
 
-    private static final Pattern HTV_CARD=Pattern.compile("\\\\*\"title\\\\*\":\\\\*\"([^\"\\\\]{3,120})\\\\*\",\\\\*\"titleSlug\\\\*\":\\\\*\"([a-z0-9-]+)\\\\*\",\\\\*\"titleId\\\\*\":\\\\*\"[^\\\\]+\\\\*\",\\\\*\"ep\\\\*\":(\\d+)[^{}]*?\\\\*\"cover\\\\*\":\\\\*\"(/uploads/[a-zA-Z0-9._/-]+)\\\\*\"[^{}]*?\\\\*\"embedUrl\\\\*\":\\\\*\"https://nhplayer\\.com/v/([A-Za-z0-9]+)/");
+    private static final Pattern HTV_CARD=Pattern.compile(Sec.s("0859570d1c2709062e4f5671395310186968762f29240e604952405509623953101c6e1c76071c0d1936360f0702286147436e1a101e0f125803457e5c4e2f4e5d174f5b1e6c1814201a0115101a013f58474e174f5b696e6e6a09582953577f3949500004174f5b08186e527f5a2e270e2e38494d395e6906164455406a7e514f255f714d4c07151824041d411f6957790934542f63485a5c3a5b6638521b6c18140f2d0e0428795a3f58471126071c5665405a085957432979470b061104385f561d5e5a4638120c1c070f4b001d085b3d4a5169711f6c355e0f49586a38485b4a"));
 
     private List<Row> rowsHtv(int page)throws Exception{
         List<Row> out=new ArrayList<>();
@@ -270,7 +270,7 @@ public final class HentaiEngine {
 
     private String htvFile(String embedUrl)throws Exception{
         String html=api.hentaText(embedUrl);
-        Matcher m=Pattern.compile("vid=([A-Za-z0-9+/=]+)").matcher(html);
+        Matcher m=Pattern.compile(Sec.s("221a11445d08244e2804593155540b1b1d0b09585c")).matcher(html);
         if(!m.find())return null;
         String dec=new String(Base64.getDecoder().decode(m.group(1)),"UTF-8");
         int bar=dec.indexOf('|');
@@ -299,7 +299,7 @@ public final class HentaiEngine {
 
     private String anFile(String embedUrl)throws Exception{
         String html=api.hentaText(embedUrl);
-        Matcher m=Pattern.compile("vid=([A-Za-z0-9+/=]+)").matcher(html);
+        Matcher m=Pattern.compile(Sec.s("221a11445d08244e2804593155540b1b1d0b09585c")).matcher(html);
         if(!m.find())return null;
         String dec=new String(Base64.getDecoder().decode(m.group(1)),"UTF-8");
         int bar=dec.indexOf('|');
@@ -316,7 +316,7 @@ public final class HentaiEngine {
 
     private String hentaistreamFile(String episodeUrl)throws Exception{
         String html=api.request(episodeUrl,"GET",null,false,heHeaders());
-        Matcher m=Pattern.compile("frames/(s[0-9]+[^'\\s<>]+?)\\.html").matcher(html);
+        Matcher m=Pattern.compile(Sec.s("3201141410204a4b013e44665c24196b6c110800494728785a4a2e4b1c3f0815")).matcher(html);
         ArrayList<String> tried=new ArrayList<>();
         while(m.find()&&tried.size()<3){
             String base=Sec.s("3c07010906694a4c0610162e4b11575e46573d00010b1032084d110a1964030b535d57457b")+m.group(1)+".html";
@@ -787,7 +787,7 @@ public final class HentaiEngine {
         }
         if(r.site.equals("ah")){
             String html=api.hentaText(r.url);
-            Matcher m=Pattern.compile("file:\"(/pl/[^\"]+?)\"").matcher(html);
+            Matcher m=Pattern.compile(Sec.s("321a191c4f714d4c02095b103b5b6f1b0d1f76")).matcher(html);
             if(!m.find())return null;
             JSONArray arr=new JSONArray(api.hentaText(Sec.s("3c07010906694a4c13091823001746515b5f7a150017")+m.group(1)));
             if(arr.length()==0)return null;
@@ -806,7 +806,7 @@ public final class HentaiEngine {
     }
 
     private static String hentakliFirstVideoId(String html){
-        Matcher m=Pattern.compile("id\\\\?\"?:\\\\?\"?([1-9][0-9]{2,5})\\\\?\"?,\\\\?\"?parent").matcher(html);
+        Matcher m=Pattern.compile(Sec.s("3d1729254a715a592e394b695a5169011f0f092845544c0e1e515e50096239250d120d1a082f4a5b4a230411170b00")).matcher(html);
         return m.find()?m.group(1):null;
     }
 
@@ -819,7 +819,7 @@ public final class HentaiEngine {
         String page=api.hentaText(u);
         HentaFile best=null;
         int bestRes=0;
-        Matcher sm=Pattern.compile("<source[^>]+>").matcher(page);
+        Matcher sm=Pattern.compile(Sec.s("68001a0c073000382c5b29605b")).matcher(page);
         while(sm.find()){
             String tag=sm.group(0);
             String src=attr(tag,"src");
@@ -895,7 +895,7 @@ public final class HentaiEngine {
                     if(g!=null){String n=g.optString("russian",g.optString("name",""));if(!n.isEmpty())a.genres.add(n);}
                 }
             }
-            String d=ApiRepository.plain(j.optString("descriptionHtml",""));
+            String d=ApiRepository.plain(j.optString(Sec.s("3016061a073a15171b0a1a0311145e"),""));
             if(d.length()>60)a.description=d;
         }catch(Exception ignored){}
     }
@@ -961,7 +961,7 @@ public final class HentaiEngine {
         Matcher m=p.matcher(html);
         while(m.find()){
             String url=m.group(1);
-            Matcher nm=Pattern.compile("-(\\d{2,3})_(rus|sub)_").matcher(url);
+            Matcher nm=Pattern.compile(Sec.s("795b291d0e6149500f4c2b63170c414c4143365a2a")).matcher(url);
             if(!nm.find())continue;
             int n=Integer.parseInt(nm.group(1));
             Anime.Episode e=map.get(n);
@@ -979,7 +979,7 @@ public final class HentaiEngine {
     }
 
     private void fillAllhentaii(Anime a,String html)throws Exception{
-        Matcher m=Pattern.compile("file:\"(/pl/[^\"]+?)\"").matcher(html);
+        Matcher m=Pattern.compile(Sec.s("321a191c4f714d4c02095b103b5b6f1b0d1f76")).matcher(html);
         if(!m.find())return;
         JSONArray arr=new JSONArray(api.hentaText(Sec.s("3c07010906694a4c13091823001746515b5f7a150017")+m.group(1)));
         for(int i=0;i<arr.length();i++){
@@ -998,7 +998,7 @@ public final class HentaiEngine {
     }
 
     private void fillHentakli(Anime a,String html)throws Exception{
-        Matcher m=Pattern.compile("id\\\\?\"?:\\\\?\"?([1-9][0-9]{2,5})").matcher(html);;
+        Matcher m=Pattern.compile(Sec.s("3d1729254a715a592e394b695a5169011f0f092845544c0e1e515e500962")).matcher(html);;
         ArrayList<String[]> eps=new ArrayList<>();
         while(m.find()&&eps.size()<12)eps.add(new String[]{m.group(1),""});
         if(eps.isEmpty())return;

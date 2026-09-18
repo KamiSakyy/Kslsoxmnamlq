@@ -2,18 +2,71 @@ package com.tsuyu.line;
 
 import android.net.Uri;
 import org.json.*;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.*;
 
 public final class SourceResolver {
     private static String publicToken = "";
     private static long tokenAt;
+    private static final long TOKEN_TTL = 4L * 60L * 60L * 1000L;
 
     private SourceResolver() {}
 
+    private static String readString(File f) {
+        try (FileInputStream fis = new FileInputStream(f);
+             ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            byte[] buf = new byte[512];
+            int n;
+            while ((n = fis.read(buf)) != -1) bos.write(buf, 0, n);
+            return new String(bos.toByteArray(), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private static void writeString(File f, String s) {
+        try (FileOutputStream fos = new FileOutputStream(f)) {
+            fos.write(s.getBytes(StandardCharsets.UTF_8));
+        } catch (Exception ignored) {}
+    }
+
+    public static synchronized void invalidateToken() {
+        publicToken = "";
+        tokenAt = 0;
+        try {
+            YoruApp app = YoruApp.app();
+            if (app != null && app.getCacheDir() != null) {
+                new File(app.getCacheDir(), "kodik_tok.dat").delete();
+            }
+        } catch (Exception ignored) {}
+    }
+
+    public static void prewarm(ApiRepository repo) {
+        YoruApp app = YoruApp.app();
+        if (app == null || app.discovery == null) return;
+        app.discovery.execute(() -> {
+            try {
+                token(repo);
+            } catch (Exception ignored) {}
+        });
+    }
+
     public static synchronized String token(ApiRepository repo) throws Exception {
-        if (!publicToken.isEmpty() && System.currentTimeMillis() - tokenAt < 300000) return publicToken;
+        if (!publicToken.isEmpty() && System.currentTimeMillis() - tokenAt < TOKEN_TTL) return publicToken;
+        YoruApp app = YoruApp.app();
+        if (app != null && app.getCacheDir() != null) {
+            File f = new File(app.getCacheDir(), "kodik_tok.dat");
+            if (f.exists() && System.currentTimeMillis() - f.lastModified() < TOKEN_TTL) {
+                String saved = readString(f).trim();
+                if (saved.length() >= 16 && saved.length() <= 120) {
+                    publicToken = saved;
+                    tokenAt = f.lastModified();
+                    return publicToken;
+                }
+            }
+        }
         String script = repo.request(Sec.s("3c07010906694a4c190a10220e5453545618371c18561437014e02091532000b411e5f5f3a5d1f0a4a255851"), "GET", null, false);
         String[] patterns = {
                 "token\\s*=\\s*[\"\\\']([A-Za-z0-9]{16,120})[\"\\\']",
@@ -25,6 +78,9 @@ public final class SourceResolver {
             if (m.find()) {
                 publicToken = m.group(1);
                 tokenAt = System.currentTimeMillis();
+                if (app != null && app.getCacheDir() != null) {
+                    writeString(new File(app.getCacheDir(), "kodik_tok.dat"), publicToken);
+                }
                 return publicToken;
             }
         }
@@ -35,7 +91,12 @@ public final class SourceResolver {
         if (mal <= 0) throw new IOException("Не удалось найти аниме в этом каталоге");
         String q = repo.query(Sec.s("3c07010906-694a4c190a-10220e5453-405b18371c-1856123611-4e02091532-000b"), repo.params("title", "Player", "hasPlayer", "false", "url", Sec.s("3c07010906694a4c190a10220e1d501e5159395c13101b3748131e040d2e174641585b5d3d1e1a0b1c1a215e") + mal, "token", token(repo), Sec.s("271b1c121c3e0a111b2c30"), String.valueOf(mal)));
         JSONObject j = repo.get(q);
-        if (j.has("error") || !j.optBoolean("found")) throw new IOException("У этого каталога пока нет просмотра");
+        if (j.has("error") || !j.optBoolean("found")) {
+            invalidateToken();
+            String q2 = repo.query(Sec.s("3c07010906-694a4c190a-10220e5453-405b18371c-1856123611-4e02091532-000b"), repo.params("title", "Player", "hasPlayer", "false", "url", Sec.s("3c07010906694a4c190a10220e1d501e5159395c13101b3748131e040d2e174641585b5d3d1e1a0b1c1a215e") + mal, "token", token(repo), Sec.s("271b1c121c3e0a111b2c30"), String.valueOf(mal)));
+            j = repo.get(q2);
+            if (j.has("error") || !j.optBoolean("found")) throw new IOException("У этого каталога пока нет просмотра");
+        }
         if (j.has("allowed") && j.optInt("allowed", 1) == 0) throw new IOException("Просмотр временно ограничен");
         String u = embed(j.optString("link"));
         if (u.isEmpty()) throw new IOException("Просмотр временно недоступен");

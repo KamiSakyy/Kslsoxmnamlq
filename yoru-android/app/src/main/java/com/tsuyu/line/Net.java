@@ -3,6 +3,8 @@ package com.tsuyu.line;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
@@ -18,7 +20,7 @@ public final class Net {
     static final String BG = "yoru-bg";
     static final String FG = "yoru-fg";
     private static final Dispatcher DISPATCHER;
-    private static final ConnectionPool POOL = new ConnectionPool(128, 10L, TimeUnit.MINUTES);
+    private static final ConnectionPool POOL = new ConnectionPool(128, 15L, TimeUnit.MINUTES);
     private static final OkHttpClient BASE;
     private static final ConcurrentHashMap<String, OkHttpClient> CLIENTS = new ConcurrentHashMap<>();
     private static final ThreadLocal<Boolean> BG_FLAG = new ThreadLocal<>();
@@ -27,7 +29,9 @@ public final class Net {
 
     public static final class FastDns implements Dns {
         private static final ConcurrentHashMap<String, DnsEntry> CACHE = new ConcurrentHashMap<>();
-        private static final long TTL = 15 * 60 * 1000L;
+        private static final long TTL = 24L * 60L * 60L * 1000L;
+        private static final Object DISK_LOCK = new Object();
+        private static volatile boolean diskLoaded;
 
         static final class DnsEntry {
             final List<InetAddress> addresses;
@@ -38,18 +42,103 @@ public final class Net {
             }
         }
 
+        private static void ensureDiskLoaded() {
+            if (diskLoaded) return;
+            synchronized (DISK_LOCK) {
+                if (diskLoaded) return;
+                diskLoaded = true;
+                try {
+                    YoruApp app = YoruApp.app();
+                    if (app == null || app.getCacheDir() == null) return;
+                    File f = new File(app.getCacheDir(), "dns_cache.properties");
+                    if (!f.exists()) return;
+                    Properties p = new Properties();
+                    try (FileInputStream fis = new FileInputStream(f)) {
+                        p.load(fis);
+                    }
+                    for (String host : p.stringPropertyNames()) {
+                        String raw = p.getProperty(host, "");
+                        if (raw.isEmpty()) continue;
+                        String[] parts = raw.split("\\|", 2);
+                        if (parts.length < 2) continue;
+                        long exp = 0;
+                        try { exp = Long.parseLong(parts[1]); } catch (Exception ignored) {}
+                        String[] ips = parts[0].split(",");
+                        ArrayList<InetAddress> addrs = new ArrayList<>();
+                        for (String ipStr : ips) {
+                            ipStr = ipStr.trim();
+                            if (ipStr.isEmpty()) continue;
+                            try {
+                                byte[] bytes = InetAddress.getByName(ipStr).getAddress();
+                                addrs.add(InetAddress.getByAddress(host, bytes));
+                            } catch (Exception ignored) {}
+                        }
+                        if (!addrs.isEmpty()) {
+                            CACHE.put(host, new DnsEntry(addrs, exp));
+                        }
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+
+        private static void persistToDisk() {
+            YoruApp app = YoruApp.app();
+            if (app == null || app.discovery == null || app.getCacheDir() == null) return;
+            app.discovery.execute(() -> {
+                synchronized (DISK_LOCK) {
+                    try {
+                        File f = new File(app.getCacheDir(), "dns_cache.properties");
+                        Properties p = new Properties();
+                        for (Map.Entry<String, DnsEntry> entry : CACHE.entrySet()) {
+                            StringBuilder sb = new StringBuilder();
+                            for (InetAddress addr : entry.getValue().addresses) {
+                                if (sb.length() > 0) sb.append(',');
+                                sb.append(addr.getHostAddress());
+                            }
+                            sb.append('|').append(entry.getValue().expiresAt);
+                            p.setProperty(entry.getKey(), sb.toString());
+                        }
+                        try (FileOutputStream fos = new FileOutputStream(f)) {
+                            p.store(fos, null);
+                        }
+                    } catch (Exception ignored) {}
+                }
+            });
+        }
+
+        private static void triggerAsyncRefresh(String hostname) {
+            YoruApp app = YoruApp.app();
+            if (app != null && app.discovery != null) {
+                app.discovery.execute(() -> {
+                    try {
+                        List<InetAddress> addresses = Arrays.asList(InetAddress.getAllByName(hostname));
+                        if (!addresses.isEmpty()) {
+                            CACHE.put(hostname, new DnsEntry(addresses, System.currentTimeMillis() + TTL));
+                            persistToDisk();
+                        }
+                    } catch (Exception ignored) {}
+                });
+            }
+        }
+
         @Override
         public List<InetAddress> lookup(String hostname) throws UnknownHostException {
             if (hostname == null) throw new UnknownHostException("hostname == null");
+            ensureDiskLoaded();
             long now = System.currentTimeMillis();
             DnsEntry entry = CACHE.get(hostname);
             if (entry != null && now < entry.expiresAt) {
+                return entry.addresses;
+            }
+            if (entry != null && !entry.addresses.isEmpty()) {
+                triggerAsyncRefresh(hostname);
                 return entry.addresses;
             }
             try {
                 List<InetAddress> addresses = Arrays.asList(InetAddress.getAllByName(hostname));
                 if (!addresses.isEmpty()) {
                     CACHE.put(hostname, new DnsEntry(addresses, now + TTL));
+                    persistToDisk();
                     return addresses;
                 }
             } catch (Exception e) {
@@ -66,18 +155,40 @@ public final class Net {
 
         public static void prewarm(String... hosts) {
             if (hosts == null) return;
+            ensureDiskLoaded();
             for (String h : hosts) {
-                if (h == null || h.isEmpty() || CACHE.containsKey(h)) continue;
+                if (h == null || h.isEmpty()) continue;
+                DnsEntry entry = CACHE.get(h);
+                if (entry != null && System.currentTimeMillis() < entry.expiresAt) continue;
                 YoruApp app = YoruApp.app();
                 if (app != null && app.io != null) {
                     app.io.execute(() -> {
                         try {
                             List<InetAddress> addresses = Arrays.asList(InetAddress.getAllByName(h));
-                            if (!addresses.isEmpty()) CACHE.put(h, new DnsEntry(addresses, System.currentTimeMillis() + TTL));
+                            if (!addresses.isEmpty()) {
+                                CACHE.put(h, new DnsEntry(addresses, System.currentTimeMillis() + TTL));
+                                persistToDisk();
+                            }
                         } catch (Exception ignored) {}
                     });
                 }
             }
+        }
+    }
+
+    public static void prewarmConnections(String... urls) {
+        if (urls == null) return;
+        for (String url : urls) {
+            if (url == null || url.isEmpty()) continue;
+            try {
+                Request req = new Request.Builder().url(url).head().tag(String.class, BG).build();
+                BASE.newCall(req).enqueue(new Callback() {
+                    @Override public void onFailure(Call call, IOException e) {}
+                    @Override public void onResponse(Call call, Response response) {
+                        try { response.close(); } catch (Exception ignored) {}
+                    }
+                });
+            } catch (Exception ignored) {}
         }
     }
 
@@ -100,7 +211,7 @@ public final class Net {
 
     static {
         ThreadPoolExecutor dispatcherPool = new ThreadPoolExecutor(
-                16, 64, 30L, TimeUnit.SECONDS,
+                32, 128, 30L, TimeUnit.SECONDS,
                 new SynchronousQueue<>(),
                 r -> {
                     Thread t = new Thread(r, "yoru-net-disp");
@@ -109,8 +220,8 @@ public final class Net {
                 }
         );
         DISPATCHER = new Dispatcher(dispatcherPool);
-        DISPATCHER.setMaxRequests(256);
-        DISPATCHER.setMaxRequestsPerHost(64);
+        DISPATCHER.setMaxRequests(512);
+        DISPATCHER.setMaxRequestsPerHost(128);
         BASE = new OkHttpClient.Builder()
                 .dispatcher(DISPATCHER)
                 .connectionPool(POOL)
@@ -119,9 +230,10 @@ public final class Net {
                 .followRedirects(false)
                 .followSslRedirects(false)
                 .retryOnConnectionFailure(true)
-                .connectTimeout(2500, TimeUnit.MILLISECONDS)
-                .readTimeout(5000, TimeUnit.MILLISECONDS)
-                .writeTimeout(5000, TimeUnit.MILLISECONDS)
+                .connectTimeout(2000, TimeUnit.MILLISECONDS)
+                .readTimeout(4500, TimeUnit.MILLISECONDS)
+                .writeTimeout(4500, TimeUnit.MILLISECONDS)
+                .pingInterval(20, TimeUnit.SECONDS)
                 .build();
     }
     private Net() {

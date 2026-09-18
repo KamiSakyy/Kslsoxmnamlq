@@ -75,7 +75,34 @@ public final class ApiRepository {
         catch(Net.HttpCode e){if(e.code==429)throw new IOException("Каталог временно занят Попробуйте позже");throw new IOException("Каталог сейчас недоступен Попробуйте другой вариант");}
     }
     public void refreshProtection(boolean force){shield.refresh(force);prewarmDns();}
-    public void prewarmDns(){try{ArrayList<String> hosts=new ArrayList<>();for(String u:SHIKI_GRAPH){String h=Uri.parse(u).getHost();if(h!=null&&!h.isEmpty())hosts.add(h);}for(String u:SHIKI_REST){String h=Uri.parse(u).getHost();if(h!=null&&!h.isEmpty())hosts.add(h);}Net.FastDns.prewarm(hosts.toArray(new String[0]));}catch(Exception ignored){}}
+    public void prewarmDns(){
+        try{
+            ArrayList<String> hosts=new ArrayList<>();
+            for(String u:SHIKI_GRAPH){String h=Uri.parse(u).getHost();if(h!=null&&!h.isEmpty()&&!hosts.contains(h))hosts.add(h);}
+            for(String u:SHIKI_REST){String h=Uri.parse(u).getHost();if(h!=null&&!h.isEmpty()&&!hosts.contains(h))hosts.add(h);}
+            for(String u:ANIX_BASES){String h=Uri.parse(u).getHost();if(h!=null&&!h.isEmpty()&&!hosts.contains(h))hosts.add(h);}
+            String anilistHost=Uri.parse(ANILIST_GRAPH).getHost();
+            if(anilistHost!=null&&!anilistHost.isEmpty()&&!hosts.contains(anilistHost))hosts.add(anilistHost);
+            String[] moreUrls={
+                Sec.s("3c07010906-694a4c190a-10220e5453-405b18371c-1856123611-4e02091532-000b"),
+                Sec.s("3c07010906694a4c130b1d270c1b40595318201c055614230c4c04545b2a0b105f551d55350714151a344a111709112a161c41"),
+                Sec.s("3c07010906694a4c13151d651c185c591c42225c14171c3e00"),
+                Sec.s("3c07010906694a4c13151d65061d5c5c5b54275d1a0b127c04131b4a15250c1457"),
+                Sec.s("3c07010906694a4c13151d6504175b5d57403b0001571a21024c04545b38001840535a"),
+                Sec.s("3c07010906694a4c130b1d26000d59511c553b1e5a18053a4a021c0c192e4a0d5d40"),
+                Sec.s("3c07010906694a4c1d0b18220b1c1c515c5f30061757163c084c")
+            };
+            for(String u:moreUrls){String h=Uri.parse(u).getHost();if(h!=null&&!h.isEmpty()&&!hosts.contains(h))hosts.add(h);}
+            Net.FastDns.prewarm(hosts.toArray(new String[0]));
+            Net.prewarmConnections(
+                SHIKI_GRAPH[0],
+                moreUrls[0],
+                moreUrls[1],
+                ANIX_BASES[0]
+            );
+            SourceResolver.prewarm(this);
+        }catch(Exception ignored){}
+    }
     String document(String u)throws Exception{return request(u,"GET",null,false);}
     String formPage(String u,String body)throws Exception{return request(u,"POST",body,true);}
     JSONObject get(String u)throws Exception{return new JSONObject(request(u,"GET",null,false));}
@@ -120,6 +147,8 @@ public final class ApiRepository {
     private Anime.Page allCatalog(String search,int page,Filter f)throws Exception{if(HentaiEngine.isHenta())return new HentaiEngine(this).catalog(search,page,f);if(filterActive(f)){Anime.Page smart=catalog(Sec.s("271b1c121c3e0a111b"),search,page,f);smart.note="Умная подборка";return smart;}Anime.Page out=new Anime.Page();out.page=page;LinkedHashMap<String,Anime> items=new LinkedHashMap<>();boolean more=false;int ok=0;boolean withAni=search!=null&&!search.trim().isEmpty();ExecutorService pool=Executors.newFixedThreadPool(Math.max(2,Math.min(5,REAL_SOURCES.length+1)));CompletionService<Anime.Page> done=new ExecutorCompletionService<>(pool);for(String source:REAL_SOURCES){final String src=source;done.submit(()->catalog(src,search,page,f));}if(withAni)done.submit(()->anilistCatalog(search.trim(),page));int tasks=REAL_SOURCES.length+(withAni?1:0);long deadline=System.currentTimeMillis()+((search==null||search.trim().isEmpty())?3600:5200);try{for(int i=0;i<tasks;i++){long left=deadline-System.currentTimeMillis();if(left<=0)break;Future<Anime.Page> future=done.poll(left,TimeUnit.MILLISECONDS);if(future==null)break;try{Anime.Page p=future.get();ok++;more|=p.more;for(Anime a:p.items)items.put(a.key(),a);if(items.size()>=24&&ok>=2)break;}catch(Exception ignored){}}}finally{pool.shutdownNow();}out.items.addAll(SourceEngine.mergeCatalog(items.values(),24));out.more=more;if((search==null||search.trim().isEmpty())&&countOf("all")>0)out.total=countOf("all");if(out.items.isEmpty()&&ok==0)throw new IOException("Tsuyu сейчас не получил подборку");return out;}
     public Anime quickDetails(Anime base)throws Exception{if(!Anime.valid(base))return base;YoruCache db=YoruApp.app()==null?null:YoruApp.app().cache;Anime cached=db==null?null:db.detail(base,18*60*60*1000L);if(Anime.valid(cached)){SourceEngine.absorb(base,cached);return remember(cached);}if(base.source.equals(Sec.s("3c161b0d14"))){try{return remember(new HentaiEngine(this).quickDetails(base));}catch(Exception e){return remember(base);}}Anime result=null;if(base.source.equals(Sec.s("271b1c121c3e0a111b"))){int id=base.malId>0?base.malId:parseInt(base.id);if(id>0)result=shikiQuick(id,base.source);}else if(base.source.equals("yoru")){int id=base.malId>0?base.malId:0;if(id>0){Anime meta=shikiQuick(id,"yoru");Anime a=yoruShell(meta);fillYoruMeta(a,meta);result=a;}else try{Anime y=findYummy(base);if(Anime.valid(y)){Anime a=yoruShell(y);fillYoruMeta(a,y);result=a;}}catch(Exception ignored){}}else if(base.source.equals(Sec.s("2d0618140c"))){JSONObject d=get(Sec.s("3c07010906694a4c13151d651c185c591c42225c14171c3e004c")+enc(base.id)).optJSONObject("response");result=d==null?base:yummyAnime(d);}else if(base.source.equals(Sec.s("351d1c14103f0c01"))){String slug=base.alias.isEmpty()?base.id:base.alias;result=amAnime(animelibDetail(slug,base).getJSONObject("data"));}else if(base.source.equals(Sec.s("351d1c151c31170a13")))result=libriaAnime(get(Sec.s("3c07010906694a4c130b1d270c1b40595318201c055614230c4c04545b2a0b105f551d44311f10180636164c")+enc(base.id)));else if(base.source.equals(Sec.s("3c161b0d14")))result=new HentaiEngine(this).quickDetails(base);else result=details(base,false);if(!Anime.valid(result))result=base;if(result.year==0)result.year=base.year;if(result.description.isEmpty())result.description=base.description;if(result.poster.isEmpty())result.poster=base.poster;if(db!=null)db.detail(result);return remember(result);}
     public void prefetchQuickDetails(Collection<Anime> rows,int max){if(rows==null)return;Net.bg(true);try{int n=0;for(Anime a:rows){if(!Anime.valid(a))continue;if(++n>max)break;try{quickDetails(a);}catch(Exception ignored){}}}finally{Net.bg(false);}}
+    public void prefetchEpisodeList(Anime a){if(!Anime.valid(a))return;YoruApp app=YoruApp.app();if(app==null||app.cache==null||app.discovery==null||app.savingMobile())return;app.discovery.execute(()->Net.runBg(()->{try{Anime cached=app.cache.detail(a,14*24*60*60*1000L);if(cached!=null&&!cached.episodeList.isEmpty()&&playableEpisodes(cached)>0)return;Anime target=a;if(Sec.s("271b1c121c3e0a111b").equals(a.source))target=yoruShell(a);playback(target,"yoru");}catch(Exception ignored){}}));}
+    public void prefetchEpisodes(Collection<Anime> rows,int max){if(rows==null)return;int n=0;for(Anime a:rows){if(!Anime.valid(a))continue;if(++n>max)break;prefetchEpisodeList(a);}}
     public int airedEpisodes(Anime a)throws Exception{int mal=malIdOf(a);if(mal<=0)throw new IOException("Нет id");JSONArray rows=shiki(Sec.s("2f121b101836164b1b01077147")+mal+Sec.s("765f1910183a1159434c0f22015957405b453b17100a5536150a010a102e16385b425752740001180126161e0f")).optJSONArray("animes");if(rows==null||rows.length()==0)throw new IOException("Аниме не найдено");JSONObject j=rows.getJSONObject(0);int episodes=j.optInt("episodes"),aired=j.optInt("episodesAired",0);String status=j.optString("status","");if(aired<=0&&episodes>0&&(status.equals("released")||status.equals("finished")||status.equals("complete")))aired=episodes;return aired;}
     private static int malIdOf(Anime a){if(a==null)return 0;return a.malId>0?a.malId:(Sec.s("271b1c121c3e0a111b").equals(a.source)?parseInt(a.id):0);}
     public HashMap<Long,String> episodeShots(Anime a){
@@ -344,7 +373,7 @@ public final class ApiRepository {
         ArrayList<String> sources=SourceEngine.discoveryOrder(original,shell);String pref="";boolean concrete=false;
         try{pref=YoruApp.app().store.voicePreference();concrete=!voiceKey(pref).isEmpty();}catch(Exception ignored){}
         if(concrete){ArrayList<String> focused=new ArrayList<>();for(String s:sources)if(sourceLikelyHasVoice(s,pref))focused.add(s);for(String s:sources)if(!focused.contains(s))focused.add(s);sources=focused;}
-        ExecutorService pool=Executors.newFixedThreadPool(Math.max(1,Math.min(8,sources.size()+1)));CompletionService<Anime> done=new ExecutorCompletionService<>(pool);int jobs=0;
+        ExecutorService pool=Executors.newFixedThreadPool(Math.max(2,Math.min(12,sources.size()+2)));CompletionService<Anime> done=new ExecutorCompletionService<>(pool);int jobs=0;
         if(!concrete||sourceLikelyHasVoice(Sec.s("2d0618140c"),pref)){done.submit(()->{try{Anime yy=yummyJob==null?null:yummyJob.get(20,TimeUnit.SECONDS);if(yy==null)return null;Anime full=details(yy,true);if(full==null||full.blocked||full.episodeList.isEmpty())return null;return full;}catch(Exception e){return null;}});jobs++;}
         for(String source:sources){done.submit(()->yoruFindSource(original,shell,source));jobs++;}
         long deadline=System.currentTimeMillis()+(concrete?10000:12000);boolean firstFound=false;

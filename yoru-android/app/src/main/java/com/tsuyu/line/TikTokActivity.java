@@ -935,6 +935,8 @@ public final class TikTokActivity extends Activity {
                     Ui.openPlayer(TikTokActivity.this, clip.anime, "yoru", clip.episode != null ? clip.episode.number : 1, clip.startMs);
                 }
             });
+            fullBtn.setBackground(Ui.shape(0xffa78bfa, 12, TikTokActivity.this));
+            fullBtn.setTextColor(0xffffffff);
             info.addView(fullBtn, Ui.lp(TikTokActivity.this, -2, 42));
 
             FrameLayout.LayoutParams ip = new FrameLayout.LayoutParams(-1, -2, Gravity.START | Gravity.BOTTOM);

@@ -337,6 +337,7 @@ public final class ApiRepository {
                         a.episodeList.addAll(cached.episodeList);
                         a.episodes=Math.max(a.episodes,a.episodeList.size());
                         fillYoruMeta(a,cached);
+                        return remember(a);
                     }
                 }catch(Exception ignored){}
             }
@@ -358,9 +359,11 @@ public final class ApiRepository {
             }
         }
         Anime meta=null;
-        if(metaJob!=null){
-            try{meta=metaJob.get(episodes?200:4000,TimeUnit.MILLISECONDS);}catch(Exception ignored){}
-        }else{
+        if(metaJob!=null&&metaJob.isDone()){
+            try{meta=metaJob.get();}catch(Exception ignored){}
+        }else if(metaJob!=null&&!episodes){
+            try{meta=metaJob.get(2000,TimeUnit.MILLISECONDS);}catch(Exception ignored){}
+        }else if(!episodes){
             try{int mal=y==null?0:y.malId;if(mal>0){Anime sh=new Anime();sh.source=Sec.s("271b1c121c3e0a111b");sh.id=String.valueOf(mal);meta=details(sh,false);}}catch(Exception ignored){}
         }
         try{if(meta!=null){fillYoruMeta(a,meta);for(Anime r:meta.related)a.related.add(r);}}catch(Exception ignored){}
@@ -384,7 +387,7 @@ public final class ApiRepository {
         try{for(int i=0;i<jobs;i++){long left=deadline-System.currentTimeMillis();if(left<=0)break;Future<Anime> f;try{f=done.poll(left,TimeUnit.MILLISECONDS);}catch(InterruptedException e){Thread.currentThread().interrupt();break;}if(f==null)break;try{Anime a=f.get();if(a!=null&&!a.episodeList.isEmpty()&&seen.add(a.source+":"+a.id)){out.add(a);if(!firstFound){firstFound=true;deadline=Math.min(deadline,System.currentTimeMillis()+(isMobile?120:250));}if(enoughYoruSources(out,pref,concrete,shell,isMobile))break;}}catch(Exception ignored){}}}finally{pool.shutdownNow();}
         out.sort(Comparator.comparingInt(a->1000-SourceEngine.score(a.source,a)));return out;
     }
-    private boolean enoughYoruSources(ArrayList<Anime> rows,String pref,boolean concrete,Anime shell,boolean isMobile){if(rows==null||rows.isEmpty())return false;int episodes=0;boolean preferred=false;for(Anime a:rows){episodes=Math.max(episodes,a==null?0:a.episodeList.size());if(concrete&&hasPreferredVoice(a,pref))preferred=true;}if(concrete&&preferred)return true;int target=shell==null?0:Math.max(shell.episodes,shell.episodesAired);int needEpisodes=target<=0?6:Math.min(target,12);if(isMobile&&episodes>=needEpisodes)return true;return rows.size()>=2&&(episodes>=needEpisodes);}
+    private boolean enoughYoruSources(ArrayList<Anime> rows,String pref,boolean concrete,Anime shell,boolean isMobile){if(rows==null||rows.isEmpty())return false;int episodes=0;for(Anime a:rows){episodes=Math.max(episodes,a==null?0:a.episodeList.size());}int target=shell==null?0:Math.max(shell.episodes,shell.episodesAired);int needEpisodes=target<=0?1:Math.min(target,6);return episodes>=needEpisodes;}
     private boolean hasPreferredVoice(Anime a,String pref){if(a==null||voiceKey(pref).isEmpty())return false;if(voiceMatches(pref,sourceVoice(a.source)))return true;for(Anime.Episode e:a.episodeList)for(Anime.Variant v:e.variants){String label=(v==null?"":v.name+" "+v.displayName+" "+v.player);if(voiceMatches(pref,label))return true;}return false;}
     private boolean sourceLikelyHasVoice(String source,String voice){String key=voiceKey(voice),s=SourceEngine.sourceId(source);if(key.isEmpty())return true;if(key.equals(Sec.s("351d1c1d0031")))return s.equals(Sec.s("351d1c1d0031"))||s.equals(Sec.s("2d0618140c"))||s.equals(Sec.s("351d1c0106360e021b"))||s.equals(Sec.s("3f1c11101e"));if(key.equals(Sec.s("351d1c1410250a1006")))return s.equals(Sec.s("351d1c1410250a1006"))||s.equals(Sec.s("2d0618140c"))||s.equals(Sec.s("3f1c11101e"));if(key.equals(Sec.s("351d1c1410370c02")))return s.equals(Sec.s("351d1c1410370c02"))||s.equals(Sec.s("2d0618140c"))||s.equals(Sec.s("3f1c11101e"));if(key.equals(Sec.s("351d1c151c31170a13")))return s.equals(Sec.s("351d1c151c31170a13"))||s.equals(Sec.s("351d1c14103f0c01"))||s.equals(Sec.s("351d1c14103f0c01460e"))||s.equals(Sec.s("2d0618140c"));return s.equals(Sec.s("2d0618140c"))||s.equals(Sec.s("351d1c0106360e021b"))||s.equals(Sec.s("3f1c11101e"))||s.equals(Sec.s("351d1c1410270e02"));}
     private void silentSweep(Anime a,Anime base){if(a==null||playableEpisodes(a)>0)return;long deadline=System.currentTimeMillis()+12000;ArrayList<String> order=null;try{order=SourceEngine.playbackOrder(base==null?a:base);}catch(Exception e){return;}if(order==null)return;for(String source:order){if(source==null||source.equals("yoru")||System.currentTimeMillis()>=deadline)continue;Anime got=null;try{got=findPlayableSource(a,source);}catch(Exception ignored){}if(got==null||got.episodeList.isEmpty()||playableEpisodes(got)<=0)continue;LinkedHashMap<String,Anime.Episode> map=new LinkedHashMap<>();try{mergeYoruEpisodes(map,got);}catch(Exception ignored){}if(map.isEmpty())continue;a.episodeList.clear();a.episodeList.addAll(map.values());a.episodeList.sort(Comparator.comparingDouble(e->e.number));a.episodes=Math.max(a.episodes,a.episodeList.size());try{a.episodesAired=Math.max(a.episodesAired,playableEpisodes(a));}catch(Exception ignored){}try{appendFutureEpisodes(a);}catch(Exception ignored){}try{applyEpisodeVisuals(a);}catch(Exception ignored){}try{remember(a);}catch(Exception ignored){}YoruCache db=YoruApp.app()==null?null:YoruApp.app().cache;if(db!=null)try{db.detail(a);}catch(Exception ignored){}break;}}

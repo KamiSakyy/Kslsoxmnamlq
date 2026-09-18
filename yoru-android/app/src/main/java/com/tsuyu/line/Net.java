@@ -227,6 +227,7 @@ public final class Net {
         if (contentType != null && contentType.startsWith("image/")) {
             return originalResponse.newBuilder()
                     .removeHeader("Pragma")
+                    .removeHeader("Vary")
                     .removeHeader("Cache-Control")
                     .header("Cache-Control", "public, max-age=604800")
                     .build();
@@ -234,6 +235,7 @@ public final class Net {
         int maxAge = mobile ? 600 : 180;
         return originalResponse.newBuilder()
                 .removeHeader("Pragma")
+                .removeHeader("Vary")
                 .removeHeader("Cache-Control")
                 .header("Cache-Control", "public, max-age=" + maxAge)
                 .build();

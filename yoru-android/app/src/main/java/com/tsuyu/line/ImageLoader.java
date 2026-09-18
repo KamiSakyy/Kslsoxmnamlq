@@ -143,6 +143,20 @@ public final class ImageLoader {
                     YoruApp app = YoruApp.app();
                     boolean online = app != null && app.traffic != null && app.traffic.connected();
                     if (ready == null && !url.isEmpty() && online) {
+                        boolean hasActive = false;
+                        synchronized (waitLock) {
+                            ArrayList<ImageView> list = waiters.get(key);
+                            if (list != null) {
+                                for (ImageView iv : list) {
+                                    if (iv != null && key.equals(iv.getTag())) {
+                                        hasActive = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (!hasActive) return;
+
                         byte[] bytes = downloadBytes(url);
                         if (bytes != null && bytes.length >= 64) {
                             saveRaw(file, bytes);

@@ -21,33 +21,12 @@ Daemon will be stopped at the end of the build
 > Task :app:processTsuyuDebugResources UP-TO-DATE
 
 > Task :app:compileTsuyuDebugJavaWithJavac
-/home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:203: error: constant string expression required
-            case Sec.s("351d1c14-10250a10-06"):{JSONArray rows=postForm(Sec.s("3c07010906694a4c13151d6504175b5d57403b0001571a21024c04545b220b1f5d"),"id",id).optJSONArray("data");if(rows==null||rows.length()==0)throw new IOException("Аниме не найдено");a=vostAnime(rows.getJSONObject(0));if(episodes){JSONArray list=new JSONArray(request(Sec.s("3c07010906694a4c13151d6504175b5d57403b0001571a21024c04545b3b09184b5c5b4520"),"POST","id="+enc(id),true));for(int i=0;i<list.length();i++){JSONObject e=list.getJSONObject(i);Anime.Episode ep=new Anime.Episode();ep.id=id+"-"+i;ep.name=e.optString("name","");ep.number=numberIn(ep.name,i+1);putStream(ep,480,e.optString("std"));putStream(ep,720,e.optString("hd"));a.episodeList.add(ep);}a.episodesAired=Math.max(a.episodesAired,a.episodeList.size());a.episodes=Math.max(a.episodes,a.episodeList.size());}break;}
-                      ^
-/home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:204: error: constant string expression required
-            case Sec.s("2d061814-0c"):{JSONObject d=get(Sec.s("3c07010906694a4c13151d651c185c591c42225c14171c3e004c")+enc(id)).optJSONObject("response");if(d==null)throw new IOException("Tsuyu не открыл карточку");a=yummyAnime(d);if(episodes){a.episodeList.addAll(YummyParser.episodes(id));a.episodesAired=Math.max(a.episodesAired,playableEpisodes(a));a.episodes=Math.max(a.episodes,a.episodeList.size());}break;}
-                      ^
-/home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:205: error: constant string expression required
-            case Sec.s("351d1c1d-0031"):{a=anidubDetails(base,episodes);break;}
-                      ^
-/home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:206: error: constant string expression required
-            case Sec.s("351d1c14-103f0c01"):{String slug=base.alias.isEmpty()?id:base.alias;JSONObject d=animelibDetail(slug,base).getJSONObject("data");a=amAnime(d);if(episodes){JSONArray rows=get(Sec.s("3c07010906694a4c13151d65061d5c5c5b54275d1a0b127c04131b4a113b0c0a5d5457456b121b1018363a0a1658")+enc(a.alias)).optJSONArray("data");for(int i=0;rows!=null&&i<rows.length();i++){JSONObject e=rows.getJSONObject(i);double n=e.optDouble("number",-1);if(n<0||!Double.isFinite(n))continue;Anime.Episode ep=new Anime.Episode();ep.id=e.optString("id");ep.number=n;ep.name=e.optString("name","");ep.poster=bestImage(e);ep.lazy=Sec.s("351d1c14-103f0c01");a.episodeList.add(ep);}a.episodeList.sort(Comparator.comparingDouble(e->e.number));a.episodesAired=Math.max(a.episodesAired,a.episodeList.size());a.episodes=Math.max(a.episodes,a.episodeList.size());}break;}
-                      ^
-/home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:207: error: constant string expression required
-            case Sec.s("351d1c14-103f0c01-460e"):{Anime copy=Anime.from(base.json());copy.source=Sec.s("351d1c14-103f0c01");a=details(copy,episodes);a.source=Sec.s("351d1c14-103f0c01-460e");break;}
-                      ^
-/home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:208: error: constant string expression required
-            case Sec.s("351d1c15-1c31170a-13"):{a=libriaAnime(get(Sec.s("3c07010906694a4c130b1d270c1b40595318201c055614230c4c04545b2a0b105f551d44311f10180636164c")+enc(id)));break;}
-                      ^
-/home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:209: error: constant string expression required
-            case Sec.s("351d1c14-10270e02"):{a=animetkaDetails(base,episodes);break;}
-                      ^
-/home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:211: error: constant string expression required
-            case Sec.s("3c121b10-1836"):{a=hanimeDetails(base,episodes);break;}case "kodik":{a=kodikDetails(base,episodes);break;}
-                      ^
+/home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:25: error: ANI_FIELDS has private access in AniListApi
+    private static final String ANI_FIELDS = AniListApi.ANI_FIELDS;
+                                                       ^
 Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
-8 errors
+1 error
 
 > Task :app:compileTsuyuDebugJavaWithJavac FAILED
 
@@ -58,33 +37,12 @@ FAILURE: Build failed with an exception.
 * What went wrong:
 Execution failed for task ':app:compileTsuyuDebugJavaWithJavac'.
 > Compilation failed; see the compiler output below.
-  /home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:203: error: constant string expression required
-              case Sec.s("351d1c14-10250a10-06"):{JSONArray rows=postForm(Sec.s("3c07010906694a4c13151d6504175b5d57403b0001571a21024c04545b220b1f5d"),"id",id).optJSONArray("data");if(rows==null||rows.length()==0)throw new IOException("Аниме не найдено");a=vostAnime(rows.getJSONObject(0));if(episodes){JSONArray list=new JSONArray(request(Sec.s("3c07010906694a4c13151d6504175b5d57403b0001571a21024c04545b3b09184b5c5b4520"),"POST","id="+enc(id),true));for(int i=0;i<list.length();i++){JSONObject e=list.getJSONObject(i);Anime.Episode ep=new Anime.Episode();ep.id=id+"-"+i;ep.name=e.optString("name","");ep.number=numberIn(ep.name,i+1);putStream(ep,480,e.optString("std"));putStream(ep,720,e.optString("hd"));a.episodeList.add(ep);}a.episodesAired=Math.max(a.episodesAired,a.episodeList.size());a.episodes=Math.max(a.episodes,a.episodeList.size());}break;}
-                        ^
-  /home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:204: error: constant string expression required
-              case Sec.s("2d061814-0c"):{JSONObject d=get(Sec.s("3c07010906694a4c13151d651c185c591c42225c14171c3e004c")+enc(id)).optJSONObject("response");if(d==null)throw new IOException("Tsuyu не открыл карточку");a=yummyAnime(d);if(episodes){a.episodeList.addAll(YummyParser.episodes(id));a.episodesAired=Math.max(a.episodesAired,playableEpisodes(a));a.episodes=Math.max(a.episodes,a.episodeList.size());}break;}
-                        ^
-  /home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:205: error: constant string expression required
-              case Sec.s("351d1c1d-0031"):{a=anidubDetails(base,episodes);break;}
-                        ^
-  /home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:206: error: constant string expression required
-              case Sec.s("351d1c14-103f0c01"):{String slug=base.alias.isEmpty()?id:base.alias;JSONObject d=animelibDetail(slug,base).getJSONObject("data");a=amAnime(d);if(episodes){JSONArray rows=get(Sec.s("3c07010906694a4c13151d65061d5c5c5b54275d1a0b127c04131b4a113b0c0a5d5457456b121b1018363a0a1658")+enc(a.alias)).optJSONArray("data");for(int i=0;rows!=null&&i<rows.length();i++){JSONObject e=rows.getJSONObject(i);double n=e.optDouble("number",-1);if(n<0||!Double.isFinite(n))continue;Anime.Episode ep=new Anime.Episode();ep.id=e.optString("id");ep.number=n;ep.name=e.optString("name","");ep.poster=bestImage(e);ep.lazy=Sec.s("351d1c14-103f0c01");a.episodeList.add(ep);}a.episodeList.sort(Comparator.comparingDouble(e->e.number));a.episodesAired=Math.max(a.episodesAired,a.episodeList.size());a.episodes=Math.max(a.episodes,a.episodeList.size());}break;}
-                        ^
-  /home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:207: error: constant string expression required
-              case Sec.s("351d1c14-103f0c01-460e"):{Anime copy=Anime.from(base.json());copy.source=Sec.s("351d1c14-103f0c01");a=details(copy,episodes);a.source=Sec.s("351d1c14-103f0c01-460e");break;}
-                        ^
-  /home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:208: error: constant string expression required
-              case Sec.s("351d1c15-1c31170a-13"):{a=libriaAnime(get(Sec.s("3c07010906694a4c130b1d270c1b40595318201c055614230c4c04545b2a0b105f551d44311f10180636164c")+enc(id)));break;}
-                        ^
-  /home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:209: error: constant string expression required
-              case Sec.s("351d1c14-10270e02"):{a=animetkaDetails(base,episodes);break;}
-                        ^
-  /home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:211: error: constant string expression required
-              case Sec.s("3c121b10-1836"):{a=hanimeDetails(base,episodes);break;}case "kodik":{a=kodikDetails(base,episodes);break;}
-                        ^
+  /home/runner/work/Kslsoxmnamlq/Kslsoxmnamlq/yoru-android/app/src/main/java/com/tsuyu/line/ApiRepository.java:25: error: ANI_FIELDS has private access in AniListApi
+      private static final String ANI_FIELDS = AniListApi.ANI_FIELDS;
+                                                         ^
   Note: Some input files use or override a deprecated API.
   Note: Recompile with -Xlint:deprecation for details.
-  8 errors
+  1 error
 
 * Try:
 > Check your code and dependencies to fix the compilation error(s)
@@ -96,5 +54,5 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD FAILED in 20s
+BUILD FAILED in 14s
 18 actionable tasks: 1 executed, 17 up-to-date

@@ -1,0 +1,82 @@
+plugins { id 'com.android.application' }
+def owner = new Properties()
+def ownerFile = rootProject.file('owner-signing/signing.properties')
+if (ownerFile.exists()) ownerFile.withInputStream { owner.load(it) }
+android {
+ namespace 'com.tsuyu.line'
+ compileSdk 36
+ defaultConfig {
+  applicationId 'com.tsuyu.line'
+  minSdk 26
+  targetSdk 36
+  versionCode 20
+  versionName '1.19'
+  ndk { abiFilters 'arm64-v8a', 'armeabi-v7a' }
+ }
+ flavorDimensions "app"
+ productFlavors {
+  tsuyu {
+   dimension "app"
+   resValue "string", "app_name", "Tsuyu"
+  }
+  henta {
+   dimension "app"
+   applicationId 'com.tsuyu.hentai'
+   versionCode 4
+   versionName '1.3'
+   resValue "string", "app_name", "Tsuyu H"
+  }
+ }
+ signingConfigs { release {
+  if (ownerFile.exists()) {
+   def p12 = rootProject.file('owner-signing/yoru-release.p12')
+   if (p12.exists()) { storeFile p12; storeType 'PKCS12' }
+   else storeFile rootProject.file('owner-signing/yoru-release.jks')
+   storePassword owner.getProperty('storePassword')
+   keyAlias owner.getProperty('keyAlias')
+   keyPassword owner.getProperty('keyPassword')
+  }
+  enableV1Signing true
+  enableV2Signing true
+  enableV3Signing true
+ } }
+ buildTypes {
+  release { minifyEnabled true; shrinkResources true; debuggable false; signingConfig signingConfigs.release; proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro' }
+  debug { applicationIdSuffix '.debug' }
+ }
+ buildFeatures { buildConfig true }
+ compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+ packaging {
+  resources {
+   excludes += [
+    'META-INF/DEPENDENCIES',
+    'META-INF/LICENSE*',
+    'META-INF/NOTICE*',
+    'META-INF/*.version',
+    'META-INF/*.md',
+    'META-INF/*.txt',
+    'META-INF/androidx/**',
+    'META-INF/kotlinx/**',
+    'kotlin/**',
+    '**.txt',
+    '**.md'
+   ]
+  }
+  jniLibs { useLegacyPackaging true }
+ }
+}
+
+dependencies {
+ testImplementation 'junit:junit:4.13.2'
+ implementation 'androidx.media3:media3-exoplayer:1.5.1'
+ implementation 'androidx.media3:media3-exoplayer-hls:1.5.1'
+ implementation 'androidx.media3:media3-exoplayer-dash:1.5.1'
+ implementation 'androidx.media3:media3-ui:1.5.1'
+ implementation 'androidx.media3:media3-database:1.5.1'
+ implementation 'org.jsoup:jsoup:1.18.3'
+ implementation 'com.squareup.okhttp3:okhttp:5.4.0'
+ implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+ implementation 'androidx.annotation:annotation:1.9.1'
+ implementation 'androidx.core:core:1.15.0'
+ implementation 'androidx.recyclerview:recyclerview:1.4.0'
+}

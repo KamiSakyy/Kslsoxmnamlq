@@ -1,0 +1,51 @@
+== 1. catalog pages (заголовки приложения) ==
+hentasis1.top OK 84692
+allhentaii.fun/2d OK 45182
+v6.hentakli.org OK 116713
+porncado.com/8-hentai OK 109452
+== 2. первая карточка с каждой страницы (regex приложения) ==
+hentasis title: https://hentasis1.top/1094-onaji-zemi-no-someya-san.html
+allhentaii title: https://allhentaii.fun/bigtits/1137-vdova-juki-onna-ne-umejuschaja-obschatsja-i-prokljatoe-kolco-hitozukiai-ga-nigate-na-miboujin-no-yukionna-san-to-noroi-no-yubiwa.html
+hentakli title: https://v6.hentakli.org/1276-sare-tsuma-wa-ubawaretai.html
+porncado title: https://porncado.com/252843-anime-hentai-yariko-underworld-ep2/
+== 3. страницы тайтлов + первый файл (regex приложения) ==
+hentasis title OK 109750
+hentasis file: https://svt05.hentasis1.top/hentasis2025/051/Onaji-Zemi-no-Someya_01_04_rus1_(www.Hentasis.top).mp4
+hentasis видео: https://svt05.hentasis1.top/hentasis2025/051/Onaji-Zemi-no-Someya_01_04_rus1_(www.Hentasis.top).mp4 -> bytes=8192 sig= MP4
+allhentaii title OK 49368
+allhentaii playlist path: /pl/2d2/21/playlist.txt?a=3
+allhentaii playlist OK
+allhentaii file: https://cdn.allhentai.fun/video/2d2/21/1.mp4?name=1
+allhentaii видео: https://cdn.allhentai.fun/video/2d2/21/1.mp4?name=1 -> bytes=8192 sig= MP4
+hentakli title OK 101829
+hentakli video.php: video.php?id=4967&cat=162,160,5,111,28,30,32,37,101,44,45,52,55,102,106,134,180,182,189,192,194,196,197,198,218
+hentakli video.php OK 19998
+hencdn: hencdn.top/video/8680
+hencdn page OK 17926
+hencdn m3u8: https://deu1c1t.storage-hencdn.com/hls/1788877427/10235_Sare-Tsuma-wa-Ubawaretai/01_raw_720.mp4/index-v1-a1.m3u8?token=st=1789606599~exp=178
+hencdn видео: https://deu1c1t.storage-hencdn.com/hls/1788877427/10235_Sare-Tsuma-wa-Ubawaretai/01_raw_720.mp4/index-v1-a1.m3u8?token=st=17896065 -> bytes=27706 sig=HLS
+porncado title OK 95346
+porncado file: https://xcdn1.nosofiles.com/c/4/1/f/2/output_69174643-4c31-42fc-9b91-ec5c95b2f14c_high.mp4?verify=1789589463-MvbBEbIUteemkMGi08bd67X1tYI36V9
+porncado видео: https://xcdn1.nosofiles.com/c/4/1/f/2/output_69174643-4c31-42fc-9b91-ec5c95b2f14c_high.mp4?verify=1789589463-MvbBEbIUteemkMGi08bd6 -> bytes=6211 sig=NONE
+porncado видео (browser GET): bytes=6254 sig=CF-CHALLENGE
+== 5. новые источники: animeidhentai (an) + hentaistream (he) ==
+an api/browse: bytes=49692
+an embed: https://nhplayer.com/v/tkf416ctxI6aoc1/
+an embed page: bytes=3881
+an video: https://r2.1hanime.com/pure-x-holic-junketsu-otome-to-konin-kankei-the-animation-2.mp4
+animeidhentai видео: https://r2.1hanime.com/pure-x-holic-junketsu-otome-to-konin-kankei-the-animation-2.mp4 -> bytes=5484 sig=NONE
+he search: bytes=48693
+he series: https://tube.hentaistream.com/hentaidvd/shoujo-ramune
+he series page: bytes=49773 eps=1
+he ep1: https://tube.hentaistream.com/shoujo-ramune-episode-01
+he episode page: bytes=58566
+he frame: frames/s32_Shoujo_Ramune_Episode_01.html
+he video: https://cdn1.streamhentai.org/Shoujo%20Ramune%20-%2001.mp4
+hentaistream видео (Shoujo Ramune): https://cdn1.streamhentai.org/Shoujo%20Ramune%20-%2001.mp4 -> bytes=8192 sig= MP4
+== 6. новый источник: hentai.tv (htv) + nhplayer ==
+htv home: bytes=290825 cards=26
+htv first embed: nhplayer.com/v/tkf416ctxI6aoc1
+htv nhplayer page: bytes=3881
+htv video: https://r2.1hanime.com/pure-x-holic-junketsu-otome-to-konin-kankei-the-animation-2.mp4
+hentai.tv видео: https://r2.1hanime.com/pure-x-holic-junketsu-otome-to-konin-kankei-the-animation-2.mp4 -> bytes=5484 sig=NONE
+== E2E RESULT: видео-сигналов 4/6 + htv (цепочка до mp4, CDN CF от DC) ==

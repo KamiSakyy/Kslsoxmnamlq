@@ -1,0 +1,14 @@
+const fs = require('fs');
+const h = fs.readFileSync('c18-ak-s.html', 'utf8');
+const i = h.indexOf('eval(function(p,a,c,k,e,d)');
+const j = h.indexOf('</script>', i);
+const call = h.slice(i, j).trim();
+const argsStart = call.lastIndexOf("('");
+const fnBody = call.slice(4, argsStart);
+const argsStr = call.slice(argsStart + 1, call.lastIndexOf(')'));
+const fn = eval('(' + fnBody + ')');
+const args = eval('[' + argsStr + ']');
+const decoded = fn.apply(null, args);
+fs.writeFileSync('c18-ak-layer1.js', decoded);
+console.log('layer1 bytes:', decoded.length);
+console.log(decoded.slice(0, 400));

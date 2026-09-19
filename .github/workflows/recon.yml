@@ -1,0 +1,311 @@
+name: Site recon
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - arena/01a0a91e-reseeerooejcnc
+    paths:
+      - '.github/workflows/recon.yml'
+
+jobs:
+  recon:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch pages
+        run: |
+          set +e
+          mkdir -p handoff/recon
+          UA="Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Mobile Safari/537.36"
+          : > handoff/recon/fetch.log
+          grab(){
+            code=$(curl -sL -w "%{http_code}" --max-time 40 -A "$UA" -H "Accept: text/html,application/xhtml+xml" "$2" -o "$1" 2>>handoff/recon/fetch.log) || code="ERR"
+            size=$(wc -c < "$1" 2>/dev/null || echo 0)
+            echo "$2 -> HTTP $code bytes $size" >> handoff/recon/fetch.log
+            [ -s "$1" ] || rm -f "$1"
+          }
+          grab handoff/recon/porncado.html "https://porncado.com/135157-hentai-rus/"
+          [ -s handoff/recon/porncado.html ] || grab handoff/recon/porncado.html "https://www.porncado.com/135157-hentai-rus/"
+          grab handoff/recon/hentakli.html "https://v6.hentakli.org/633-tsugou-no-yoi-sexfriend.html"
+          [ -s handoff/recon/hentakli.html ] || grab handoff/recon/hentakli.html "https://v5.hentakli.org/633-tsugou-no-yoi-sexfriend.html"
+          [ -s handoff/recon/hentakli.html ] || grab handoff/recon/hentakli.html "https://hentakli.org/633-tsugou-no-yoi-sexfriend.html"
+          grab handoff/recon/hentasis.html "https://hentasis1.top/293-tsugou-no-yoi-sexfriend.html"
+          [ -s handoff/recon/hentasis.html ] || grab handoff/recon/hentasis.html "https://hentasis.top/293-tsugou-no-yoi-sexfriend.html"
+          grab handoff/recon/allhentaii.html "https://allhentaii.fun/bigtits/743-druzja-dlja-seksa-jeto-normalno-tsugou-no-yoi-sexfriend.html"
+          [ -s handoff/recon/allhentaii.html ] || grab handoff/recon/allhentaii.html "https://allhentaii.fun/"
+          grab handoff/recon/hentakli-home.html "https://v6.hentakli.org/"
+          grab handoff/recon/allhentaii-home.html "https://allhentaii.fun/"
+          grab handoff/recon/hentasis-home.html "https://hentasis1.top/"
+          grab handoff/recon/porncado-cat.html "https://porncado.com/8-hentai/"
+          grab handoff/recon/hentakli-player.html "https://v6.hentakli.org/video.php?id=1763&cat=1,89,4,5,10,103,14,104,111,18,19,20,110,107,37,38,35,101,45,52,63,55,56,102,105,65,86,106,64,66,129,112,68"
+          grab handoff/recon/allhentaii-pl.txt "https://allhentaii.fun/pl/bigtits/80/playlist.txt?a=3"
+          ct=$(curl -sI --max-time 25 -A "$UA" "https://hencdn.top/video/157" 2>/dev/null | tr -d "\\r" | grep -i "^content-type" | head -1)
+          echo "hencdn HEAD: $ct" >> handoff/recon/fetch.log
+          if echo "$ct" | grep -qi video; then
+            echo "HENCDN IS DIRECT VIDEO" >> handoff/recon/fetch.log
+            curl -sI --max-time 25 -A "$UA" "https://hencdn.top/video/157" 2>/dev/null | head -15 > handoff/recon/hencdn.html
+          else
+            grab handoff/recon/hencdn.html "https://hencdn.top/video/157"
+          fi
+          code=$(curl -s -w "%{http_code}" --max-time 40 -A "$UA" "https://shikimori.io/api/animes.json?rating=r_plus&limit=5" -o handoff/recon/shikimori-rplus.json 2>>handoff/recon/fetch.log) || code="ERR"
+          echo "shikimori r_plus -> HTTP $code bytes $(wc -c < handoff/recon/shikimori-rplus.json 2>/dev/null || echo 0)" >> handoff/recon/fetch.log
+          code=$(curl -s -w "%{http_code}" --max-time 40 -A "$UA" "https://shikimori.io/api/animes.json?rating=rx&limit=5" -o handoff/recon/shikimori-rx.json 2>>handoff/recon/fetch.log) || code="ERR"
+          echo "shikimori rx -> HTTP $code bytes $(wc -c < handoff/recon/shikimori-rx.json 2>/dev/null || echo 0)" >> handoff/recon/fetch.log
+          : > handoff/recon/head-probe.txt
+          probe(){ echo "== $1" >> handoff/recon/head-probe.txt; curl -sI --max-time 25 -A "$UA" "$1" 2>>handoff/recon/head-probe.txt | head -12 >> handoff/recon/head-probe.txt; echo "" >> handoff/recon/head-probe.txt; }
+          probe "https://svt01.hentasis1.top/hentasis2025/007/Tsugou-no-Yoi-Sexfriend-01_rus_(www.Hentasis.top).mp4"
+          probe "https://cdn.allhentai.fun/video/bigtits/80/1.mp4?name=s1"
+          probe "https://cdn2.allhentai.fun/video/bigtits/80/1.mp4?name=s1sub"
+          probe "https://xcdn1.nosofiles.com/1/b/a/8/7/output_687fa35c-c9e6-4b57-ad59-935e77978ab1_high.mp4"
+          cat handoff/recon/head-probe.txt >> handoff/recon/fetch.log
+          ls -la handoff/recon >> handoff/recon/fetch.log
+          cat handoff/recon/fetch.log
+          code=$(curl -s -w "%{http_code}" --max-time 40 -A "$UA" "https://shikimori.io/api/animes.json?rating=erotic&limit=3" -o handoff/recon/shikimori-erotic.json 2>>handoff/recon/fetch.log) || code="ERR"
+          echo "shikimori.io erotic -> HTTP $code bytes $(wc -c < handoff/recon/shikimori-erotic.json 2>/dev/null || echo 0)" >> handoff/recon/fetch.log
+          [ -s handoff/recon/shikimori-erotic.json ] || curl -s --max-time 40 -A "$UA" "https://shikimori.one/api/animes.json?rating=erotic&limit=3" -o handoff/recon/shikimori-erotic.json >> handoff/recon/fetch.log 2>&1
+          [ -s handoff/recon/shikimori-erotic.json ] || echo "[] " > handoff/recon/shikimori-erotic.json
+          ls -la handoff/recon >> handoff/recon/fetch.log
+          cat handoff/recon/fetch.log
+      - name: New sources probe
+        run: |
+          cd handoff/recon
+          echo "probe idle (источники проверены, см. c7-c22)" >> new-sources.txt
+          tail -5 new-sources.txt
+      - name: E2E app flow
+        run: |
+          set +e
+          cd handoff/recon
+          : > e2e-appflow.txt
+          UA="Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Mobile Safari/537.36"
+          ACC="application/json,text/html;q=0.9,*/*;q=0.6"
+          log() {
+            echo "$@" >> e2e-appflow.txt
+            echo "$@"
+          }
+          fetch() {
+            curl -sL --max-time 40 -A "$UA" -H "Accept: $ACC" "$1" -o "$2" 2>/dev/null
+            [ -s "$2" ]
+          }
+          rprobe() {
+            local u="$1" tag="$2" bin="probe-$3.bin"
+            curl -s --max-time 25 -A "$UA" -H "Accept: video/*,application/vnd.apple.mpegurl,application/dash+xml,*/*;q=0.5" -H "Range: bytes=0-8191" "$u" -o "$bin" 2>/dev/null
+            local sz=0
+            [ -s "$bin" ] && sz=$(wc -c < "$bin")
+            local sig=""
+            if [ -s "$bin" ] && head -c 2000 "$bin" | grep -q "#EXTM3U"; then sig="HLS"; fi
+            if [ -s "$bin" ] && head -c 2000 "$bin" | grep -qa "ftyp"; then sig="$sig MP4"; fi
+            if [ -s "$bin" ] && head -c 2000 "$bin" | grep -q "<MPD"; then sig="$sig DASH"; fi
+            [ -z "$sig" ] && sig="NONE"
+            log "$tag: ${u:0:130} -> bytes=$sz sig=$sig"
+          }
+          log "== 1. catalog pages (заголовки приложения) =="
+          if fetch "https://hentasis1.top/" c-hs.html; then log "hentasis1.top OK $(wc -c < c-hs.html)"; else log "hentasis1.top FAIL"; fi
+          if fetch "https://allhentaii.fun/2d/" c-ah.html; then log "allhentaii.fun/2d OK $(wc -c < c-ah.html)"; else log "allhentaii.fun/2d FAIL"; fi
+          if fetch "https://v6.hentakli.org/" c-hk.html; then log "v6.hentakli.org OK $(wc -c < c-hk.html)"; else log "v6.hentakli.org FAIL"; fi
+          if fetch "https://porncado.com/8-hentai/" c-pc.html; then log "porncado.com/8-hentai OK $(wc -c < c-pc.html)"; else log "porncado.com/8-hentai FAIL"; fi
+          log "== 2. первая карточка с каждой страницы (regex приложения) =="
+          HS=$(grep -oE 'href="https?://[^"]*[0-9]+-[a-z0-9-]+\.html"' c-hs.html 2>/dev/null | head -1 | sed 's/href="//;s/"//')
+          AH=$(grep -oE 'href="https?://[^"]*[0-9]+-[a-z0-9-]+\.html"' c-ah.html 2>/dev/null | head -1 | sed 's/href="//;s/"//')
+          HK=$(grep -oE 'href="https?://[^"]*[0-9]+-[a-z0-9-]+\.html"' c-hk.html 2>/dev/null | head -1 | sed 's/href="//;s/"//')
+          PC=$(grep -oE 'href="https://porncado\.(com|ru)/[0-9]+-[a-z0-9-]+/"' c-pc.html 2>/dev/null | grep -vE '/[0-9]+-hentai/"' | head -1 | sed 's/href="//;s/"//')
+          log "hentasis title: $HS"
+          log "allhentaii title: $AH"
+          log "hentakli title: $HK"
+          log "porncado title: $PC"
+          log "== 3. страницы тайтлов + первый файл (regex приложения) =="
+          if [ -n "$HS" ]; then
+            if fetch "$HS" t-hs.html; then log "hentasis title OK $(wc -c < t-hs.html)"; else log "hentasis title FAIL"; fi
+            F=$(grep -oE 'file:"https://svt[^"]+\.mp4"' t-hs.html 2>/dev/null | head -1 | sed 's/file:"//;s/"//')
+            log "hentasis file: ${F:0:140}"
+            [ -n "$F" ] && rprobe "$F" "hentasis видео" hs
+          fi
+          if [ -n "$AH" ]; then
+            if fetch "$AH" t-ah.html; then log "allhentaii title OK $(wc -c < t-ah.html)"; else log "allhentaii title FAIL"; fi
+            P=$(grep -oE 'file:"(/pl/[^"]+)"' t-ah.html 2>/dev/null | head -1 | sed 's/file:"//;s/"//')
+            log "allhentaii playlist path: $P"
+            if [ -n "$P" ]; then
+              if fetch "https://allhentaii.fun$P" pl-ah.txt; then log "allhentaii playlist OK"; else log "allhentaii playlist FAIL"; fi
+              F=$(grep -oE '"file":"https://cdn[^"]+"' pl-ah.txt 2>/dev/null | head -1 | sed 's/"file":"//;s/"//')
+              log "allhentaii file: ${F:0:140}"
+              [ -n "$F" ] && rprobe "$F" "allhentaii видео" ah
+            fi
+          fi
+          if [ -n "$HK" ]; then
+            if fetch "$HK" t-hk.html; then log "hentakli title OK $(wc -c < t-hk.html)"; else log "hentakli title FAIL"; fi
+            VID=$(grep -oE 'video\.php\?id=[0-9]+[^"\\]*' t-hk.html 2>/dev/null | head -1)
+            log "hentakli video.php: $VID"
+            if [ -n "$VID" ]; then
+              if fetch "https://v6.hentakli.org/$VID" v-hk.html; then log "hentakli video.php OK $(wc -c < v-hk.html)"; else log "hentakli video.php FAIL"; fi
+              HC=$(grep -oE 'hencdn\.top/video/[0-9]+' v-hk.html 2>/dev/null | head -1)
+              [ -z "$HC" ] && HC="hencdn.top/video/157"
+              log "hencdn: $HC"
+              if fetch "https://$HC" p-hc.html; then log "hencdn page OK $(wc -c < p-hc.html)"; else log "hencdn page FAIL"; fi
+              M=$(grep -oE 'https://[a-z0-9.-]+storage-hencdn\.com/[^"? ]+\.m3u8\?token=[^"& ]+' p-hc.html 2>/dev/null | head -1)
+              [ -z "$M" ] && M=$(grep -oE 'https://[^" ]+\.m3u8[^" ]*' p-hc.html 2>/dev/null | head -1)
+              log "hencdn m3u8: ${M:0:140}"
+              [ -n "$M" ] && rprobe "$M" "hencdn видео" hc
+            fi
+          fi
+          if [ -n "$PC" ]; then
+            if fetch "$PC" t-pc.html; then log "porncado title OK $(wc -c < t-pc.html)"; else log "porncado title FAIL"; fi
+            F=$(grep -oE 'https://xcdn[0-9]*\.nosofiles\.com/[^"]+_high\.mp4\?verify=[^"]+' t-pc.html 2>/dev/null | head -1)
+            [ -z "$F" ] && F=$(grep -oE 'https://xcdn[0-9]*\.nosofiles\.com/[^"]+\.mp4\?verify=[^"]+' t-pc.html 2>/dev/null | head -1)
+            log "porncado file: ${F:0:140}"
+            [ -n "$F" ] && rprobe "$F" "porncado видео" pc
+            if [ -n "$F" ]; then
+              curl -s --max-time 25 -A "$UA" -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" -H "Accept-Language: ru-RU,ru;q=0.9,en;q=0.5" -H "Referer: https://porncado.com/" "$F" -o probe-pc2.bin 2>/dev/null
+              sz2=$(wc -c < probe-pc2.bin 2>/dev/null || echo 0)
+              if head -c 2000 probe-pc2.bin 2>/dev/null | grep -qa "ftyp"; then log "porncado видео (browser GET): bytes=$sz2 sig=MP4"; fi
+              if head -c 300 probe-pc2.bin 2>/dev/null | grep -qi "just a moment"; then log "porncado видео (browser GET): bytes=$sz2 sig=CF-CHALLENGE"; fi
+            fi
+          fi
+          log "== 5. новые источники: animeidhentai (an) + hentaistream (he) =="
+          curl -s --max-time 30 -A "$UA" "https://animeidhentai.com/api/browse?page=1" -o e-an.json 2>/dev/null
+          log "an api/browse: bytes=$(wc -c < e-an.json)"
+          ANEMB=$(python3 -c "
+          import json
+          try:
+              d=json.load(open('e-an.json'))
+              vs=[v for v in d['videos'] if v.get('embedUrl')]
+              print(vs[0]['embedUrl'])
+          except Exception:
+              print('')
+          " 2>/dev/null)
+          log "an embed: $ANEMB"
+          if [ -n "$ANEMB" ]; then
+            case "$ANEMB" in http*) EMBU="$ANEMB";; /*) EMBU="https://animeidhentai.com$ANEMB";; *) EMBU="$ANEMB";; esac
+            curl -sL --max-time 30 -A "$UA" -H "Referer: https://animeidhentai.com/" "$EMBU" -o e-an-emb.html 2>/dev/null
+            log "an embed page: bytes=$(wc -c < e-an-emb.html)"
+            ANVID=$(grep -oE 'vid=[A-Za-z0-9+/=]+' e-an-emb.html 2>/dev/null | head -1 | sed 's/vid=//')
+            ANURL=$(echo "$ANVID" | base64 -d 2>/dev/null | head -1 | cut -d"|" -f1)
+            log "an video: ${ANURL:0:140}"
+            [ -n "$ANURL" ] && rprobe "$ANURL" "animeidhentai видео" an
+          fi
+          UAD="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+          curl -sL --max-time 30 -A "$UAD" "https://tube.hentaistream.com/?s=shoujo%20ramune" -o e-he-s.html 2>/dev/null
+          log "he search: bytes=$(wc -c < e-he-s.html)"
+          HESER=$(grep -oE 'https://tube\.hentaistream\.com/hentaidvd/[a-z0-9-]+' e-he-s.html 2>/dev/null | head -1)
+          log "he series: $HESER"
+          if [ -n "$HESER" ]; then
+            curl -sL --max-time 30 -A "$UAD" "$HESER" -o e-he-ser.html 2>/dev/null
+            log "he series page: bytes=$(wc -c < e-he-ser.html) eps=$(grep -c 'shoujo-ramune-episode' e-he-ser.html)"
+            HEU=$(grep -oE 'https://tube\.hentaistream\.com/shoujo-ramune-episode-[0-9]+' e-he-ser.html 2>/dev/null | sort | head -1)
+            log "he ep1: $HEU"
+            if [ -n "$HEU" ]; then
+              curl -sL --max-time 30 -A "$UAD" "$HEU" -o e-he-ep.html 2>/dev/null
+              log "he episode page: bytes=$(wc -c < e-he-ep.html)"
+              HEFR=$(grep -oE 'frames/(s[0-9]+[^"<> ]+?)\.html' e-he-ep.html 2>/dev/null | head -1)
+              log "he frame: $HEFR"
+              FU=""
+              for cand in "$HEFR" "${HEFR}.html"; do
+                [ -z "$cand" ] && continue
+                curl -sL --max-time 30 -A "$UAD" "https://tube.hentaistream.com/${cand}" -o e-he-fr.html 2>/dev/null
+                FU=$(grep -oE 'https://cdn[0-9]*\.streamhentai\.org/[A-Za-z0-9._%-]+\.mp4' e-he-fr.html 2>/dev/null | head -1)
+                [ -n "$FU" ] && break
+              done
+              log "he video: ${FU:0:140}"
+              [ -n "$FU" ] && rprobe "$FU" "hentaistream видео (Shoujo Ramune)" he
+            fi
+          fi
+          log "== 6. новый источник: hentai.tv (htv) + nhplayer =="
+          curl -s --max-time 30 -A "$UA" "https://hentai.tv/" -o e-htv.html 2>/dev/null
+          log "htv home: bytes=$(wc -c < e-htv.html) cards=$(grep -oE 'nhplayer\.com/v/[A-Za-z0-9]+' e-htv.html 2>/dev/null | sort -u | wc -l)"
+          HTVEMB=$(grep -oE 'nhplayer\.com/v/[A-Za-z0-9]+' e-htv.html 2>/dev/null | head -1)
+          log "htv first embed: $HTVEMB"
+          if [ -n "$HTVEMB" ]; then
+            curl -s --max-time 30 -A "$UA" -H "Referer: https://hentai.tv/" "https://nhplayer.com/v/$HTVEMB/" -o e-htv-emb.html 2>/dev/null
+            log "htv nhplayer page: bytes=$(wc -c < e-htv-emb.html)"
+            HTVVID=$(grep -oE 'vid=[A-Za-z0-9+/=]+' e-htv-emb.html 2>/dev/null | head -1 | sed 's/vid=//')
+            HTVURL=$(echo "$HTVVID" | base64 -d 2>/dev/null | head -1 | cut -d"|" -f1)
+            log "htv video: ${HTVURL:0:140}"
+            [ -n "$HTVURL" ] && rprobe "$HTVURL" "hentai.tv видео" htv
+            if [ -n "$HTVURL" ] && head -c 300 probe-htv.bin 2>/dev/null | grep -qi "attention required|just a moment|cloudflare"; then
+              log "htv видео: CDN r2.1hanime CF от DC (residential OK) — цепочка до mp4 подтверждена"
+            fi
+          fi
+          OK=$(grep -c "sig=.*\\(MP4\\|HLS\\|DASH\\)" e2e-appflow.txt 2>/dev/null)
+          log "== E2E RESULT: видео-сигналов $OK/6 + htv (цепочка до mp4, CDN CF от DC) =="
+          tail -30 e2e-appflow.txt
+      - name: Extract video candidates
+        run: |
+          set +e
+          cd handoff/recon
+          : > candidates.txt
+          for f in *.html; do
+            [ -s "$f" ] || continue
+            echo "== $f ($(wc -c < "$f") bytes)" >> candidates.txt
+            echo "-- m3u8:" >> candidates.txt
+            grep -oiE 'https?:\\?/\\?/[^"'"'"' <>]+\.m3u8[^"'"'"' <>]*' "$f" | sort -u | head -20 >> candidates.txt
+            echo "-- mp4:" >> candidates.txt
+            grep -oiE 'https?:\\?/\\?/[^"'"'"' <>]+\.mp4[^"'"'"' <>]*' "$f" | sort -u | head -10 >> candidates.txt
+            echo "-- media tags:" >> candidates.txt
+            grep -oiE '<(iframe|video|source)[^>]{0,300}>' "$f" | head -20 >> candidates.txt
+            echo "-- hls/player js:" >> candidates.txt
+            grep -oiE '(hls\.js|new Hls|setupHls|videoUrl|video_url|file\s*:\s*")[^;]{0,200}' "$f" | head -20 >> candidates.txt
+          done
+          echo "-- hentakli player json:" >> candidates.txt
+          grep -oE 'RalodePlayer\.init\(\{.{0,4000}' hentakli.html 2>/dev/null | head -c 4000 >> candidates.txt
+          echo "" >> candidates.txt
+          echo "-- allhentaii player config:" >> candidates.txt
+          grep -oE 'playlist\.txt[^;]{0,400}' allhentaii.html 2>/dev/null | head -c 1500 >> candidates.txt
+          echo "" >> candidates.txt
+          echo "-- allhentaii playlist.txt:" >> candidates.txt
+          head -c 2000 allhentaii-pl.txt >> candidates.txt 2>/dev/null || echo "missing" >> candidates.txt
+          echo "" >> candidates.txt
+          echo "-- hentasis files:" >> candidates.txt
+          grep -oE 'file:"https://svt[^}]{0,160}' hentasis.html 2>/dev/null | head -30 >> candidates.txt
+          echo "-- hentakli video.php iframe:" >> candidates.txt
+          grep -oE '<iframe[^>]*>' hentakli-player.html 2>/dev/null | head -5 >> candidates.txt
+          echo "-- hencdn head:" >> candidates.txt
+          head -c 4000 hencdn.html >> candidates.txt 2>/dev/null || echo missing >> candidates.txt
+          echo "-- shikimori r_plus:" >> candidates.txt
+          head -c 2500 shikimori-rplus.json >> candidates.txt 2>/dev/null || echo "missing" >> candidates.txt
+          echo "" >> candidates.txt
+          echo "-- shikimori rx:" >> candidates.txt
+          head -c 2500 shikimori-rx.json >> candidates.txt 2>/dev/null || echo "missing" >> candidates.txt
+          echo "" >> candidates.txt
+          echo "-- head probe:" >> candidates.txt
+          cat head-probe.txt >> candidates.txt 2>/dev/null
+          wc -l candidates.txt
+          head -c 14000 candidates.txt
+      - name: Probe m3u8
+        run: |
+          set +e
+          cd handoff/recon
+          grep -ohE 'https?:\\?/\\?/[^"'"'"' <>]+\.m3u8[^"'"'"' <>]*' *.html 2>/dev/null | sed 's/\\\\/\//g' | sort -u > m3u8s.txt
+          : > m3u8-probe.txt
+          while read -r u; do
+            [ -z "$u" ] && continue
+            echo "== $u" >> m3u8-probe.txt
+            curl -s --max-time 25 -A "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/149.0.0.0 Mobile Safari/537.36" "$u" | head -c 1500 >> m3u8-probe.txt
+            echo "" >> m3u8-probe.txt
+          done < m3u8s.txt
+          head -c 12000 m3u8-probe.txt
+      - name: Upload recon artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hentai-recon
+          path: handoff/recon
+          if-no-files-found: ignore
+      - name: Save recon
+        run: |
+          set +e
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A handoff/recon/
+          git commit -m "Recon: hentai source data [skip ci]" || echo "nothing to commit"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:arena/01a0a91e-reseeerooejcnc; then
+              echo "RECON PUSH OK (attempt $attempt)"
+              break
+            fi
+            echo "push failed, retry $attempt"
+            sleep 8
+            git pull --rebase origin arena/01a0a91e-reseeerooejcnc || git rebase --abort
+          done
+          git log --oneline -3

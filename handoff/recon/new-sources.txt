@@ -1,0 +1,35 @@
+== HTV generality c22 ==
+home bytes=290825 cards=26
+series bytes=75992 cards=14
+code=2rqFyTJUcIxdn2v host=r2.1hanime.com
+  probe r2.1hanime.com: https://r2.1hanime.com/shoujo-ramune-5.mp4?12 -> bytes=5484 sig=NONE
+code=BMPaPILU7iolj8f host=r2.1hanime.com
+  probe r2.1hanime.com: https://r2.1hanime.com/sare-tsuma-wa-ubawaretai-1.mp4 -> bytes=5484 sig=NONE
+code=EHKFjVOxNKJN6ve host=r2.1hanime.com
+  probe r2.1hanime.com: https://r2.1hanime.com/shoujo-ramune-4.mp4 -> bytes=5484 sig=NONE
+code=MqaHEYBRGiOrNqg host=r2.1hanime.com
+  probe r2.1hanime.com: https://r2.1hanime.com/kanojo-saimin-1.mp4 -> bytes=5484 sig=NONE
+code=TrJtixK9fkwWjQn host=r2.1hanime.com
+  probe r2.1hanime.com: https://r2.1hanime.com/pure-x-holic-junketsu-otome-to-konin-kankei-the-animation-1.mp4 -> bytes=5484 sig=NONE
+code=U3g9ASak4eSW9jG host=r2.1hanime.com
+  probe r2.1hanime.com: https://r2.1hanime.com/shoujo-ramune-7.mp4 -> bytes=5484 sig=NONE
+code=gNdMuTKLKMlunRe host=r2.1hanime.com
+  probe r2.1hanime.com: https://r2.1hanime.com/kanojo-saimin-2.mp4 -> bytes=5484 sig=NONE
+code=ikbN4WNjcSUEBkp host=r2.1hanime.com
+  probe r2.1hanime.com: https://r2.1hanime.com/shoujo-ramune-1.mp4 -> bytes=5484 sig=NONE
+code=kHYDaBtxl39kpb3 host=r2.1hanime.com
+  probe r2.1hanime.com: https://r2.1hanime.com/muchuu-no-tou-2.mp4 -> bytes=5484 sig=NONE
+code=lFf1zzLgcw3Vcjp host=r2.1hanime.com
+  probe r2.1hanime.com: https://r2.1hanime.com/shoujo-ramune-6.mp4 -> bytes=5484 sig=NONE
+code=nzhRQZcQOdajGon host=r2.1hanime.com
+  probe r2.1hanime.com: https://r2.1hanime.com/shoujo-ramune-2.mp4 -> bytes=5484 sig=NONE
+code=tkf416ctxI6aoc1 host=r2.1hanime.com
+  probe r2.1hanime.com: https://r2.1hanime.com/pure-x-holic-junketsu-otome-to-konin-kankei-the-animation-2.mp4 -> bytes=5484 sig=NONE
+code=uwkxACe5qJzJtVP host=r2.1hanime.com
+  probe r2.1hanime.com: https://r2.1hanime.com/kokuhaku-4.mp4 -> bytes=5484 sig=NONE
+code=z4rceMmpawLraG3 host=r2.1hanime.com
+  probe r2.1hanime.com: https://r2.1hanime.com/shoujo-ramune-3.mp4 -> bytes=5484 sig=NONE
+== nhplayer без referer ==
+no-ref: 200 bytes=3655
+== DONE c22 ==
+probe idle (источники проверены, см. c7-c22)

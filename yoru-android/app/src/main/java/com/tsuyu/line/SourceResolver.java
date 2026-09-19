@@ -168,10 +168,17 @@ public final class SourceResolver {
             try {
                 String searchUrl = mal > 0
                         ? repo.query(Sec.s("3c07010906694a4c190a10220e1842591c553b1e5a0a103217001a"), repo.params("token", token(repo), Sec.s("271b1c121c3e0a111b3a1d2f"), String.valueOf(mal), Sec.s("231a01112a36150a010a102e16"), "true"))
-                        : repo.query(Sec.s("3c07010906694a4c190a10220e1842591c553b1e5a0a103217001a"), repo.params("token", token(repo), "title", shell.title, Sec.s("231a01112a36150a010a102e16"), "true"));
+                        : (shell.kpId > 0
+                            ? repo.query(Sec.s("3c07010906694a4c190a10220e1842591c553b1e5a0a103217001a"), repo.params("token", token(repo), Sec.s("3f1a1b16053c0c10193a1d2f"), String.valueOf(shell.kpId), Sec.s("231a01112a36150a010a102e16"), "true"))
+                            : repo.query(Sec.s("3c07010906694a4c190a10220e1842591c553b1e5a0a103217001a"), repo.params("token", token(repo), "title", shell.title, Sec.s("231a01112a36150a010a102e16"), "true")));
                 JSONObject root = repo.get(searchUrl);
                 results = root.optJSONArray("results");
-                if ((results == null || results.length() == 0) && mal > 0 && !shell.title.isEmpty()) {
+                if ((results == null || results.length() == 0) && mal > 0 && shell.kpId > 0) {
+                    String kpSearch = repo.query(Sec.s("3c07010906694a4c190a10220e1842591c553b1e5a0a103217001a"), repo.params("token", token(repo), Sec.s("3f1a1b16053c0c10193a1d2f"), String.valueOf(shell.kpId), Sec.s("231a01112a36150a010a102e16"), "true"));
+                    JSONObject kpRoot = repo.get(kpSearch);
+                    results = kpRoot.optJSONArray("results");
+                }
+                if ((results == null || results.length() == 0) && !shell.title.isEmpty()) {
                     String fallbackSearch = repo.query(Sec.s("3c07010906694a4c190a10220e1842591c553b1e5a0a103217001a"), repo.params("token", token(repo), "title", shell.title, Sec.s("231a01112a36150a010a102e16"), "true"));
                     JSONObject fbRoot = repo.get(fallbackSearch);
                     results = fbRoot.optJSONArray("results");

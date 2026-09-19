@@ -18,6 +18,8 @@ final class SeriesWatcher extends SQLiteOpenHelper {
     static final long PERIOD=15L*60*1000;
     private static volatile HashMap<String,Boolean> memo=new HashMap<>();
     private static volatile long memoAt;
+    private static volatile Set<String> watchedCache;
+    private static volatile long watchedCacheAt;
 
     SeriesWatcher(Context context){super(context.getApplicationContext(),"series-watcher.db",null,1);}
 
@@ -46,19 +48,24 @@ final class SeriesWatcher extends SQLiteOpenHelper {
         }catch(Exception e){return false;}
     }
 
+    private static synchronized Set<String> getWatchedCache(){
+        long now=System.currentTimeMillis();
+        if(watchedCache!=null&&now-watchedCacheAt<30000L)return watchedCache;
+        Set<String> set=new HashSet<>();
+        try(SeriesWatcher store=new SeriesWatcher(YoruApp.app());
+            Cursor c=store.getReadableDatabase().rawQuery("SELECT id FROM watches",null)){
+            while(c.moveToNext())set.add(c.getString(0));
+        }catch(Exception ignored){}
+        watchedCache=set;
+        watchedCacheAt=now;
+        return set;
+    }
+
     static boolean has(Anime anime,double episode){
+        if(anime==null)return false;
         try{
-            if(anime==null)return false;
-            long now=System.currentTimeMillis();
-            if(now-memoAt>2000){memo=new HashMap<>();memoAt=now;}
             String id=watchId(anime,episode);
-            Boolean hit=memo.get(id);
-            if(hit!=null)return hit.booleanValue();
-            try(SeriesWatcher store=new SeriesWatcher(YoruApp.app())){
-                boolean on=store.watched(id);
-                memo.put(id,on);
-                return on;
-            }
+            return getWatchedCache().contains(id);
         }catch(Exception e){return false;}
     }
 
@@ -74,11 +81,13 @@ final class SeriesWatcher extends SQLiteOpenHelper {
         v.put("notified",0);
         v.put("created",System.currentTimeMillis());
         getWritableDatabase().insertWithOnConflict("watches",null,v,SQLiteDatabase.CONFLICT_REPLACE);
+        watchedCache=null;
         memo.clear();
     }
 
     void forget(String id){
         getWritableDatabase().delete("watches","id=?",new String[]{id});
+        watchedCache=null;
         memo.clear();
     }
 

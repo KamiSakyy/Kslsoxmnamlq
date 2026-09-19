@@ -336,7 +336,7 @@ public final class ApiRepository {
             if(db!=null){
                 try{
                     Anime cached=db.detail(a,24*60*60*1000L);
-                    if(cached!=null&&!cached.episodeList.isEmpty()&&playableEpisodes(cached)>0&&countVoices(cached)>1){
+                    if(cached!=null&&!cached.episodeList.isEmpty()&&playableEpisodes(cached)>0&&countVoices(cached)>=6){
                         a.episodeList.clear();
                         a.episodeList.addAll(cached.episodeList);
                         a.episodes=Math.max(a.episodes,a.episodeList.size());
@@ -356,7 +356,7 @@ public final class ApiRepository {
                 appendFutureEpisodes(a);
                 applyEpisodeVisuals(a);
                 if(db!=null&&!a.episodeList.isEmpty())db.detail(a);
-                if(a.episodeList.isEmpty()||playableEpisodes(a)<=0){
+                if(a.episodeList.isEmpty()||playableEpisodes(a)<=0||countVoices(a)<6){
                     silentSweep(a,base);
                     if(db!=null&&!a.episodeList.isEmpty())db.detail(a);
                 }
@@ -386,11 +386,49 @@ public final class ApiRepository {
         CompletionService<Anime> done=new ExecutorCompletionService<>(pool);int jobs=0;
         done.submit(()->{try{Anime yy=yummyJob==null?null:yummyJob.get(10,TimeUnit.SECONDS);if(yy==null)return null;Anime full=details(yy,true);if(full==null||full.blocked||full.episodeList.isEmpty())return null;return full;}catch(Exception e){return null;}});jobs++;
         for(String source:sources){final String src=source;done.submit(()->yoruFindSource(original,shell,src));jobs++;}
-        long deadline=System.currentTimeMillis()+(isMobile?3500:5000);
-        try{for(int i=0;i<jobs;i++){long left=deadline-System.currentTimeMillis();if(left<=0)break;Future<Anime> f;try{f=done.poll(left,TimeUnit.MILLISECONDS);}catch(InterruptedException e){Thread.currentThread().interrupt();break;}if(f==null)break;try{Anime a=f.get();if(a!=null&&!a.episodeList.isEmpty()&&seen.add(a.source+":"+a.id)){out.add(a);}}catch(Exception ignored){}}}finally{pool.shutdownNow();}
+        long deadline=System.currentTimeMillis()+(concrete?12000:15000);
+        boolean firstFound=false;
+        try{
+            for(int i=0;i<jobs;i++){
+                long left=deadline-System.currentTimeMillis();
+                if(left<=0)break;
+                Future<Anime> f;
+                try{f=done.poll(left,TimeUnit.MILLISECONDS);}
+                catch(InterruptedException e){Thread.currentThread().interrupt();break;}
+                if(f==null)break;
+                try{
+                    Anime a=f.get();
+                    if(a!=null&&!a.episodeList.isEmpty()&&seen.add(a.source+":"+a.id)){
+                        out.add(a);
+                        if(!firstFound){
+                            firstFound=true;
+                            deadline=Math.min(deadline,System.currentTimeMillis()+(isMobile?3500:5000));
+                        }
+                        if(enoughYoruSources(out,pref,concrete,shell,isMobile))break;
+                    }
+                }catch(Exception ignored){}
+            }
+        }finally{
+            pool.shutdownNow();
+        }
         out.sort(Comparator.comparingInt(a->1000-SourceEngine.score(a.source,a)));return out;
     }
-    private boolean enoughYoruSources(ArrayList<Anime> rows,String pref,boolean concrete,Anime shell,boolean isMobile){if(rows==null||rows.isEmpty())return false;int episodes=0;for(Anime a:rows){episodes=Math.max(episodes,a==null?0:a.episodeList.size());}int target=shell==null?0:Math.max(shell.episodes,shell.episodesAired);int needEpisodes=target<=0?1:Math.min(target,6);return episodes>=needEpisodes;}
+    private boolean enoughYoruSources(ArrayList<Anime> rows,String pref,boolean concrete,Anime shell,boolean isMobile){
+        if(rows==null||rows.isEmpty())return false;
+        int episodes=0;
+        HashSet<String> vSet=new HashSet<>();
+        for(Anime a:rows){
+            if(a==null)continue;
+            episodes=Math.max(episodes,a.episodeList.size());
+            for(Anime.Episode e:a.episodeList)for(Anime.Variant v:e.variants){
+                String k=voiceKey(v.name);
+                if(!k.isEmpty())vSet.add(k);
+            }
+        }
+        int target=shell==null?0:Math.max(shell.episodes,shell.episodesAired);
+        int needEpisodes=target<=0?1:Math.min(target,6);
+        return rows.size()>=3 && vSet.size()>=8 && episodes>=needEpisodes;
+    }
     private boolean hasPreferredVoice(Anime a,String pref){if(a==null||voiceKey(pref).isEmpty())return false;if(voiceMatches(pref,sourceVoice(a.source)))return true;for(Anime.Episode e:a.episodeList)for(Anime.Variant v:e.variants){String label=(v==null?"":v.name+" "+v.displayName+" "+v.player);if(voiceMatches(pref,label))return true;}return false;}
     private boolean sourceLikelyHasVoice(String source,String voice){String key=voiceKey(voice),s=SourceEngine.sourceId(source);if(key.isEmpty())return true;if(key.equals(Sec.s("351d1c1d0031")))return s.equals(Sec.s("351d1c1d0031"))||s.equals(Sec.s("2d0618140c"))||s.equals(Sec.s("351d1c0106360e021b"))||s.equals(Sec.s("3f1c11101e"));if(key.equals(Sec.s("351d1c1410250a1006")))return s.equals(Sec.s("351d1c1410250a1006"))||s.equals(Sec.s("2d0618140c"))||s.equals(Sec.s("3f1c11101e"));if(key.equals(Sec.s("351d1c1410370c02")))return s.equals(Sec.s("351d1c1410370c02"))||s.equals(Sec.s("2d0618140c"))||s.equals(Sec.s("3f1c11101e"));if(key.equals(Sec.s("351d1c151c31170a13")))return s.equals(Sec.s("351d1c151c31170a13"))||s.equals(Sec.s("351d1c14103f0c01"))||s.equals(Sec.s("351d1c14103f0c01460e"))||s.equals(Sec.s("2d0618140c"));return s.equals(Sec.s("2d0618140c"))||s.equals(Sec.s("351d1c0106360e021b"))||s.equals(Sec.s("3f1c11101e"))||s.equals(Sec.s("351d1c1410270e02"));}
     private void silentSweep(Anime a,Anime base){if(a==null)return;int voiceCount=0;HashSet<String> vSet=new HashSet<>();for(Anime.Episode e:a.episodeList){for(Anime.Variant v:e.variants){String k=voiceKey(v.name);if(!k.isEmpty())vSet.add(k);}}if(vSet.size()>=12)return;long deadline=System.currentTimeMillis()+10000;ArrayList<String> order=null;try{order=SourceEngine.discoveryOrder(base==null?a:base,null);}catch(Exception e){return;}if(order==null)return;LinkedHashMap<String,Anime.Episode> map=new LinkedHashMap<>();for(Anime.Episode e:a.episodeList){map.put(episodeParam(e.number),e);}boolean addedAny=false;for(String source:order){if(source==null||source.equals("yoru")||System.currentTimeMillis()>=deadline)continue;Anime got=null;try{got=findPlayableSource(a,source);}catch(Exception ignored){}if(got==null||got.episodeList.isEmpty()||playableEpisodes(got)<=0)continue;try{mergeYoruEpisodes(map,got);addedAny=true;}catch(Exception ignored){}}if(addedAny){a.episodeList.clear();a.episodeList.addAll(map.values());a.episodeList.sort(Comparator.comparingDouble(e->e.number));a.episodes=Math.max(a.episodes,a.episodeList.size());try{a.episodesAired=Math.max(a.episodesAired,playableEpisodes(a));}catch(Exception ignored){}try{appendFutureEpisodes(a);}catch(Exception ignored){}try{applyEpisodeVisuals(a);}catch(Exception ignored){}try{remember(a);}catch(Exception ignored){}YoruCache db=YoruApp.app()==null?null:YoruApp.app().cache;if(db!=null)try{db.detail(a);}catch(Exception ignored){}}}

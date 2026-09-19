@@ -53,6 +53,13 @@ public final class SourceResolver {
         });
     }
 
+    private static final String[] FALLBACK_TOKENS = {
+            Sec.s("641545404d63505a4204412e074c055150026247451d106b01014451177f5d40"),
+            Sec.s("3146414d436350521450442a564f565401576146141d4037015642554229551d"),
+            Sec.s("6045174e146a505516514d73541801540b0f6040401b433056521003152f5241"),
+            Sec.s("6d4a454d106652514a04477b0348060607536247114c4536075610554579001b")
+    };
+
     public static synchronized String token(ApiRepository repo) throws Exception {
         if (!publicToken.isEmpty() && System.currentTimeMillis() - tokenAt < TOKEN_TTL) return publicToken;
         YoruApp app = YoruApp.app();
@@ -67,20 +74,29 @@ public final class SourceResolver {
                 }
             }
         }
-        String script = repo.request(Sec.s("3c07010906694a4c190a10220e5453545618371c18561437014e02091532000b411e5f5f3a5d1f0a4a255851"), "GET", null, false);
-        String[] patterns = {
-                "token\\s*=\\s*[\"\\\']([A-Za-z0-9]{16,120})[\"\\\']",
-                "[\"\\\']token[\"\\\']\\s*:\\s*[\"\\\']([A-Za-z0-9]{16,120})[\"\\\']",
-                "token=\\\\?[\"\\\']([A-Za-z0-9]{16,120})[\"\\\']"
-        };
-        for (String pattern : patterns) {
-            Matcher m = Pattern.compile(pattern).matcher(script);
-            if (m.find()) {
-                publicToken = m.group(1);
-                tokenAt = System.currentTimeMillis();
-                if (app != null && app.getCacheDir() != null) {
-                    writeString(new File(app.getCacheDir(), "kodik_tok.dat"), publicToken);
+        try {
+            String script = repo.request(Sec.s("3c07010906694a4c190a10220e5453545618371c18561437014e02091532000b411e5f5f3a5d1f0a4a255851"), "GET", null, false);
+            String[] patterns = {
+                    "token\\s*=\\s*[\"\\\']([A-Za-z0-9]{16,120})[\"\\\']",
+                    "[\"\\\']token[\"\\\']\\s*:\\s*[\"\\\']([A-Za-z0-9]{16,120})[\"\\\']",
+                    "token=\\\\?[\"\\\']([A-Za-z0-9]{16,120})[\"\\\']"
+            };
+            for (String pattern : patterns) {
+                Matcher m = Pattern.compile(pattern).matcher(script);
+                if (m.find()) {
+                    publicToken = m.group(1);
+                    tokenAt = System.currentTimeMillis();
+                    if (app != null && app.getCacheDir() != null) {
+                        writeString(new File(app.getCacheDir(), "kodik_tok.dat"), publicToken);
+                    }
+                    return publicToken;
                 }
+            }
+        } catch (Exception ignored) {}
+        for (String fb : FALLBACK_TOKENS) {
+            if (fb != null && !fb.isEmpty()) {
+                publicToken = fb;
+                tokenAt = System.currentTimeMillis();
                 return publicToken;
             }
         }
@@ -160,6 +176,11 @@ public final class SourceResolver {
                     JSONObject fbRoot = repo.get(fallbackSearch);
                     results = fbRoot.optJSONArray("results");
                 }
+                if ((results == null || results.length() == 0) && !shell.original.isEmpty()) {
+                    String origSearch = repo.query(Sec.s("3c07010906694a4c190a10220e1842591c553b1e5a0a103217001a"), repo.params("token", token(repo), "title", shell.original, Sec.s("231a01112a36150a010a102e16"), "true"));
+                    JSONObject origRoot = repo.get(origSearch);
+                    results = origRoot.optJSONArray("results");
+                }
             } catch (Exception ignored) {}
             String defaultUrl = "";
             try {
@@ -169,55 +190,57 @@ public final class SourceResolver {
                 Anime.Episode ep = new Anime.Episode();
                 ep.id = shell.id + "-" + i;
                 ep.number = i;
-                if (!shell.finished() && (aired > 0 ? i > aired : i > 0)) {
+                boolean isFuture = !shell.finished() && aired > 0 && i > aired;
+                ep.name = "";
+                ep.lazy = Sec.s("3f1c11101e");
+                if (results != null && results.length() > 0) {
+                    HashSet<String> seen = new HashSet<>();
+                    for (int r = 0; r < results.length(); r++) {
+                        JSONObject item = results.optJSONObject(r);
+                        if (item == null) continue;
+                        JSONObject tr = item.optJSONObject("translation");
+                        String voiceName = tr != null ? tr.optString("title", "") : "";
+                        if (voiceName.isEmpty()) voiceName = item.optString("title", "");
+                        if (voiceName.isEmpty()) voiceName = "Озвучка";
+                        String epLink = "";
+                        JSONObject seasons = item.optJSONObject("seasons");
+                        if (seasons != null) {
+                            Iterator<String> sIt = seasons.keys();
+                            while (sIt.hasNext() && epLink.isEmpty()) {
+                                JSONObject sObj = seasons.optJSONObject(sIt.next());
+                                if (sObj != null) {
+                                    JSONObject eps = sObj.optJSONObject("episodes");
+                                    if (eps != null && eps.has(String.valueOf(i))) {
+                                        epLink = eps.optString(String.valueOf(i), "");
+                                    }
+                                }
+                            }
+                        }
+                        if (epLink.isEmpty() && (!isFuture || i == 1)) {
+                            epLink = item.optString("link", "");
+                            if (!epLink.isEmpty() && i > 1 && !epLink.contains("episode=")) {
+                                epLink = Uri.parse(epLink).buildUpon().appendQueryParameter("episode", String.valueOf(i)).build().toString();
+                            }
+                        }
+                        String safe = embed(epLink);
+                        if (!safe.isEmpty() && seen.add(voiceName + "|" + safe)) {
+                            Anime.Variant v = new Anime.Variant(voiceName, "Tsuyu", safe);
+                            v.displayName = voiceName;
+                            ep.variants.add(v);
+                        }
+                    }
+                }
+                if (ep.variants.isEmpty() && !defaultUrl.isEmpty() && (!isFuture || i == 1)) {
+                    ep.resolverUrl = Uri.parse(defaultUrl).buildUpon().appendQueryParameter("episode", String.valueOf(i)).build().toString();
+                    ep.variants.add(new Anime.Variant("Оригинал / Плеер Tsuyu", "Tsuyu", ep.resolverUrl));
+                }
+                if (ep.variants.isEmpty() && isFuture) {
                     ep.future = true;
                     ep.airDate = (i == aired + 1 && !shell.nextEpisodeAt.isEmpty()) ? shell.nextEpisodeAt : "Не вышла";
                     ep.name = ep.airDate;
                     ep.lazy = "future";
                 } else {
-                    ep.name = "";
-                    ep.lazy = Sec.s("3f1c11101e");
-                    if (results != null && results.length() > 0) {
-                        HashSet<String> seen = new HashSet<>();
-                        for (int r = 0; r < results.length(); r++) {
-                            JSONObject item = results.optJSONObject(r);
-                            if (item == null) continue;
-                            JSONObject tr = item.optJSONObject("translation");
-                            String voiceName = tr != null ? tr.optString("title", "") : "";
-                            if (voiceName.isEmpty()) voiceName = item.optString("title", "");
-                            if (voiceName.isEmpty()) voiceName = "Озвучка";
-                            String epLink = "";
-                            JSONObject seasons = item.optJSONObject("seasons");
-                            if (seasons != null) {
-                                Iterator<String> sIt = seasons.keys();
-                                while (sIt.hasNext() && epLink.isEmpty()) {
-                                    JSONObject sObj = seasons.optJSONObject(sIt.next());
-                                    if (sObj != null) {
-                                        JSONObject eps = sObj.optJSONObject("episodes");
-                                        if (eps != null && eps.has(String.valueOf(i))) {
-                                            epLink = eps.optString(String.valueOf(i), "");
-                                        }
-                                    }
-                                }
-                            }
-                            if (epLink.isEmpty()) {
-                                epLink = item.optString("link", "");
-                                if (!epLink.isEmpty() && i > 1 && !epLink.contains("episode=")) {
-                                    epLink = Uri.parse(epLink).buildUpon().appendQueryParameter("episode", String.valueOf(i)).build().toString();
-                                }
-                            }
-                            String safe = embed(epLink);
-                            if (!safe.isEmpty() && seen.add(voiceName + "|" + safe)) {
-                                Anime.Variant v = new Anime.Variant(voiceName, "Tsuyu", safe);
-                                v.displayName = voiceName;
-                                ep.variants.add(v);
-                            }
-                        }
-                    }
-                    if (ep.variants.isEmpty() && !defaultUrl.isEmpty()) {
-                        ep.resolverUrl = Uri.parse(defaultUrl).buildUpon().appendQueryParameter("episode", String.valueOf(i)).build().toString();
-                        ep.variants.add(new Anime.Variant("Оригинал / Плеер Tsuyu", "Tsuyu", ep.resolverUrl));
-                    }
+                    ep.future = false;
                 }
                 shell.episodeList.add(ep);
             }

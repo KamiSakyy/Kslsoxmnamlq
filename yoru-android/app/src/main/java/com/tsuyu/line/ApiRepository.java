@@ -268,16 +268,17 @@ public final class ApiRepository {
         String selected=selectedMode==null||selectedMode.trim().isEmpty()?"auto":selectedMode.trim();
         if(selected.equals("all"))selected="auto";
         if(input!=null&&Sec.s("3c161b0d14").equals(input.source)&&!selected.equals(Sec.s("3c161b0d14")))selected=Sec.s("3c161b0d14");
-        if(input.metadataOnly()||input.episodeList.isEmpty()||countVoices(input)<6)input=details(input,true);
+        Anime fullInput=(input!=null&&(input.metadataOnly()||input.episodeList.isEmpty()||countVoices(input)<6))?details(input,true):input;
+        final Anime targetInput=fullInput!=null?fullInput:input;
         if(!selected.equals("auto")){
-            Anime video=findPlayableSource(input,selected);
-            if(video!=null)return playbackResult(input,video,selected);
-            if(Sec.s("3c161b0d14").equals(selected)||Sec.s("3c161b0d14").equals(input.source))throw new IOException("Просмотр сейчас не вернул серии");
+            Anime video=findPlayableSource(targetInput,selected);
+            if(video!=null)return playbackResult(targetInput,video,selected);
+            if(Sec.s("3c161b0d14").equals(selected)||Sec.s("3c161b0d14").equals(targetInput.source))throw new IOException("Просмотр сейчас не вернул серии");
         }
-        ArrayList<String> order=SourceEngine.playbackOrder(input);
+        ArrayList<String> order=SourceEngine.playbackOrder(targetInput);
         ExecutorService pool=Executors.newFixedThreadPool(Math.max(1,Math.min(6,order.size())));
         CompletionService<Anime.Playback> done=new ExecutorCompletionService<>(pool);
-        for(String source:order){final String src=source;done.submit(()->{Anime video=findPlayableSource(input,src);return video==null?null:playbackResult(input,video,src);});}
+        for(String source:order){final String src=source;done.submit(()->{Anime video=findPlayableSource(targetInput,src);return video==null?null:playbackResult(targetInput,video,src);});}
         long deadline=System.currentTimeMillis()+9500;
         try{for(int i=0;i<order.size();i++){long left=deadline-System.currentTimeMillis();if(left<=0)break;Future<Anime.Playback> f=done.poll(left,TimeUnit.MILLISECONDS);if(f==null)break;try{Anime.Playback r=f.get();if(r!=null)return r;}catch(Exception ignored){}}}finally{pool.shutdownNow();}
         throw new IOException("Tsuyu сейчас не нашёл серии");

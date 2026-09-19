@@ -185,8 +185,8 @@ VPN полностью удалён в YORU 2.9.0. Не возвращать `Vp
 
 - CI: https://github.com/KamiSakyy/Kslsoxmnamlq/actions/runs/35446932224 — success (unit tests, debug/release assembly, Multi-DEX, apksigner verify, лимит веса).
 - Код сборки: `7ab08ea`; APK commit: `cf6150d`.
-- Release: `apk-output/Tsuyu-1.21-release.apk`, SHA-256 `0e78ee5f7c6a58ba0f4d69a4f4a80e2ba4f1b0a4d2b8ba4bbf7a2b56cd0ea4a3` (фактическое значение в `apk-output/Tsuyu-1.21-release.apk.sha256`), 2 220 799 байт — лимит 2,7 МБ не превышен.
-- Debug: `apk-output/Tsuyu-1.21-debug.apk`, 7 435 843 байт. Tsuyu H: `apk-output/TsuyuHentai-1.3-release.apk`, 2 208 511 байт.
+- Release: `apk-output/Tsuyu-1.21-release.apk`, SHA-256 `7add23c9d6bda92df210eb6e7363ef21e188b3a649bff2ba27022dbdad08394c`, 2 220 799 байт — лимит 2,7 МБ не превышен.
+- Debug: `apk-output/Tsuyu-1.21-debug.apk`, 7 435 843 байт. Tsuyu H: `apk-output/TsuyuHentai-1.3-release.apk`, 2 208 511 байт. Их SHA-256 лежат рядом в `apk-output/*.sha256`.
 - Проверено локально: `sha256sum -c` всех трёх APK, `unzip -t`, бинарный манифест (versionName 1.21, следов 1.20 и 1.19 нет, пакет `com.tsuyu.line`), сертификат `530e456eec6762aa371a22a22bb58a6d699d7840e7b41af59ba8e2fea9f3c3e7` совпадает с эталоном владельца и с 1.19/1.20 — обновление встаёт поверх любого из них.
 - Проверено по dex: строки ручного сбора озвучек присутствуют («Найти все озвучки во всех источниках», «озвучек: », «Озвучка и аудиодорожки · »), строка автоматического добора из 1.20 («Найдено ещё озвучек») отсутствует — автосбор действительно удалён, а не только отключён.
 - Сверка с 1.19 по токенам: в `ApiRepository` вне `silentSweep` и нового ручного `refreshAllVoices` отличий ноль, все окна ожидания и пороги дословно прежние.

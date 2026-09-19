@@ -147,3 +147,16 @@ VPN полностью удалён в YORU 2.9.0. Не возвращать `Vp
 - Кэши, их лимиты и алгоритмы не менялись: правки только в порогах полноты списка озвучек и в окнах ожидания источников. `YoruCache` не тронут.
 - Workflow `.github/workflows/build-apk.yml` переведён на ветку текущей сессии `arena/01a0b9c7-kslsoxmnamlq` и на имена артефактов `Tsuyu-1.20-*`; без этого CI не запускался вовсе, потому что ветка сессии отличалась от ветки в триггере.
 - Проверено: `javalang`-разбор всех 55 Java-файлов без ошибок, `data.bin` расшифровывается штатным ключом `Sec`, нативные заглушки `.so` в репозитории пересобираются в CI через `tools/build-native.sh`.
+
+### Проверенная выдача Tsuyu 1.20
+
+- CI: https://github.com/KamiSakyy/Kslsoxmnamlq/actions/runs/35445821241 — success (unit tests, debug/release assembly, Multi-DEX, apksigner verify, лимит веса).
+- Код сборки: `c813596`; APK commit: `21f974c`.
+- Release: `apk-output/Tsuyu-1.20-release.apk`, SHA-256 `34887a6e6e2c9658c2049d8568c8b2642a9b05a46a9d6c7e4c5af6eb95ec522b`, 2 220 799 байт (лимит 2,7 МБ).
+- Debug: `apk-output/Tsuyu-1.20-debug.apk`, SHA-256 `06a09cb6c1de47be2054c1e96697d25eaa20da602c033f8b5029445ff1f5eb57`.
+- Tsuyu H: `apk-output/TsuyuHentai-1.3-release.apk`, SHA-256 `af70cd533c96e05e5ccf589091b1349f5ff71ad46256b2459ae0668a3cb50a4d`.
+- Проверено локально: SHA-256 всех трёх APK, целостность ZIP, бинарный манифест (versionName 1.20, пакеты `com.tsuyu.line`, `com.tsuyu.line.debug`, `com.tsuyu.hentai`), сертификат подписи `530e456eec6762aa371a22a22bb58a6d699d7840e7b41af59ba8e2fea9f3c3e7` совпадает с 1.19 и с эталоном владельца — обновление встаёт поверх. Новые строки добора озвучек присутствуют в dex релизного APK.
+- Исходники: `Tsuyu-1.20-source.zip`, `Tsuyu-1.20-full-source.zip`, `handoff/Tsuyu-1.20-source.zip`, SHA-256 `4de2051b096b57dcc889d0c3a380e59290d4ad2a78de53ed5dc6d191e4f2ff25`.
+- Первая сборка 1.20 упала на `Ui.custom` с четырьмя кнопками (сигнатура принимает три); исправлено отдельной строкой полного поиска внутри диалога. `javalang`-разбор 55 файлов ошибок не дал — разбор не заменяет компиляцию, поэтому проверка только через CI.
+- На физическом устройстве озвучки не проверялись: рост числа дорожек подтверждён только по коду и таймингам, замеров на телефоне не было.
+

@@ -176,16 +176,16 @@ jobs:
       - name: Report APK sizes
         working-directory: .
         run: |
-          release=apk-output/Tsuyu-1.20-release.apk
+          release=apk-output/Tsuyu-1.21-release.apk
           henta=apk-output/TsuyuHentai-1.3-release.apk
-          debug=apk-output/Tsuyu-1.20-debug.apk
+          debug=apk-output/Tsuyu-1.21-debug.apk
           mkdir -p apk-output
           cp yoru-android/app/build/outputs/apk/tsuyu/release/app-tsuyu-release.apk "$release"
           cp yoru-android/app/build/outputs/apk/tsuyu/debug/app-tsuyu-debug.apk "$debug"
           cp yoru-android/app/build/outputs/apk/henta/release/app-henta-release.apk "$henta"
-          rm -f apk-output/Tsuyu-1.20-release.apk.sha256 apk-output/Tsuyu-1.20-debug.apk.sha256 apk-output/TsuyuHentai-1.3-release.apk.sha256
-          sha256sum "$release" > apk-output/Tsuyu-1.20-release.apk.sha256
-          sha256sum "$debug" > apk-output/Tsuyu-1.20-debug.apk.sha256
+          rm -f apk-output/Tsuyu-1.21-release.apk.sha256 apk-output/Tsuyu-1.21-debug.apk.sha256 apk-output/TsuyuHentai-1.3-release.apk.sha256
+          sha256sum "$release" > apk-output/Tsuyu-1.21-release.apk.sha256
+          sha256sum "$debug" > apk-output/Tsuyu-1.21-debug.apk.sha256
           sha256sum "$henta" > apk-output/TsuyuHentai-1.3-release.apk.sha256
           size=$(stat -c %s "$release")
           hsize=$(stat -c %s "$henta")
@@ -212,8 +212,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f apk-output/Tsuyu-1.20-*.apk apk-output/Tsuyu-1.20-*.apk.sha256 apk-output/TsuyuHentai-1.3-*.apk apk-output/TsuyuHentai-1.3-*.apk.sha256
-          git commit -m "Add built Tsuyu 1.20 release APK [skip ci]" || exit 0
+          git add -f apk-output/Tsuyu-1.21-*.apk apk-output/Tsuyu-1.21-*.apk.sha256 apk-output/TsuyuHentai-1.3-*.apk apk-output/TsuyuHentai-1.3-*.apk.sha256
+          git commit -m "Add built Tsuyu 1.21 release APK [skip ci]" || exit 0
           git push origin HEAD:arena/01a0b9c7-kslsoxmnamlq || { sleep 8; git pull --rebase origin arena/01a0b9c7-kslsoxmnamlq; git push origin HEAD:arena/01a0b9c7-kslsoxmnamlq; }
       - name: Diagnose save step
         if: failure()
@@ -237,10 +237,10 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: tsuyu-1.20-release-apk
+          name: tsuyu-1.21-release-apk
           path: |
-            apk-output/Tsuyu-1.20-*.apk
-            apk-output/Tsuyu-1.20-*.apk.sha256
+            apk-output/Tsuyu-1.21-*.apk
+            apk-output/Tsuyu-1.21-*.apk.sha256
             apk-output/TsuyuHentai-1.3-*.apk
             apk-output/TsuyuHentai-1.3-*.apk.sha256
 

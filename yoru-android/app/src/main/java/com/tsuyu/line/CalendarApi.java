@@ -82,7 +82,7 @@ public final class CalendarApi {
     }
 
     private static List<ApiRepository.AiringItem> fetchAiringPage(ApiRepository repo, String status, String order, int page, long now, long start, long end, boolean premiere) throws Exception {
-        String fields = ShikimoriApi.SH_FIELDS + Sec.s("741d10010137070b07161b2e");
+        String fields = ShikimoriApi.SH_FIELDS;
         JSONArray rows = repo.shiki(Sec.s("2f121b101836164b1e0c1922114307001e4635141043") + page + Sec.s("7800011801261659") + JSONObject.quote(status) + Sec.s("781c071d10215f") + order + Sec.s("78101017063c1706165f122a090a571949") + fields + Sec.s("290e")).optJSONArray("animes");
         ArrayList<ApiRepository.AiringItem> out = new ArrayList<>();
         if (rows != null) {

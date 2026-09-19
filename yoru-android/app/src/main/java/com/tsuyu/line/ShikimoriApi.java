@@ -132,7 +132,7 @@ public final class ShikimoriApi {
         a.description = ApiRepository.plain(desc);
         if (a.description.isEmpty()) {
             try {
-                JSONObject rest = new JSONObject(repo.shikiRest(Sec.s("7b1205105a-320b0a1f00-077409105f-59460b6143-5309143400-5e") + id));
+                JSONObject rest = new JSONObject(repo.shikiRest(Sec.s("7b1205105a320b0a1f000764") + id));
                 String rDesc = rest.optString("description_html", rest.optString("description", ""));
                 if (!rDesc.isEmpty() && !rDesc.equals("null")) a.description = ApiRepository.plain(rDesc);
             } catch (Exception ignored) {}
@@ -200,6 +200,13 @@ public final class ShikimoriApi {
             String st = j.optString("status", "");
             if (!st.isEmpty()) a.status = st;
         } catch (Exception ignored) {}
+        if (a.description.isEmpty()) {
+            try {
+                JSONObject rest = new JSONObject(repo.shikiRest(Sec.s("7b1205105a320b0a1f000764") + mal));
+                String rDesc = rest.optString("description_html", rest.optString("description", ""));
+                if (!rDesc.isEmpty() && !rDesc.equals("null")) a.description = ApiRepository.plain(rDesc);
+            } catch (Exception ignored) {}
+        }
     }
 
     public static void enrichVisuals(Anime a, ApiRepository repo) {

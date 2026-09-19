@@ -37,7 +37,81 @@ public final class CalendarScreen extends FrameLayout {
     private void setItems(List<ApiRepository.AiringItem> rows,boolean keepPosition){final int gen=generation;final ArrayList<ApiRepository.AiringItem> fresh=new ArrayList<>();if(rows!=null)for(ApiRepository.AiringItem it:rows)if(it!=null&&it.anime!=null)fresh.add(it);YoruApp.app().io.execute(()->{boolean unavail=!fresh.isEmpty();for(ApiRepository.AiringItem item:fresh)if(!"personal-fallback".equals(item.source)){unavail=false;break;}BucketData d=computeBuckets(fresh);final boolean ua=unavail;YoruApp.app().main.post(()->{if(!alive()||gen!=generation)return;items.clear();items.addAll(fresh);generalUnavailable=ua;buckets.clear();buckets.putAll(d.buckets);filterCounts.clear();filterCounts.putAll(d.counts);bucketsDirty=false;if(selected>=DAYS)selected=-1;rebuildVisible(true);adapter.publish();if(!keepPosition)recycler.scrollToPosition(0);});});}
     private static final class BucketData{final HashMap<String,ArrayList<ArrayList<ApiRepository.AiringItem>>> buckets=new HashMap<>();final HashMap<String,Integer> counts=new HashMap<>();}
     private void refreshBuckets(){final int gen=generation;final ArrayList<ApiRepository.AiringItem> snapshot=new ArrayList<>(items);YoruApp.app().io.execute(()->{BucketData d=computeBuckets(snapshot);YoruApp.app().main.post(()->{if(!alive()||gen!=generation)return;buckets.clear();buckets.putAll(d.buckets);filterCounts.clear();filterCounts.putAll(d.counts);bucketsDirty=false;rebuildVisible(false);adapter.publish();});});}
-    private BucketData computeBuckets(List<ApiRepository.AiringItem> src){BucketData d=new BucketData();for(String[] f:FILTERS){ArrayList<ArrayList<ApiRepository.AiringItem>> days=new ArrayList<>(DAYS);for(int j=0;j<DAYS;j++)days.add(new ArrayList<>());d.buckets.put(f[0],days);d.counts.put(f[0],0);}long now=System.currentTimeMillis(),day0=starts[0];SecureStore store=null;try{store=YoruApp.app().store;}catch(Exception ignored){}boolean personal=store!=null&&store.ready();HashMap<String,Boolean> favMemo=new HashMap<>(),historyMemo=new HashMap<>();HashSet<String> seen=new HashSet<>();for(ApiRepository.AiringItem item:src){if(item==null||item.anime==null)continue;int day=(int)((item.time-day0)/(24L*60*60*1000));if(day<0||day>=DAYS)continue;String aKey=item.anime.key();if(!seen.add(aKey+"|"+item.time+"|"+item.episode+"|"+item.kind))continue;boolean fav=false,history=false;if(personal){Boolean f=favMemo.get(aKey);if(f==null){f=store.favorite(item.anime);favMemo.put(aKey,f);}Boolean h=historyMemo.get(aKey);if(h==null){h=store.progress(item.anime).length()>0;historyMemo.put(aKey,h);}fav=f;history=h;}boolean premiere="Премьера".equals(item.kind);boolean ongoing=item.anime.ongoing()||"Новая серия".equals(item.kind);String at=item.anime.type;boolean film=at!=null&&at.toLowerCase(Locale.ROOT).contains("фильм");putBucket(d,"all",day,item);if(fav)putBucket(d,"fav",day,item);if(!history&&!fav)putBucket(d,"new",day,item);if(item.time>=now)putBucket(d,"soon",day,item);if(premiere)putBucket(d,"premiere",day,item);if(ongoing)putBucket(d,"ongoing",day,item);if(film)putBucket(d,"film",day,item);}for(ArrayList<ArrayList<ApiRepository.AiringItem>> daysList:d.buckets.values()){for(ArrayList<ApiRepository.AiringItem> dayList:daysList){dayList.sort((x,y)->{boolean fa=x.time>=now,fb=y.time>=now;if(fa!=fb)return fa?-1:1;return fa?Long.compare(x.time,y.time):Long.compare(y.time,x.time);});}}if(!personal&&store!=null&&!personalRefreshQueued){personalRefreshQueued=true;final SecureStore st=store;YoruApp.app().io.execute(()->{try{st.preload();}catch(Exception ignored){}YoruApp.app().main.post(()->{personalRefreshQueued=false;if(!alive())return;bucketsDirty=true;refreshBuckets();});});}return d;}
+    private BucketData computeBuckets(List<ApiRepository.AiringItem> src){
+        BucketData d=new BucketData();
+        for(String[] f:FILTERS){
+            ArrayList<ArrayList<ApiRepository.AiringItem>> days=new ArrayList<>(DAYS);
+            for(int j=0;j<DAYS;j++)days.add(new ArrayList<>());
+            d.buckets.put(f[0],days);
+            d.counts.put(f[0],0);
+        }
+        long now=System.currentTimeMillis(),day0=starts[0];
+        SecureStore store=null;
+        try{store=YoruApp.app().store;}catch(Exception ignored){}
+        boolean personal=store!=null&&store.ready();
+        HashSet<String> favKeys=new HashSet<>();
+        HashSet<String> historyKeys=new HashSet<>();
+        if(personal){
+            try{
+                for(Anime a:store.favorites()){
+                    if(a!=null){
+                        favKeys.add(a.key());
+                        if(a.malId>0)favKeys.add("mal:"+a.malId);
+                    }
+                }
+                for(Anime a:store.recent()){
+                    if(a!=null){
+                        historyKeys.add(a.key());
+                        if(a.malId>0)historyKeys.add("mal:"+a.malId);
+                    }
+                }
+            }catch(Exception ignored){}
+        }
+        HashSet<String> seen=new HashSet<>();
+        for(ApiRepository.AiringItem item:src){
+            if(item==null||item.anime==null)continue;
+            int day=(int)((item.time-day0)/(24L*60*60*1000));
+            if(day<0||day>=DAYS)continue;
+            String aKey=item.anime.key();
+            if(!seen.add(aKey+"|"+item.time+"|"+item.episode+"|"+item.kind))continue;
+            boolean fav=personal&&(favKeys.contains(aKey)||(item.anime.malId>0&&favKeys.contains("mal:"+item.anime.malId)));
+            boolean history=personal&&(historyKeys.contains(aKey)||(item.anime.malId>0&&historyKeys.contains("mal:"+item.anime.malId)));
+            boolean premiere="Премьера".equals(item.kind);
+            boolean ongoing=item.anime.ongoing()||"Новая серия".equals(item.kind);
+            String at=item.anime.type;
+            boolean film=at!=null&&at.toLowerCase(Locale.ROOT).contains("фильм");
+            putBucket(d,"all",day,item);
+            if(fav)putBucket(d,"fav",day,item);
+            if(!history&&!fav)putBucket(d,"new",day,item);
+            if(item.time>=now)putBucket(d,"soon",day,item);
+            if(premiere)putBucket(d,"premiere",day,item);
+            if(ongoing)putBucket(d,"ongoing",day,item);
+            if(film)putBucket(d,"film",day,item);
+        }
+        for(ArrayList<ArrayList<ApiRepository.AiringItem>> daysList:d.buckets.values()){
+            for(ArrayList<ApiRepository.AiringItem> dayList:daysList){
+                dayList.sort((x,y)->{
+                    boolean fa=x.time>=now,fb=y.time>=now;
+                    if(fa!=fb)return fa?-1:1;
+                    return fa?Long.compare(x.time,y.time):Long.compare(y.time,x.time);
+                });
+            }
+        }
+        if(!personal&&store!=null&&!personalRefreshQueued){
+            personalRefreshQueued=true;
+            final SecureStore st=store;
+            YoruApp.app().io.execute(()->{
+                try{st.preload();}catch(Exception ignored){}
+                YoruApp.app().main.post(()->{
+                    personalRefreshQueued=false;
+                    if(!alive())return;
+                    bucketsDirty=true;
+                    refreshBuckets();
+                });
+            });
+        }
+        return d;
+    }
     private static void putBucket(BucketData d,String key,int day,ApiRepository.AiringItem item){ArrayList<ArrayList<ApiRepository.AiringItem>> days=d.buckets.get(key);if(days!=null&&day>=0&&day<days.size()){days.get(day).add(item);d.counts.put(key,d.counts.getOrDefault(key,0)+1);}}
     private ArrayList<ApiRepository.AiringItem> dayItems(int day){ArrayList<ArrayList<ApiRepository.AiringItem>> days=buckets.get(filter);ArrayList<ApiRepository.AiringItem> out=new ArrayList<>();if(days==null)return out;if(day<0){for(ArrayList<ApiRepository.AiringItem> d:days)out.addAll(d);}else if(day<days.size())out.addAll(days.get(day));return out;}
     private void rebuildVisible(boolean reset){allRows.clear();allRows.addAll(dayItems(selected));visible.clear();if(reset)shownCount=24;int total=allRows.size(),end=Math.min(shownCount,total);if(end>0)visible.addAll(allRows.subList(0,end));shownCount=end;String tail=end<total?" из "+total:"";state=selected<0?"Все события · "+end+tail:longDays[Math.max(0,Math.min(DAYS-1,selected))]+" · "+end+tail;if(generalUnavailable)state+=" · общее расписание недоступно, показана доступная часть";}
@@ -45,12 +119,12 @@ public final class CalendarScreen extends FrameLayout {
     private int filteredCount(){return countForFilter(filter);}
     private int countForFilter(String key){Integer n=filterCounts.get(key);return n==null?0:n;}
     private int dayCount(String key,int day){ArrayList<ArrayList<ApiRepository.AiringItem>> days=buckets.get(key);return days==null||day<0||day>=days.size()?0:days.get(day).size();}
-    private int kindColor(ApiRepository.AiringItem item){if(item==null)return Ui.PURPLE;if("Премьера".equals(item.kind))return Ui.AMBER;boolean hasAired=item.anime!=null&&(item.anime.finished()||(item.anime.episodesAired>0&&item.anime.episodesAired>=item.episode));if(hasAired)return Ui.EMERALD;if(item.anime!=null&&item.anime.ongoing())return Ui.PURPLE;if(item.time<System.currentTimeMillis())return Ui.EMERALD;return Ui.ZINC4;}
-    private String statusSuffix(ApiRepository.AiringItem item){try{if(item!=null&&item.anime!=null){if(YoruApp.app().store.ready()&&YoruApp.app().store.favorite(item.anime))return " · в коллекции";if(item.anime.year>0)return " · "+item.anime.year;}}catch(Exception ignored){}return "";}
+    private int kindColor(ApiRepository.AiringItem item){if(item==null)return Ui.PURPLE;if("Премьера".equals(item.kind))return Ui.AMBER;if(item.time>System.currentTimeMillis())return Ui.PURPLE;return Ui.EMERALD;}
+    private String statusSuffix(ApiRepository.AiringItem item){if(item==null||item.anime==null)return "";if(item.anime.year>0)return " · "+item.anime.year;return "";}
     private void prepareDays(){long base=todayStart();if(base==starts[0]&&shortDays[0]!=null)return;for(int i=0;i<DAYS;i++){starts[i]=base+i*24L*60*60*1000;Date d=new Date(starts[i]);shortDays[i]=i==0?"Сегодня":i==1?"Завтра":shortDayFormat.format(d).replaceFirst("\\.","");longDays[i]=i==0?"Сегодня":i==1?"Завтра":longDayFormat.format(d);}}
     private long todayStart(){Calendar c=Calendar.getInstance(MSK);c.set(Calendar.HOUR_OF_DAY,0);c.set(Calendar.MINUTE,0);c.set(Calendar.SECOND,0);c.set(Calendar.MILLISECOND,0);return c.getTimeInMillis();}
     private synchronized String time(long t){return timeFormat.format(new Date(t));}
-    private String countdown(ApiRepository.AiringItem item){if(item==null)return "";long t=item.time;long diff=t-System.currentTimeMillis();boolean hasAired=item.anime!=null&&(item.anime.finished()||(item.anime.episodesAired>0&&item.anime.episodesAired>=item.episode));if(hasAired)return "уже вышло";if(diff<=0){if(diff>=-2*60*60*1000L)return "выходит сейчас";return "ожидается выход";}long min=diff/60000,h=min/60,d=h/24;if(d>0)return "через "+d+" д "+(h%24)+" ч";if(h>0)return "через "+h+" ч "+(min%60)+" мин";return "через "+Math.max(1,min)+" мин";}
+    private String countdown(ApiRepository.AiringItem item){if(item==null)return "";long t=item.time;long diff=t-System.currentTimeMillis();if(diff>0){long min=diff/60000,h=min/60,d=h/24;if(d>0)return "через "+d+" д "+(h%24)+" ч";if(h>0)return "через "+h+" ч "+(min%60)+" мин";return "через "+Math.max(1,min)+" мин";}boolean hasAired=item.anime!=null&&(item.anime.finished()||(item.anime.episodesAired>0&&item.anime.episodesAired>=item.episode));if(hasAired||diff<-3*60*60*1000L)return "уже вышло";if(diff>=-2*60*60*1000L)return "выходит сейчас";return "ожидается выход";}
     private final class CalendarEntry {
         final int type;
         final ApiRepository.AiringItem item;
@@ -159,8 +233,11 @@ public final class CalendarScreen extends FrameLayout {
     private final class HeaderView extends LinearLayout {
         final TextView status,all;
         final TextView[] days=new TextView[DAYS],filters=new TextView[FILTERS.length];
+        private final android.graphics.drawable.Drawable activeBg,inactiveBg;
         HeaderView() {
             super(activity);setOrientation(VERTICAL);setPadding(0,Ui.dp(activity,12),0,Ui.dp(activity,10));
+            activeBg=Ui.shape(0xffffffff,999,activity);
+            inactiveBg=Ui.shape(0x0aFFFFFF,999,activity);
             addView(Ui.label(activity,"КАЛЕНДАРЬ Tsuyu"));Ui.space(this,9);addView(Ui.text(activity,"Выход серий",28,Ui.TEXT,true));
             Ui.space(this,7);addView(Ui.text(activity,"Все ближайшие аниме одним списком · время — МСК",12,Ui.MUTED,false));Ui.space(this,12);
             Ui.space(this,13);LinearLayout dayRow=horizontal();
@@ -171,9 +248,23 @@ public final class CalendarScreen extends FrameLayout {
             Ui.space(this,10);status=Ui.text(activity,"",12,Ui.MUTED,false);addView(status);
         }
         LinearLayout horizontal(){HorizontalScrollView scroll=new HorizontalScrollView(activity);scroll.setHorizontalScrollBarEnabled(false);LinearLayout row=Ui.row(activity);scroll.addView(row);addView(scroll,Ui.lp(activity,-1,-2));return row;}
-        TextView chip(LinearLayout row,Runnable click){TextView view=Ui.chip(activity,"",false,click);LinearLayout.LayoutParams p=Ui.lp(activity,-2,-2);p.rightMargin=Ui.dp(activity,7);row.addView(view,p);return view;}
+        TextView chip(LinearLayout row,Runnable click){
+            TextView view=Ui.chip(activity,"",false,click);
+            LinearLayout.LayoutParams p=Ui.lp(activity,-2,-2);
+            p.rightMargin=Ui.dp(activity,7);
+            view.setPadding(Ui.dp(activity,14),Ui.dp(activity,10),Ui.dp(activity,14),Ui.dp(activity,10));
+            row.addView(view,p);
+            return view;
+        }
         void select(){rebuildVisible(true);adapter.publish();recycler.scrollToPosition(0);}
-        void style(TextView view,String value,boolean active){if(!TextUtils.equals(value,view.getText()))view.setText(value);if(view.isSelected()!=active){view.setSelected(active);view.setTextColor(active?0xff09090b:Ui.ZINC);view.setBackground(active?Ui.shape(0xffffffff,999,activity):Ui.shape(0x0aFFFFFF,999,activity));view.setPadding(Ui.dp(activity,14),Ui.dp(activity,10),Ui.dp(activity,14),Ui.dp(activity,10));}}
+        void style(TextView view,String value,boolean active){
+            if(!TextUtils.equals(value,view.getText()))view.setText(value);
+            if(view.isSelected()!=active){
+                view.setSelected(active);
+                view.setTextColor(active?0xff09090b:Ui.ZINC);
+                view.setBackground(active?activeBg:inactiveBg);
+            }
+        }
         void bind(){
             status.setText(state);
             style(all,"Все дни · "+filteredCount(),selected<0);

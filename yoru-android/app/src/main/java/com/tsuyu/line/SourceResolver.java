@@ -146,9 +146,25 @@ public final class SourceResolver {
         }
         if (episodes) {
             int mal = shell.malId > 0 ? shell.malId : CalendarApi.parseInt(shell.id);
-            String url = directKodik(mal, repo);
             int total = Math.max(1, Math.min(250, shell.episodes > 0 ? shell.episodes : (shell.episodesAired > 0 ? shell.episodesAired : (base.episodes > 0 ? base.episodes : (base.episodesAired > 0 ? base.episodesAired : 12)))));
             int aired = shell.episodesAired > 0 ? shell.episodesAired : (base.episodesAired > 0 ? base.episodesAired : (shell.finished() ? total : 0));
+            JSONArray results = null;
+            try {
+                String searchUrl = mal > 0
+                        ? repo.query(Sec.s("3c07010906694a4c190a10220e1842591c553b1e5a0a103217001a"), repo.params("token", token(repo), Sec.s("271b1c121c3e0a111b3a1d2f"), String.valueOf(mal), Sec.s("231a01112a36150a010a102e16"), "true"))
+                        : repo.query(Sec.s("3c07010906694a4c190a10220e1842591c553b1e5a0a103217001a"), repo.params("token", token(repo), "title", shell.title, Sec.s("231a01112a36150a010a102e16"), "true"));
+                JSONObject root = repo.get(searchUrl);
+                results = root.optJSONArray("results");
+                if ((results == null || results.length() == 0) && mal > 0 && !shell.title.isEmpty()) {
+                    String fallbackSearch = repo.query(Sec.s("3c07010906694a4c190a10220e1842591c553b1e5a0a103217001a"), repo.params("token", token(repo), "title", shell.title, Sec.s("231a01112a36150a010a102e16"), "true"));
+                    JSONObject fbRoot = repo.get(fallbackSearch);
+                    results = fbRoot.optJSONArray("results");
+                }
+            } catch (Exception ignored) {}
+            String defaultUrl = "";
+            try {
+                defaultUrl = directKodik(mal, repo);
+            } catch (Exception ignored) {}
             for (int i = 1; i <= total; i++) {
                 Anime.Episode ep = new Anime.Episode();
                 ep.id = shell.id + "-" + i;
@@ -161,8 +177,47 @@ public final class SourceResolver {
                 } else {
                     ep.name = "";
                     ep.lazy = Sec.s("3f1c11101e");
-                    ep.resolverUrl = Uri.parse(url).buildUpon().appendQueryParameter("episode", String.valueOf(i)).build().toString();
-                    ep.variants.add(new Anime.Variant("Оригинал / Плеер Tsuyu", "Tsuyu", ep.resolverUrl));
+                    if (results != null && results.length() > 0) {
+                        HashSet<String> seen = new HashSet<>();
+                        for (int r = 0; r < results.length(); r++) {
+                            JSONObject item = results.optJSONObject(r);
+                            if (item == null) continue;
+                            JSONObject tr = item.optJSONObject("translation");
+                            String voiceName = tr != null ? tr.optString("title", "") : "";
+                            if (voiceName.isEmpty()) voiceName = item.optString("title", "");
+                            if (voiceName.isEmpty()) voiceName = "Озвучка";
+                            String epLink = "";
+                            JSONObject seasons = item.optJSONObject("seasons");
+                            if (seasons != null) {
+                                Iterator<String> sIt = seasons.keys();
+                                while (sIt.hasNext() && epLink.isEmpty()) {
+                                    JSONObject sObj = seasons.optJSONObject(sIt.next());
+                                    if (sObj != null) {
+                                        JSONObject eps = sObj.optJSONObject("episodes");
+                                        if (eps != null && eps.has(String.valueOf(i))) {
+                                            epLink = eps.optString(String.valueOf(i), "");
+                                        }
+                                    }
+                                }
+                            }
+                            if (epLink.isEmpty()) {
+                                epLink = item.optString("link", "");
+                                if (!epLink.isEmpty() && i > 1 && !epLink.contains("episode=")) {
+                                    epLink = Uri.parse(epLink).buildUpon().appendQueryParameter("episode", String.valueOf(i)).build().toString();
+                                }
+                            }
+                            String safe = embed(epLink);
+                            if (!safe.isEmpty() && seen.add(voiceName + "|" + safe)) {
+                                Anime.Variant v = new Anime.Variant(voiceName, "Tsuyu", safe);
+                                v.displayName = voiceName;
+                                ep.variants.add(v);
+                            }
+                        }
+                    }
+                    if (ep.variants.isEmpty() && !defaultUrl.isEmpty()) {
+                        ep.resolverUrl = Uri.parse(defaultUrl).buildUpon().appendQueryParameter("episode", String.valueOf(i)).build().toString();
+                        ep.variants.add(new Anime.Variant("Оригинал / Плеер Tsuyu", "Tsuyu", ep.resolverUrl));
+                    }
                 }
                 shell.episodeList.add(ep);
             }

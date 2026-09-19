@@ -50,6 +50,35 @@ public final class SecureStore {
     private static boolean containsFolder(Collection<String> rows,String value){for(String row:rows)if(sameFolder(row,value))return true;return false;}
     private static ArrayList<String> jsonToList(JSONArray arr){ArrayList<String> out=new ArrayList<>();for(int i=0;arr!=null&&i<arr.length();i++){String f=cleanFolder(arr.optString(i));if(!f.isEmpty())out.add(f);}return out;}
     public synchronized boolean updateFavoriteEpisodes(Anime a,int episodes){ensure();String key=favoriteKey(a);if(!Anime.valid(a)||key.isEmpty())return false;try{JSONObject item=favorites.optJSONObject(key);if(item==null)return false;Anime copy=Anime.from(a.json());int released=Math.max(0,episodes),seen=item.optInt("episodesSeen",0);boolean ongoing=copy.ongoing()||copy.episodes>released;boolean repaired=false;if(ongoing&&released>0&&seen>released){seen=released;repaired=true;}boolean alert=seen>0&&released>seen;if(released>seen||seen<=0||repaired){copy.episodes=Math.max(released,copy.episodes);copy.episodesAired=Math.max(copy.episodesAired,copy.episodes>0?Math.min(copy.episodes,released):released);item.put("release",copy.json());item.put("episodesSeen",repaired?released:Math.max(released,seen));write("favorites",favorites);rebuildFavoriteIndex();}return alert;}catch(Exception e){return false;}}
+    public synchronized void updateFavoriteSchedule(int malId, String nextAt, int aired) {
+        ensure();
+        if (malId <= 0) return;
+        try {
+            Iterator<String> keys = favorites.keys();
+            while (keys.hasNext()) {
+                String k = keys.next();
+                JSONObject obj = favorites.optJSONObject(k);
+                if (obj == null) continue;
+                JSONObject rel = obj.optJSONObject("release");
+                if (rel != null && rel.optInt("malId", 0) == malId) {
+                    boolean changed = false;
+                    if (nextAt != null && !nextAt.isEmpty() && !nextAt.equals(rel.optString("nextEpisodeAt", ""))) {
+                        rel.put("nextEpisodeAt", nextAt);
+                        changed = true;
+                    }
+                    if (aired > 0 && aired != rel.optInt("episodesAired", 0)) {
+                        rel.put("episodesAired", aired);
+                        changed = true;
+                    }
+                    if (changed) {
+                        write("favorites", favorites);
+                        rebuildFavoriteIndex();
+                    }
+                    break;
+                }
+            }
+        } catch (Exception ignored) {}
+    }
     public synchronized int favoriteCount(){ensure();return favorites.length();}
     public synchronized JSONObject progress(Anime a){ensure();String key=historyKey(a);JSONObject j=key.isEmpty()?null:history.optJSONObject(key);return j==null?new JSONObject():j;}
     public synchronized void progress(Anime a,double episode,int seconds,int duration,String mode,String dubbing,boolean tracked){ensure();if(!Anime.valid(a)||episode<0||!Double.isFinite(episode)||privateMode())return;try{String hKey=historyKey(a);if(hKey.isEmpty())hKey=a.key();JSONObject j=new JSONObject().put("release",a.json()).put("episode",episode).put("time",Math.max(0,seconds)).put("duration",Math.max(0,duration)).put("updated",System.currentTimeMillis()).put("tracked",tracked).put("playerMode",mode==null?"":mode).put("dubbing",dubbing==null?"":dubbing);history.put(hKey,j);if(a.episodes>0&&episode>=a.episodes&&!"ongoing".equalsIgnoreCase(a.status)){removeWatch(a);String favKey=favoriteKey(a);JSONObject fav=favKey.isEmpty()?null:favorites.optJSONObject(favKey);if(fav!=null)fav.put("bucket","completed");}if(history.length()>100){String oldest=null;long at=Long.MAX_VALUE;Iterator<String> keys=history.keys();while(keys.hasNext()){String k=keys.next();long t=history.optJSONObject(k).optLong("updated");if(t<at){oldest=k;at=t;}}if(oldest!=null)history.remove(oldest);}write("favorites",favorites);write("history",history);write("settings",settings);try{if(YoruApp.app()!=null&&YoruApp.app().cache!=null)YoruApp.app().cache.progressMirror(hKey,j);}catch(Exception ignored){}rebuildFavoriteIndex();rebuildHistoryIndex();}catch(Exception ignored){}}
